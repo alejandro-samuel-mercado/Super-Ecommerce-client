@@ -329,9 +329,7 @@ export default function ProductDetailPage() {
                 className={`rounded-full border-2 h-12 w-12 transition-all ${isFav ? "border-red-200 bg-red-50 text-red-500 hover:bg-red-100 hover:border-red-300" : "hover:border-primary/50 hover:text-primary"}`}
                 onClick={() => {
                   toggleFavorite(product.id);
-                  toast.success(
-                    isFav ? "Eliminado de favoritos" : "Agregado a favoritos",
-                  );
+                  
                 }}
               >
                 <Heart className={`h-6 w-6 ${isFav ? "fill-current" : ""}`} />
@@ -555,7 +553,7 @@ export default function ProductDetailPage() {
             <div id="main-cta" className="flex flex-col sm:flex-row gap-4 mb-8">
               <Button
                 size="lg"
-                className="flex-1 max-sm:py-4 max-sm:w-80 max-sm:mx-auto rounded-full h-14 text-base font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300"
+                className="flex-1 max-sm:py-4 max-sm:w-60 max-sm:mx-auto rounded-full h-14 text-base font-bold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300"
                 onClick={handleAddToCart}
                 disabled={!currentSku || currentStock === 0}
               >
@@ -565,7 +563,7 @@ export default function ProductDetailPage() {
               <Button
                 size="lg"
                 variant="secondary"
-                className="flex-1 rounded-full h-14 max-sm:py-4 max-sm:w-80 max-sm:mx-auto  text-base font-bold border-2 border-primary/10 hover:border-primary/30 bg-secondary/90 hover:bg-secondary/50 shadow-lg shadow-black/5 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+                className="flex-1 rounded-full h-14 max-sm:py-4 max-sm:w-60 max-sm:mx-auto  text-base font-bold border-2 border-primary/10 hover:border-primary/30 bg-secondary/90 hover:bg-secondary/50 shadow-lg shadow-black/5 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                 onClick={() => {
                   handleBuyNow();
                   window.location.href = "/cart?reloaded=true";

@@ -200,7 +200,7 @@ function ProductsContent() {
   const activeFilterCount = Object.keys(filters).length;
 
   const FilterSidebar = () => (
-    <div className="space-y-6">i
+    <div className="space-y-6  ">
       <div className="">
         <h3 className="font-semibold mb-3 text-foreground">Ordenar Por</h3>
         <Select
@@ -351,18 +351,18 @@ function ProductsContent() {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="left">
+            <SheetContent side="left" className="max-sm:overflow-y-scroll">
               <SheetHeader>
                 <SheetTitle>{productsContent.listing.filters.title}</SheetTitle>
               </SheetHeader>
-              <div className="mt-6">
+              <div className="mt-6 ">
                 <FilterSidebar />
               </div>
             </SheetContent>
           </Sheet>
         </div>
 
-        <div className="w-full flex gap-10">
+        <div className="w-full flex max-md:flex-col gap-10">
           {/* Barra de búsqueda */}
           <div className="mb-10 ">
             <div className="relative w-[50vw] md:w-[70vw] max-md:w-full ">

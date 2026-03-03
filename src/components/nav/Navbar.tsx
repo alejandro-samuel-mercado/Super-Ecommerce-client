@@ -144,7 +144,7 @@ export function Navbar() {
       transition={{ duration: 0.3 }}
       className={`fixed z-50 transition-all duration-300 w-full lg:w-auto ${
         scrolled
-          ? "top-2 lg:top-5 bg-secondary/60 backdrop-blur-md py-2 w-[95%] lg:w-[80%] left-1/2 right-1/2 -ml-[47.5%] lg:-ml-[40%] -mr-[47.5%] lg:-mr-[40%] rounded-[1.5rem] lg:rounded-full shadow-2xl shadow-primary/20"
+          ? "top-2 lg:top-5 bg-secondary/60 backdrop-blur-md py-2 max-sm:py-1 w-[95%] max-sm:w-[90%] max-sm:-ml-[45%] lg:w-[80%] left-1/2 right-1/2 -ml-[47.5%] lg:-ml-[40%] -mr-[47.5%] lg:-mr-[40%] rounded-[1.5rem] lg:rounded-full shadow-2xl shadow-primary/20"
           : "top-0 left-0 right-0 backdrop-blur-xl shadow-md"
       }`}
       onKeyDown={handleKeyDown}
@@ -165,7 +165,7 @@ export function Navbar() {
               <img
                 src={config.logoUrl}
                 alt={config.storeName || navbar.logo.alt}
-                className={scrolled ? "h-8 w-auto" : "h-12 w-auto"}
+                className={scrolled ? "h-8 w-auto" : "h-7 md:h-8 w-auto max-lg:h-10 max-sm:h-8 "}
               />
             ) : (
               navbar.logo.text

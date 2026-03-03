@@ -81,7 +81,7 @@ function LoginContent() {
   };
 
   return (
-    <main className="min-h-screen pb-0 md:h-auto grid lg:grid-cols-2   ">
+    <main className="min-h-screen pb-0 md:h-auto grid lg:grid-cols-2  max-sm:overflow-hidden ">
       {/* Lado decorativo */}
       <div className="hidden lg:flex flex-col justify-between relative overflow-hidden p-16 text-white  ">
         <div className="absolute inset-0 bg-gradient-to-t from-primary via-indigo-600 to-purple-800 opacity-90" />

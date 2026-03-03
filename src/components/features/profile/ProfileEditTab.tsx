@@ -73,7 +73,7 @@ export function ProfileEditTab({ user }: ProfileEditTabProps) {
         method: "PUT",
         body: JSON.stringify(payload),
       });
-      toast.success(profile.profileEdit.successMessage);
+     
       setIsEditing(false);
       await refreshUser();
     } catch (error) {

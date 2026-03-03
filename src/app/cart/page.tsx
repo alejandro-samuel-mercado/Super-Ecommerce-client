@@ -257,7 +257,7 @@ function CartContent() {
     },
   });
 
-  // Auto-calcular envío cuando el método sea "shipping" y tengamos dirección
+  // Auto-calcular envío cuando el método sea "shipping" 
   useEffect(() => {
     if (
       deliveryData.method === "shipping" &&
@@ -643,7 +643,7 @@ function CartContent() {
     createOrderMutation.isPending;
 
   return (
-    <main className="min-h-screen  pb-40 pt-40 md:pt-20 ">
+    <main className="min-h-screen  pb-40 pt-40 md:pt-20 max-sm:top-10 ">
       <div className="container mx-auto px-4 max-w-6xl md:p-20">
         <h1 className="text-4xl font-bold mb-10 text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           {cartContent.title}

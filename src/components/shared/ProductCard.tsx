@@ -78,7 +78,7 @@ export function ProductCard({ product }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     toggleFavorite(product.id);
-    toast.success(isFav ? "Eliminado de favoritos" : "Agregado a favoritos");
+  
   };
 
   return (

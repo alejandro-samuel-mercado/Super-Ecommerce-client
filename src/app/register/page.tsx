@@ -94,7 +94,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen grid lg:grid-cols-2 max-md:pb-20 max-md:pt-10 max-md:bg-gray-300/80 ">
+    <main className="min-h-screen grid lg:grid-cols-2 max-md:pb-20 max-md:pt-10 max-md:bg-gray-300/80 max-sm:overflow-hidden ">
       {/* Lado de búsqueda - Decorativo */}
       <div className="hidden lg:flex flex-col justify-between relative overflow-hidden p-16 text-white bg-black">
         {/* Gradiente de fondo */}
