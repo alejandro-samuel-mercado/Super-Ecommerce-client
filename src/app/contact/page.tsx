@@ -241,7 +241,7 @@ export default function ContactPage() {
       </section>
 
       {/* Separador  */}
-      <div className="absolute left-0 w-full overflow-hidden leading-[0] z-20 ">
+      <div className="relative -top-[1px] left-0 w-full overflow-hidden leading-[0] z-20 ">
         <svg
           data-name="Layer 1"
           xmlns="http://www.w3.org/2000/svg"
@@ -263,9 +263,9 @@ export default function ContactPage() {
       </div>
 
       <div className="max-w-[95%]  max-md:max-w-full pt-20  mx-auto max-sm:px-2 max-md:px-20 max-lg:px-16 px-4 -mt-20 relative z-20">
-        <div className="grid lg:grid-cols-12 gap-10 ">
+      <div className="grid lg:grid-cols-12 gap-10 justify-center ">
           {/* Información de contacto y sucursales */}
-          <div className="lg:col-span-4 space-y-8 ">
+          <div className="lg:col-span-6 xl:col-span-4   space-y-8 ">
             <Card className="p-8 max-sm:px-4 max-md:px-10  max-lg:px-16 rounded-[2.5rem] border-[3px] border-secondary bg-white shadow-[0_20px_60px_-15px_rgba(168,85,247,0.4)] h-full relative overflow-hidden ">
               <div className="absolute top-0 right-0 w-64 h-64 bg-purple-50 rounded-bl-[100px] -z-10 -mr-10 -mt-10"></div>
 
@@ -354,7 +354,7 @@ export default function ContactPage() {
           </div>
 
           {/*  Contact Form */}
-          <div className="lg:col-span-8">
+          <div className=" lg:col-span-6  lg:ml-20 xl:ml-60 xl:-mr-60">
             <Card className="p-8 max-md:px-4 md:p-12 rounded-[2.5rem] border-[3px] border-primary/60 bg-white shadow-[0_20px_60px_-15px_rgba(99,102,241,0.4)] h-full relative overflow-hidden">
               <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50/50 rounded-bl-[150px] -z-10 -mr-20 -mt-20"></div>
 
@@ -369,7 +369,7 @@ export default function ContactPage() {
                     <div className="space-y-3">
                       <Label
                         htmlFor="name"
-                        className="text-xl font-bold ml-1 text-gray-800"
+                        className="text-lg font-bold ml-1 text-gray-800"
                       >
                         Nombre Completo
                       </Label>
@@ -377,7 +377,7 @@ export default function ContactPage() {
                         id="name"
                         {...register("name")}
                         placeholder="Tu nombre"
-                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-xl px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.name ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
+                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.name ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
                       />
                       {errors.name && (
                         <p className="text-red-600 font-bold text-sm ml-2">
@@ -389,7 +389,7 @@ export default function ContactPage() {
                     <div className="space-y-3">
                       <Label
                         htmlFor="email"
-                        className="text-xl font-bold ml-1 text-gray-800"
+                        className="text-lg font-bold ml-1 text-gray-800"
                       >
                         Email
                       </Label>
@@ -398,7 +398,7 @@ export default function ContactPage() {
                         type="email"
                         {...register("email")}
                         placeholder="tucorreo@ejemplo.com"
-                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-xl px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.email ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
+                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.email ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
                       />
                       {errors.email && (
                         <p className="text-red-600 font-bold text-sm ml-2">
@@ -412,7 +412,7 @@ export default function ContactPage() {
                     <div className="space-y-3">
                       <Label
                         htmlFor="phone"
-                        className="text-xl font-bold ml-1 text-gray-800"
+                        className="text-lg font-bold ml-1 text-gray-800"
                       >
                         Teléfono (Opcional)
                       </Label>
@@ -420,13 +420,13 @@ export default function ContactPage() {
                         id="phone"
                         {...register("phone")}
                         placeholder="+54 ..."
-                        className="h-12 rounded-[1.2rem] border-2 border-gray-400 bg-gray-50/50 text-xl px-6 font-medium placeholder:text-gray-400 focus:border-secondary focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all"
+                        className="h-12 rounded-[1.2rem] border-2 border-gray-400 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400 focus:border-secondary focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all"
                       />
                     </div>
                     <div className="space-y-3">
                       <Label
                         htmlFor="subject"
-                        className="text-xl font-bold ml-1 text-gray-800"
+                        className="text-lg font-bold ml-1 text-gray-800"
                       >
                         Asunto
                       </Label>
@@ -434,7 +434,7 @@ export default function ContactPage() {
                         id="subject"
                         {...register("subject")}
                         placeholder="Motivo de consulta"
-                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-xl px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.subject ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
+                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.subject ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
                       />
                       {errors.subject && (
                         <p className="text-red-600 font-bold text-sm ml-2">
@@ -447,7 +447,7 @@ export default function ContactPage() {
                   <div className="space-y-3">
                     <Label
                       htmlFor="message"
-                      className="text-xl font-bold ml-1 text-gray-800"
+                      className="text-lg font-bold ml-1 text-gray-800"
                     >
                       Mensaje
                     </Label>
@@ -455,7 +455,7 @@ export default function ContactPage() {
                       id="message"
                       {...register("message")}
                       rows={6}
-                      className={`w-full rounded-[1.5rem] border-2 bg-gray-50/50 p-6 text-xl font-medium outline-none transition-all placeholder:text-gray-400 focus:bg-white ${
+                      className={`w-full rounded-[1.5rem] border-2 bg-gray-50/50 p-6 text-lg font-medium outline-none transition-all placeholder:text-gray-400 focus:bg-white ${
                         errors.message
                           ? "border-red-500 focus:ring-red-200"
                           : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"
@@ -471,7 +471,7 @@ export default function ContactPage() {
 
                   <Button
                     type="submit"
-                    className="w-full h-20 text-2xl rounded-full bg-gradient-to-r from-secondary/70 to-primary/70 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xl hover:shadow-[0_20px_40px_-10px_rgba(124,58,237,0.5)] hover:-translate-y-1 transition-all font-black"
+                    className="w-full h-20 text-xl rounded-full bg-gradient-to-r from-secondary/70 to-primary/70 hover:from-purple-700 hover:to-indigo-700 text-white shadow-xl hover:shadow-[0_20px_40px_-10px_rgba(124,58,237,0.5)] hover:-translate-y-1 transition-all font-black"
                     disabled={isSubmitting}
                   >
                     {isSubmitting

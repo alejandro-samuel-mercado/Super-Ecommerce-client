@@ -260,7 +260,7 @@ export function Hero() {
       <div
         className={`fixed lg:top-5 z-50 transition-all duration-300 max-sm:w-full   left-0 right-0 ${
           scrolled
-            ? "flex max-sm:w-[80%] max-sm:left-0 max-sm:right-0 max-sm:mx-auto bg-secondary/60 backdrop-blur-md shadow-sm py-3 max-md:py-2 max-sm:py-1 w-[95%] lg:w-[80%] left-1/2 right-1/2 -ml-[47.5%] lg:-ml-[40%] -mr-[47.5%] lg:-mr-[40%] rounded-[1.5rem] lg:rounded-full top-2 max-sm:top-6"
+            ? "flex max-sm:max-w-[90%] max-sm:left-0 max-sm:right-0 max-sm:mx-auto   bg-secondary/60 backdrop-blur-md shadow-sm py-3 max-md:py-2 max-sm:py-1 w-[95%] lg:w-[80%] left-1/2 right-1/2 -ml-[47.5%] lg:-ml-[40%] -mr-[47.5%] lg:-mr-[40%] rounded-[1.5rem] lg:rounded-full top-2 max-sm:top-6"
             : "max-lg:py-3 max-sm:py-1 max-lg:px-4 max-sm:px-1 py-4 max-lg:bg-gradient-to-r from-secondary to-primary lg:left-1/2 lg:right-1/2 lg:-ml-[40%] lg:-mr-[40%] lg:w-[80%]  w-full left-0 right-0 shadow-md lg:shadow-none top-0"
         }`}
       >
@@ -624,7 +624,7 @@ export function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 * index }}
                   whileHover={{ y: -8, scale: 1.02 }}
-                  className="border-2 border-gray-400 bg-primary/80 backdrop-blur-sm shadow-sm rounded-2xl p-6 w-50 "
+                  className="border-2 border-gray-400 bg-primary/80 max-sm:bg-primary/40 backdrop-blur-sm shadow-sm rounded-2xl p-6 w-50 "
                 >
                   <div className="flex flex-col items-center text-center gap-3">
                     <div

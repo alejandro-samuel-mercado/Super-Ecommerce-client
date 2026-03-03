@@ -211,7 +211,7 @@ export default function ProductDetailPage() {
   const averageRating = product?.averageRating || 0;
 
   return (
-    <main className="min-h-screen py-8 pb-40 relative overflow-hidden pt-28 max-md:pt-20 max-sm:pt-16">
+    <main className="min-h-screen py-8 pb-40 relative overflow-hidden pt-28 max-md:pt-20 max-sm:pt-8">
       {/* Blobs decorativos */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>
@@ -316,7 +316,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Información del producto */}
-          <div className="bg-primary/20 backdrop-blur-xl border border-white/40 rounded-[2rem] p-8  max-md:p-16 max-sm:p-10 lg:p-10 shadow-xl shadow-primary/5 relative">
+          <div className="bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-xl  border border-white/40 rounded-[2rem] p-8  max-md:p-16 max-sm:p-10 lg:p-10 shadow-xl shadow-primary/5 relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-bl-[100px] rounded-tr-[2rem] -z-10"></div>
 
             <div className="flex items-start justify-between mb-6">
