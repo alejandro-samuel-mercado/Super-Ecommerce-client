@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,17 +28,17 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-  AlertCircle,
-  Award,
-  Check,
-  Loader2,
-  MapPin,
-  Minus,
-  Plus,
-  ShieldCheck,
-  Tag,
-  Trash2,
-  User,
+    AlertCircle,
+    Award,
+    Check,
+    Loader2,
+    MapPin,
+    Minus,
+    Plus,
+    ShieldCheck,
+    Tag,
+    Trash2,
+    User,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -105,16 +105,16 @@ function CartContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
- 
-  if (
-    typeof window !== "undefined" &&
-    searchParams.get("reloaded") !== "true"
-  ) {
-    const params = new URLSearchParams(window.location.search);
-    params.set("reloaded", "true");
-    window.location.replace(`${window.location.pathname}?${params.toString()}`);
-    return null;
-  }
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      searchParams.get("reloaded") !== "true"
+    ) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("reloaded", "true");
+      window.location.replace(`${window.location.pathname}?${params.toString()}`);
+    }
+  }, [searchParams]);
 
   const { user, isLoading: isAuthLoading } = useAuth();
 

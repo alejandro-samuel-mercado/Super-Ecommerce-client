@@ -11,20 +11,27 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PublicConfig, configService } from "@/services/config";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Calendar,
-  Gift,
-  Heart,
-  LogOut,
-  Mail,
-  MapPin,
-  MessageSquare,
-  Package,
-  User as UserIcon,
+    Gift,
+    Heart,
+    LogOut,
+    Mail,
+    MapPin,
+    MessageSquare,
+    Package,
+    User as UserIcon
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function ProfilePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><div className="h-12 w-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>}>
+      <ProfileContent />
+    </Suspense>
+  );
+}
+
+function ProfileContent() {
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();

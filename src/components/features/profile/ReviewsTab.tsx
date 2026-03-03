@@ -86,7 +86,7 @@ export function ReviewsTab() {
                 {comment.approved ? "Aprobado" : "Pendiente"}
               </span>
             </div>
-            <p className="text-gray-600 mt-4 italic">"{comment.content}"</p>
+            <p className="text-gray-600 mt-4 italic">&quot;{comment.content}&quot;</p>
             <p className="text-xs text-muted-foreground mt-4">
               Publicado el {new Date(comment.createdAt).toLocaleDateString()}
             </p>

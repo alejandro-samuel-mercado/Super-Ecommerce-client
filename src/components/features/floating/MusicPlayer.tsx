@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { Music, Pause, Play, SkipBack, SkipForward } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -11,7 +11,7 @@ export function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const tracks = [
+  const tracks = useMemo(() => [
     {
       title: "Ambient Flow",
       artist: "Free",
@@ -27,7 +27,7 @@ export function MusicPlayer() {
       artist: "Free",
       src: "/tracks/track3.mp3",
     },
-  ];
+  ], []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const track = tracks[currentIndex];
@@ -40,7 +40,7 @@ export function MusicPlayer() {
     return () => {
       audioRef.current?.pause();
     };
-  }, []);
+  }, [tracks]);
 
   useEffect(() => {
     if (!audioRef.current) return;
@@ -51,7 +51,7 @@ export function MusicPlayer() {
     if (isPlaying) {
       audioRef.current.play().catch(console.error);
     }
-  }, [track]);
+  }, [track, isPlaying]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;

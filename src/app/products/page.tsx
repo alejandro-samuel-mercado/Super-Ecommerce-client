@@ -9,19 +9,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
 } from "@/components/ui/sheet";
 import { formatPrice } from "@/lib/utils";
 import { productService } from "@/services/products";
@@ -31,7 +31,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Filter, Search, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 interface Filters {
   sort?: string;
@@ -45,6 +45,14 @@ interface Filters {
 }
 
 export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>}>
+      <ProductsContent />
+    </Suspense>
+  );
+}
+
+function ProductsContent() {
   const { currency } = useCurrencyStore();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -73,7 +81,7 @@ export default function ProductsPage() {
     fetchFilterData();
   }, []);
 
-  // Inicializar filtros desde la URL (Leer TODOS los parámetros)
+
   useEffect(() => {
     const urlFilters: Record<string, any> = {};
     searchParams.forEach((value, key) => {
@@ -91,7 +99,7 @@ export default function ProductsPage() {
       }
     });
     setFilters(urlFilters);
-    // Sincronizar el input de búsqueda con la URL
+    
     setSearchInput(urlFilters.search || "");
   }, [searchParams]);
 

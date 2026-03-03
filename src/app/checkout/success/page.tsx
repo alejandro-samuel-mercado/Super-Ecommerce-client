@@ -8,10 +8,18 @@ import { motion } from "framer-motion";
 import { Check, Download, Home, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-foreground font-mono"><div className="flex flex-col items-center gap-4"><div className="h-12 w-12 border-2 border-primary/20 border-t-primary rounded-full animate-spin" /><p className="tracking-[0.2em] uppercase text-xs text-primary font-bold">Cargando...</p></div></div>}>
+      <CheckoutSuccessContent />
+    </Suspense>
+  );
+}
+
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const clearCart = useCartStore((state) => state.clearCart);
@@ -20,51 +28,8 @@ export default function CheckoutSuccessPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  useEffect(() => {
-    const isMP =
-      searchParams.has("collection_id") ||
-      searchParams.has("preference_id") ||
-      searchParams.has("payment_id") ||
-      searchParams.has("merchant_order_id");
-    const isStripe = searchParams.has("session_id");
-    const isPayPal =
-      (searchParams.has("token") && searchParams.has("PayerID")) ||
-      searchParams.has("paymentId");
 
-    const saleId =
-      searchParams.get("saleId") || searchParams.get("external_reference");
-    const isValidRedirect = isMP || isStripe || isPayPal;
-/*
-    if (!isValidRedirect && !saleId) {
-      router.replace("/");
-      return;
-    }*/
-
-    const fetchOrderDetails = async () => {
-      try {
-        if (saleId) {
-          const data = await orderService.getById(saleId);
-          // Mapeo preventivo para compatibilidad con el Backend
-          const mappedData = {
-            ...data,
-            tax: data.taxAmount || 0,
-            shipping: data.shippingCost || 0,
-          };
-          setSale(mappedData);
-          clearCart();
-          setTimeout(() => handleDownloadInvoice(data.id), 2000);
-        }
-      } catch (error) {
-        toast.error("Error al cargar detalles de la orden");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchOrderDetails();
-  }, [searchParams, clearCart, router]);
-
-  const handleDownloadInvoice = async (id?: string) => {
+  const handleDownloadInvoice = useCallback(async (id?: string) => {
     const saleId = id || sale?.id || sale?.uuid;
     if (!saleId) return;
 
@@ -94,7 +59,53 @@ export default function CheckoutSuccessPage() {
     } finally {
       setIsDownloading(false);
     }
-  };
+  }, [sale]);
+
+  
+  useEffect(() => {
+    const isMP =
+      searchParams.has("collection_id") ||
+      searchParams.has("preference_id") ||
+      searchParams.has("payment_id") ||
+      searchParams.has("merchant_order_id");
+    const isStripe = searchParams.has("session_id");
+    const isPayPal =
+      (searchParams.has("token") && searchParams.has("PayerID")) ||
+      searchParams.has("paymentId");
+
+    const saleId =
+      searchParams.get("saleId") || searchParams.get("external_reference");
+    const isValidRedirect = isMP || isStripe || isPayPal;
+
+    if (!isValidRedirect && !saleId) {
+      router.replace("/");
+      return;
+    }
+
+    const fetchOrderDetails = async () => {
+      try {
+        if (saleId) {
+          const data = await orderService.getById(saleId);
+          // Mapeo preventivo para compatibilidad con el Backend
+          const mappedData = {
+            ...data,
+            tax: data.taxAmount || 0,
+            shipping: data.shippingCost || 0,
+          };
+          setSale(mappedData);
+          clearCart();
+          setTimeout(() => handleDownloadInvoice(data.id), 2000);
+        }
+      } catch (error) {
+        toast.error("Error al cargar detalles de la orden");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrderDetails();
+  }, [searchParams, clearCart, router, handleDownloadInvoice]);
+
 
   if (isLoading) {
     return (

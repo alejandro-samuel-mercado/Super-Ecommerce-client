@@ -13,18 +13,18 @@ import { useUIStore } from "@/store/ui";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-   ChevronLeft,
-   ChevronRight,
-   Headphones,
-   Heart,
-   Menu,
-   Package,
-   Search,
-   ShieldCheck,
-   ShoppingCart,
-   Truck,
-   User,
-   X
+    ChevronLeft,
+    ChevronRight,
+    Headphones,
+    Heart,
+    Menu,
+    Package,
+    Search,
+    ShieldCheck,
+    ShoppingCart,
+    Truck,
+    User,
+    X
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -412,7 +412,7 @@ export function Hero() {
                             className="text-xs text-primary hover:underline font-semibold block w-full py-1"
                             onClick={() => setShowSearchResults(false)}
                           >
-                            Ver todos los resultados para "{searchQuery}"
+                            Ver todos los resultados para &quot;{searchQuery}&quot;
                           </Link>
                         </div>
                       </>

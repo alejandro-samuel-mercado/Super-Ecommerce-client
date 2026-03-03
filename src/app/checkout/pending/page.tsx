@@ -6,9 +6,17 @@ import { motion } from "framer-motion";
 import { Clock, Eye } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function CheckoutPendingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-foreground font-mono"><div className="h-12 w-12 border-2 border-primary/20 border-t-primary rounded-full animate-spin" /></div>}>
+      <CheckoutPendingContent />
+    </Suspense>
+  );
+}
+
+function CheckoutPendingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const saleId =
@@ -24,13 +32,13 @@ export default function CheckoutPendingPage() {
       searchParams.has("status") ||
       searchParams.has("external_reference");
 
-      /*
+   
     if (!hasPaymentParams) {
       router.replace("/");
-    } else {*/
+    } else {
       setIsValidating(false);
       clearCart();
-    
+  }
   }, [clearCart, searchParams, router]);
 
   if (isValidating) {

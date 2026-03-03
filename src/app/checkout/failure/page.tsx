@@ -5,9 +5,17 @@ import { motion } from "framer-motion";
 import { Home, RefreshCcw, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function CheckoutFailurePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-foreground font-mono"><div className="h-12 w-12 border-2 border-primary/20 border-t-primary rounded-full animate-spin" /></div>}>
+      <CheckoutFailureContent />
+    </Suspense>
+  );
+}
+
+function CheckoutFailureContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isValidating, setIsValidating] = useState(true);
@@ -20,11 +28,11 @@ export default function CheckoutFailurePage() {
       searchParams.has("collection_status");
 
 
-   /* if (!hasPaymentParams) {
+   if (!hasPaymentParams) {
       router.replace("/");
-    } else {*/
+    } else {
       setIsValidating(false);
-    
+  }
 
 
   }, [searchParams, router]);
