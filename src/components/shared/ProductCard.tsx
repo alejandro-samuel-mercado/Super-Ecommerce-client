@@ -84,7 +84,7 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={isOutOfStock ? "#" : `/products/${product.id}`}
-      className={`group block sm:border-none shadow-2xl rounded-2xl p-2 border-b border-primary pb-6 ${isOutOfStock ? "opacity-75 cursor-not-allowed" : ""}`}
+      className={`group block bg-card/30 max-sm:bg-card/80 sm:border-none shadow-2xl rounded-2xl p-2 border-b border-primary pb-6 ${isOutOfStock ? "opacity-75 cursor-not-allowed" : ""}`}
       onClick={handleCardClick}
     >
       <div

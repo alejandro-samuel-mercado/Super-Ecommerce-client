@@ -51,7 +51,7 @@ export function FloatingChat() {
         setIsTyping(false);
         setMessages((prev) => [...prev, msg]);
 
-        // Guardar ID si se proporciona (desde la primera respuesta del bot, etc.)
+       
         if (msg.conversationId) {
           localStorage.setItem(
             "chat_conversation_id",
@@ -92,7 +92,6 @@ export function FloatingChat() {
   const handleSend = () => {
     if (!input.trim() || !socket) return;
 
-    // Actualización optimista
     setMessages((prev) => [...prev, { sender: "USER", text: input }]);
 
     socket.emit("client_message", { text: input });
