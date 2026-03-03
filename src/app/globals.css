@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* User-specified Palette: Purple, Coral, Peach, Yellow, Cream */
+    --background: 60 100% 96%; 
+    --foreground: 320 35% 25%; 
+    
+    --card: 60 100% 98%;
+    --card-foreground: 320 35% 25%;
+    
+    --popover: 60 100% 98%;
+    --popover-foreground: 320 35% 25%;
+    
+    --primary: 324 39% 51%; 
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary:  270 91% 65%; 
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 48 81% 76%; 
+    --muted-foreground: 320 20% 40%;
+    
+    --accent: 32 91% 76%; 
+    --accent-foreground: 320 35% 25%;
+    
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 48 60% 85%;
+    --input: 48 60% 90%;
+    --ring: 324 39% 51%;
+    
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 320 30% 12%;
+    --foreground: 60 100% 95%;
+    
+    --card: 320 25% 15%;
+    --card-foreground: 60 100% 95%;
+    
+    --popover: 320 25% 15%;
+    --popover-foreground: 60 100% 95%;
+    
+    --primary: 324 39% 51%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary:#a855f7;
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 320 20% 22%;
+    --muted-foreground: 48 40% 70%;
+    
+    --accent: 32 70% 50%;
+    --accent-foreground: 60 100% 95%;
+    
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 60 100% 95%;
+    
+    --border: 320 20% 22%;
+    --input: 320 20% 22%;
+    --ring: 324 39% 51%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply text-foreground;
+    background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(180 100% 97%) 40%, hsl(200 100% 95%) 100%);
+    min-height: 100vh;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .soft-shadow {
+    box-shadow: 0 4px 20px hsla(324, 39%, 51%, 0.08), 0 1px 4px hsla(0, 0%, 0%, 0.05);
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+  }
+}
