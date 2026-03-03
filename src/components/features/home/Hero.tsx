@@ -13,18 +13,18 @@ import { useUIStore } from "@/store/ui";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    ChevronLeft,
-    ChevronRight,
-    Headphones,
-    Heart,
-    Menu,
-    Package,
-    Search,
-    ShieldCheck,
-    ShoppingCart,
-    Truck,
-    User,
-    X
+   ChevronLeft,
+   ChevronRight,
+   Headphones,
+   Heart,
+   Menu,
+   Package,
+   Search,
+   ShieldCheck,
+   ShoppingCart,
+   Truck,
+   User,
+   X
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -222,7 +222,7 @@ export function Hero() {
           {category.name}
         </Link>
         {hasChildren && (
-          <ul className="space-y-1 ml-1 pl-2 border-l border-muted">
+          <ul className="space-y-1 ml-1 pl-2 border-l border-border">
             {category.children.map((child: any) => (
               <li key={child.id}>
                 <Link
@@ -318,7 +318,7 @@ export function Hero() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 mt-2 bg-white/95 backdrop-blur-md shadow-xl rounded-xl p-6 w-[800px] soft-shadow border border-muted z-50"
+                      className="absolute top-full left-0 mt-2 bg-white/95 backdrop-blur-md shadow-xl rounded-xl p-6 w-[800px] soft-shadow border border-border z-50"
                     >
                       <div className="grid grid-cols-4 gap-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
                         {categoriesTree.length > 0 ? (
@@ -435,7 +435,7 @@ export function Hero() {
                 Productos
               </Link>
               <Link
-                href="/products?esTendencia=true"
+                href="/products?isTrending=true"
                 className="text-sm font-semibold text-white hover:bg-white px-2 py-2 rounded-full hover:text-gray-900 transition-all"
               >
                 Tendencias

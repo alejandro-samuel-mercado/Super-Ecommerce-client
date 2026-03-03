@@ -46,7 +46,7 @@ export function Navbar() {
           {category.name}
         </Link>
         {hasChildren && (
-          <ul className="space-y-1 ml-1 pl-2 border-l border-muted">
+          <ul className="space-y-1 ml-1 pl-2 border-l border-border">
             {category.children.map((child: any) => (
               <li key={child.id}>
                 <Link
@@ -205,7 +205,7 @@ export function Navbar() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full left-0 mt-2 bg-white/95 backdrop-blur-md shadow-xl rounded-xl p-6 w-[800px] soft-shadow border border-muted z-50"
+                    className="absolute top-full left-0 mt-2 bg-white/95 backdrop-blur-md shadow-xl rounded-xl p-6 w-[800px] soft-shadow border border-border z-50"
                   >
                     <div className="grid grid-cols-4 gap-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
                       {categoriesTree.length > 0 ? (
@@ -232,13 +232,13 @@ export function Navbar() {
             </div>
 
             <Link
-              href="/products?tendencia=true"
+              href="/products?isTrending=true"
               className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${scrolled ? "text-white hover:bg-white hover:text-gray-700" : "text-foreground hover:bg-secondary/60 hover:text-white"}`}
             >
               Tendencias
             </Link>
             <Link
-              href="/products?esNuevo=true"
+              href="/products?isNew=true"
               className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all  ${scrolled ? "text-white hover:bg-white hover:text-gray-700" : "text-foreground hover:bg-secondary/60 hover:text-white"}`}
             >
               Nuevos

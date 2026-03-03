@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    /* User-specified Palette: Purple, Coral, Peach, Yellow, Cream */
-    --background: 60 100% 96%; 
+    
+    --background: 270 40% 97%; 
     --foreground: 320 35% 25%; 
     
     --card: 60 100% 98%;
@@ -29,7 +29,7 @@
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 48 60% 85%;
+    --border: 220 14% 84%;
     --input: 48 60% 90%;
     --ring: 324 39% 51%;
     

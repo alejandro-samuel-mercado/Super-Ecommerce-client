@@ -114,7 +114,7 @@ const {user}= useAuth()
             </div>
 
             <Link
-              href="/products?tendencia=true"
+              href="/products?isTrending=true"
               onClick={closeMobileMenu}
               className="flex justify-between items-center text-3xl max-sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-all py-2"
             >
@@ -123,7 +123,7 @@ const {user}= useAuth()
             </Link>
 
             <Link
-              href="/products?esNuevo=true"
+              href="/products?isNew=true"
               onClick={closeMobileMenu}
               className="flex justify-between items-center text-3xl max-sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-all py-2"
             >

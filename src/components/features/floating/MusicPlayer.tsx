@@ -7,9 +7,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 export function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isTouchRef = useRef(false);
 
   const tracks = useMemo(() => [
     {
@@ -66,36 +67,43 @@ export function MusicPlayer() {
   };
 
   const handleMouseEnter = () => {
+    if (isTouchRef.current) return;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setIsHovered(true);
+    setIsExpanded(true);
   };
 
   const handleMouseLeave = () => {
+    if (isTouchRef.current) return;
     timeoutRef.current = setTimeout(() => {
-      setIsHovered(false);
+      setIsExpanded(false);
     }, 300);
+  };
+
+  const handleDiscClick = () => {
+    isTouchRef.current = true;
+    setIsExpanded((prev) => !prev);
   };
 
   return (
     <div className="fixed bottom-6 left-6 z-40 flex items-end">
       <motion.div
         initial={{ width: "3.5rem" }}
-        animate={{ width: isHovered ? "auto" : "3.5rem" }}
+        animate={{ width: isExpanded ? "auto" : "3.5rem" }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className="bg-black/90 backdrop-blur-xl rounded-full shadow-2xl flex items-center p-1.5 border border-white/10 overflow-hidden cursor-pointer"
       >
         <div
+          onClick={handleDiscClick}
           className={`relative flex items-center justify-center h-11 w-11 shrink-0 rounded-full ${isPlaying ? "animate-spin-slow" : ""}`}
         >
-          {/* Icono del álbum */}
           <div className="absolute inset-0 bg-gradient-to-tr from-primary to-secondary rounded-full opacity-80"></div>
           <Music className="w-5 h-5 text-white relative z-10" />
         </div>
 
         <AnimatePresence>
-          {isHovered && (
+          {isExpanded && (
             <motion.div
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: "auto" }}
@@ -157,7 +165,7 @@ export function MusicPlayer() {
         </AnimatePresence>
 
         {/* Barras del visualizador (simuladas) */}
-        {isPlaying && !isHovered && (
+        {isPlaying && !isExpanded && (
           <div className="flex gap-0.5 items-end h-4 ml-2 mr-2">
             <motion.div
               animate={{ height: [4, 12, 6] }}

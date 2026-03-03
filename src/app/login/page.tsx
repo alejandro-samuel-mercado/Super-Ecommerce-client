@@ -152,8 +152,8 @@ function LoginContent() {
             </Button>
 
             <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+              <div className="absolute inset-0 flex items-center ">
+                <span className="w-full border-t " />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="px-2 text-muted-foreground">
@@ -172,7 +172,7 @@ function LoginContent() {
                   type="email"
                   {...register("email")}
                   placeholder={auth.login.emailPlaceholder}
-                  className={`rounded-xl h-14 border-2 bg-muted/20 focus:bg-background transition-all ${errors.email ? "border-destructive" : "border-muted hover:border-primary/40 focus:border-primary"}`}
+                  className={`rounded-xl h-14 border-2 bg-muted/20 focus:bg-background transition-all ${errors.email ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive ml-1">
@@ -198,7 +198,7 @@ function LoginContent() {
                   type="password"
                   {...register("password")}
                   placeholder={auth.login.passwordPlaceholder}
-                  className={`rounded-xl h-14 border-2 bg-muted/20 focus:bg-background transition-all ${errors.password ? "border-destructive" : "border-muted hover:border-primary/40 focus:border-primary"}`}
+                  className={`rounded-xl h-14 border-2 bg-muted/20 focus:bg-background transition-all ${errors.password ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                 />
                 {errors.password && (
                   <p className="text-sm text-destructive ml-1">

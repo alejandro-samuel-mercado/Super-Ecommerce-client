@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,17 +28,17 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-    AlertCircle,
-    Award,
-    Check,
-    Loader2,
-    MapPin,
-    Minus,
-    Plus,
-    ShieldCheck,
-    Tag,
-    Trash2,
-    User,
+   AlertCircle,
+   Award,
+   Check,
+   Loader2,
+   MapPin,
+   Minus,
+   Plus,
+   ShieldCheck,
+   Tag,
+   Trash2,
+   User,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -677,7 +677,7 @@ function CartContent() {
                         ? "bg-gradient-to-r from-primary to-secondary text-white scale-110"
                         : isActive
                           ? "bg-gradient-to-r from-primary to-secondary text-white scale-125 ring-4 ring-primary/20"
-                          : "bg-white text-muted-foreground border-2 border-muted"
+                          : "bg-white text-muted-foreground border-2 border-border"
                     }`}
                   >
                     {isCompleted ? <Check className="h-5 w-5" /> : step.id}
@@ -1345,7 +1345,7 @@ function CartContent() {
                         className={`flex items-start space-x-3 p-6 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-lg ${
                           deliveryData.method === "pickup"
                             ? "border-primary bg-primary/5 shadow-primary/10"
-                            : "border-muted bg-white/50 hover:border-primary/40"
+                            : "border-border bg-white/50 hover:border-primary/40"
                         }`}
                       >
                         <RadioGroupItem
@@ -1372,7 +1372,7 @@ function CartContent() {
                           className={`flex items-start space-x-3 p-6 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-lg ${
                             deliveryData.method === "shipping"
                               ? "border-primary bg-primary/5 shadow-primary/10"
-                              : "border-muted bg-white/50 hover:border-primary/40"
+                              : "border-border bg-white/50 hover:border-primary/40"
                           }`}
                         >
                           <RadioGroupItem
@@ -1529,7 +1529,7 @@ function CartContent() {
                                 className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
                                   selectedGateway === option.slug
                                     ? "border-primary bg-primary/5 shadow-primary/10"
-                                    : "border-muted bg-white/50 hover:border-primary/30"
+                                    : "border-border bg-white/50 hover:border-primary/30"
                                 }`}
                               >
                                 <div className="flex items-center gap-3">

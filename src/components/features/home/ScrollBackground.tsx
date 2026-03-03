@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 export function ScrollBackground() {
   const { scrollYProgress } = useScroll();
 
-  // Transformar el progreso de scroll en diferentes valores para varios efectos
+ 
   const opacity = useTransform(
     scrollYProgress,
     [0, 0.3, 0.7, 1],
@@ -19,7 +19,7 @@ export function ScrollBackground() {
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
       {/* Gradiente de Fondo */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-blue-100/80 via-purple-100/80 to-pink-100/80"
+        className="absolute inset-0 bg-gradient-to-bl from-primary/20 via-white to-secondary/30"
         style={{ opacity }}
       />
 

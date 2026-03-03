@@ -9,19 +9,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
+   Sheet,
+   SheetContent,
+   SheetHeader,
+   SheetTitle,
+   SheetTrigger,
 } from "@/components/ui/sheet";
 import { formatPrice } from "@/lib/utils";
 import { productService } from "@/services/products";
@@ -365,7 +365,7 @@ function ProductsContent() {
         <div className="w-full flex max-md:flex-col gap-10">
           {/* Barra de búsqueda */}
           <div className="mb-10 ">
-            <div className="relative w-[50vw] md:w-[70vw] max-md:w-full ">
+            <div className="relative w-[60vw] md:w-[40vw] max-md:w-full ">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-xl"></div>
               <div className="relative bg-white/80 backdrop-blur-md border-2 border-white/60 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-primary" />
@@ -406,7 +406,8 @@ function ProductsContent() {
                 if (key === "search") label = `Búsqueda: "${value}"`;
                 if (key === "freeShipping") label = "Envío Gratis";
                 if (key === "inStock") label = "Solo en Stock";
-
+                if (key === "isNew") label = "Nuevos";
+                if (key === "isTrending") label = "Tendencias";
                 return (
                   <motion.div
                     key={key}
@@ -452,13 +453,13 @@ function ProductsContent() {
               className="sticky top-24"
             >
               <div className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 border-4 border-gray-200 rounded-[2rem] p-6 shadow-2xl shadow-primary/70">
-                <div className="mb-6">
+                <div className="mb-6 0">
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
                     {productsContent.listing.filters.title}
                   </h2>
                   <div className="h-1 w-20 bg-gradient-to-r from-primary to-secondary rounded-full"></div>
                 </div>
-                <div>
+                <div className="">
                   <FilterSidebar />
                 </div>
               </div>
@@ -504,7 +505,7 @@ function ProductsContent() {
                       size="icon"
                       disabled={page === 1}
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      className="rounded-full w-10 h-10 border-muted-foreground/20"
+                      className="rounded-full w-10 h-10 border-border-foreground/20"
                     >
                       ←
                     </Button>
@@ -543,7 +544,7 @@ function ProductsContent() {
                       onClick={() =>
                         setPage((p) => Math.min(data.totalPages, p + 1))
                       }
-                      className="rounded-full w-10 h-10 border-muted-foreground/20"
+                      className="rounded-full w-10 h-10 border-border-foreground/20"
                     >
                       →
                     </Button>

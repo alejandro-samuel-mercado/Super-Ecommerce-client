@@ -145,7 +145,7 @@ export default function RegisterPage() {
           <div className="space-y-6">
             <Button
               variant="outline"
-              className="w-full rounded-full h-14 hover:bg-muted/50 border-2 border-muted hover:border-primary/20 bg-background transition-all font-medium text-base relative overflow-hidden group"
+              className="w-full rounded-full h-14 hover:bg-muted/50 border-2 border-border hover:border-primary/20 bg-background transition-all font-medium text-base relative overflow-hidden group"
               onClick={() => loginWithGoogle()}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -193,7 +193,7 @@ export default function RegisterPage() {
                     id="firstName"
                     {...register("firstName")}
                     placeholder={auth.register.firstNamePlaceholder}
-                    className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.firstName ? "border-destructive" : "border-muted hover:border-primary/40 focus:border-primary"}`}
+                    className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.firstName ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                   />
                   {errors.firstName && (
                     <p className="text-sm text-destructive ml-1">
@@ -210,7 +210,7 @@ export default function RegisterPage() {
                     id="lastName"
                     {...register("lastName")}
                     placeholder={auth.register.lastNamePlaceholder}
-                    className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.lastName ? "border-destructive" : "border-muted hover:border-primary/40 focus:border-primary"}`}
+                    className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.lastName ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                   />
                   {errors.lastName && (
                     <p className="text-sm text-destructive ml-1">
@@ -229,7 +229,7 @@ export default function RegisterPage() {
                   type="email"
                   {...register("email")}
                   placeholder={auth.register.emailPlaceholder}
-                  className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.email ? "border-destructive" : "border-muted hover:border-primary/40 focus:border-primary"}`}
+                  className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.email ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive ml-1">
@@ -247,7 +247,7 @@ export default function RegisterPage() {
                   type="password"
                   {...register("password")}
                   placeholder={auth.register.passwordPlaceholder}
-                  className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.password ? "border-destructive" : "border-muted hover:border-primary/40 focus:border-primary"}`}
+                  className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.password ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                 />
                 {errors.password && (
                   <p className="text-sm text-destructive ml-1">
@@ -265,7 +265,7 @@ export default function RegisterPage() {
                   type="password"
                   {...register("confirmPassword")}
                   placeholder={auth.register.confirmPasswordPlaceholder}
-                  className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.confirmPassword ? "border-destructive" : "border-muted hover:border-primary/40 focus:border-primary"}`}
+                  className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.confirmPassword ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                 />
                 {errors.confirmPassword && (
                   <p className="text-sm text-destructive ml-1">
