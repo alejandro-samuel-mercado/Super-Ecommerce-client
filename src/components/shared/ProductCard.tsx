@@ -9,7 +9,9 @@ import { Product } from "@/types";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { memo } from "react";
 import { toast } from "sonner";
+
 
 interface ProductCardProps {
   product: Product;
@@ -17,7 +19,7 @@ interface ProductCardProps {
 
 import { useAuth } from "@/contexts/AuthContext";
 
-export function ProductCard({ product }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavoritesStore();
@@ -226,4 +228,4 @@ export function ProductCard({ product }: ProductCardProps) {
       )}
     </Link>
   );
-}
+});

@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
 } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -18,7 +18,7 @@ import { useMutation } from "@tanstack/react-query";
 import { AlertCircle, Minus, Plus, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function CartDrawer() {
   const { isCartOpen, closeCart } = useUIStore();
@@ -28,7 +28,7 @@ export function CartDrawer() {
   const { currency } = useCurrencyStore();
 
   const [preview, setPreview] = useState<OrderPreviewResponse | null>(null);
-  const debouncedItems = useDebounce(items, 500);
+  const debouncedItems = useDebounce(items, 300);
 
   const previewMutation = useMutation({
     mutationFn: async () => {
@@ -46,11 +46,16 @@ export function CartDrawer() {
     },
   });
 
+  const triggerPreview = useCallback(() => {
+    previewMutation.mutate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedItems]);
+
   useEffect(() => {
     if (isCartOpen && debouncedItems.length > 0) {
-      previewMutation.mutate();
+      triggerPreview();
     }
-  }, [debouncedItems, isCartOpen, previewMutation]);
+  }, [debouncedItems, isCartOpen, triggerPreview]);
 
   const stockIssues = preview?.stockIssues || [];
   const hasStockError = preview?.hasStockError || false;
@@ -144,20 +149,18 @@ export function CartDrawer() {
                          
                           <>
                             <input
-                              type="number"
-                              min="0.001"
-                              step="0.001"
-                              value={item.qty}
-                              onChange={(e) => {
-                                const v = parseFloat(e.target.value);
-                                if (!isNaN(v) && v > 0)
+                              type="text"
+                              inputMode="decimal"
+                              defaultValue={item.qty}
+                              onBlur={(e) => {
+                                const v = parseFloat(e.target.value.replace(",", "."));
+                                if (!isNaN(v) && v > 0) {
                                   updateQuantity(item.skuId, v, user !== null);
+                                } else {
+                                  e.target.value = String(item.qty);
+                                }
                               }}
                               className="w-20 text-center text-xs font-bold bg-transparent border-none outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5"
-                              disabled={
-                                stockLimit !== undefined &&
-                                item.qty >= stockLimit
-                              }
                             />
                             <span className="text-xs text-muted-foreground pr-1 font-semibold">
                               {item.measurementUnit === "KG"

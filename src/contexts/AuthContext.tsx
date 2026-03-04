@@ -5,11 +5,11 @@ import { useCartStore } from "@/store/cart";
 import { useFavoritesStore } from "@/store/favorites";
 import { User } from "@/types";
 import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
+    ReactNode,
+    createContext,
+    useContext,
+    useEffect,
+    useState,
 } from "react";
 
 interface AuthContextType {
@@ -45,8 +45,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setUser(null);
           setAccessToken(null);
-          useFavoritesStore.getState().clearFavorites();
-          useCartStore.getState().clearCart(false);
         }
       } catch (error: any) {
         // Solo desloguear si es un error 401 explícito.

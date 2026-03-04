@@ -9,19 +9,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-   Select,
-   SelectContent,
-   SelectItem,
-   SelectTrigger,
-   SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
-   Sheet,
-   SheetContent,
-   SheetHeader,
-   SheetTitle,
-   SheetTrigger,
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
 } from "@/components/ui/sheet";
 import { formatPrice } from "@/lib/utils";
 import { productService } from "@/services/products";
@@ -440,16 +440,7 @@ function ProductsContent() {
         <div className="flex gap-8">
           {/* Sidebar */}
           <aside className="hidden lg:block w-80 flex-shrink-0">
-            <motion.div
-              animate={{
-                rotate: [0.5, -0.5, 0.5],
-                y: [0, -3, 0],
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              <div
               className="sticky top-24"
             >
               <div className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 border-4 border-gray-200 rounded-[2rem] p-6 shadow-2xl shadow-primary/70">
@@ -463,7 +454,7 @@ function ProductsContent() {
                   <FilterSidebar />
                 </div>
               </div>
-            </motion.div>
+            </div>
           </aside>
 
           {/* Grid de productos */}

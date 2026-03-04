@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-   Select,
-   SelectContent,
-   SelectItem,
-   SelectTrigger,
-   SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,17 +28,17 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-   AlertCircle,
-   Award,
-   Check,
-   Loader2,
-   MapPin,
-   Minus,
-   Plus,
-   ShieldCheck,
-   Tag,
-   Trash2,
-   User,
+    AlertCircle,
+    Award,
+    Check,
+    Loader2,
+    MapPin,
+    Minus,
+    Plus,
+    ShieldCheck,
+    Tag,
+    Trash2,
+    User,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -313,7 +313,7 @@ function CartContent() {
     customerData.city,
   ]);
 
-  const debouncedItems = useDebounce(items, 500);
+  const debouncedItems = useDebounce(items, 300);
   const debouncedPointsToUse = useDebounce(pointsToUse, 500);
 
   // Calculate client-side subtotal
@@ -422,7 +422,8 @@ function CartContent() {
       prevDepsRef.current = dependencyString;
       previewMutation.mutate();
     }
-  }, [dependencyString, user, previewMutation.isPending]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dependencyString, user]);
 
   const couponMutation = useMutation({
     mutationFn: async (code: string) => {
@@ -590,6 +591,12 @@ function CartContent() {
   const handleNext = () => {
     const steps: Step[] = ["cart", "data", "delivery", "payment"];
     const currentIndex = steps.indexOf(currentStep);
+
+    if (currentStep === "cart" && !user) {
+      router.push(`/login?redirect=${encodeURIComponent("/cart?reloaded=true")}`);
+      return;
+    }
+
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -617,23 +624,20 @@ function CartContent() {
     createOrderMutation.mutate();
   };
 
-  if (!user || (items.length === 0 && currentStep === "cart")) {
+  if (items.length === 0 && currentStep === "cart") {
     return (
       <main className="min-h-screen py-16 pt-40 max:md:pt-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-3xl font-bold mb-4">
-            {!user
-              ? "Debe iniciar sesión para ver su carrito"
-              : cartContent.step1.emptyCart}
+            {cartContent.step1.emptyCart}
           </h1>
-          <Button onClick={() => router.push(!user ? "/login" : "/products")}>
-            {!user ? "Iniciar Sesión" : cartContent.step1.continueShopping}
+          <Button onClick={() => router.push("/products")}>
+            {cartContent.step1.continueShopping}
           </Button>
         </div>
       </main>
     );
-  
-}
+  }
   const isDebouncing = items !== debouncedItems;
   const isUpdating =
     isDebouncing ||
@@ -814,17 +818,17 @@ function CartContent() {
                             {item.allowFractional ? (
                               <div className="flex items-center gap-2 bg-white/40 backdrop-blur-sm p-1.5 rounded-2xl border border-white/60">
                                 <input
-                                  type="number"
-                                  step="0.001"
-                                  min="0.001"
+                                  type="text"
                                   inputMode="decimal"
-                                  value={item.qty}
-                                  onChange={(e) =>
-                                    handleQuantityChange(
-                                      item,
-                                      parseFloat(e.target.value) || 0,
-                                    )
-                                  }
+                                  defaultValue={item.qty}
+                                  onBlur={(e) => {
+                                    const v = parseFloat(e.target.value.replace(",", "."));
+                                    if (!isNaN(v) && v > 0) {
+                                      handleQuantityChange(item, v);
+                                    } else {
+                                      e.target.value = String(item.qty);
+                                    }
+                                  }}
                                   className="w-20 text-center font-bold text-lg text-primary bg-transparent outline-none"
                                 />
                                 <span className="text-xs font-bold text-muted-foreground uppercase pr-2">
@@ -1799,7 +1803,8 @@ function CartContent() {
                       </>
                     ) : (
                       <>
-                        {currentStep === "cart" &&
+                        {currentStep === "cart" && !user && "Iniciar Sesión para Continuar"}
+                        {currentStep === "cart" && user &&
                           cartContent.step1.summary.proceedToCheckout}
                         {currentStep === "data" &&
                           cartContent.step2.continueButton}

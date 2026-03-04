@@ -4,13 +4,13 @@ import { ProductCard } from "@/components/shared/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -27,13 +27,13 @@ import { useFavoritesStore } from "@/store/favorites";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ChevronRight,
-  Heart,
-  Minus,
-  Plus,
-  ShoppingCart,
-  Star,
-  ZoomIn,
+    ChevronRight,
+    Heart,
+    Minus,
+    Plus,
+    ShoppingCart,
+    Star,
+    ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -49,6 +49,7 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSku, setSelectedSku] = useState<number | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
+  const [quantityInput, setQuantityInput] = useState<string>("1");
   const [showStickyCTA, setShowStickyCTA] = useState(false);
 
   const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -197,6 +198,10 @@ export default function ProductDetailPage() {
     );
 
     toast.success("Agregado al carrito");
+
+    const minQty = product.allowFractional ? 0.001 : 1;
+    setQuantity(minQty);
+    setQuantityInput(String(minQty));
   };
 
   const handleBuyNow = () => {
@@ -494,22 +499,70 @@ export default function ProductDetailPage() {
                 {product.allowFractional
                   ? `Cantidad (${product.measurementUnit === "KG" ? "kg" : product.measurementUnit === "LITRO" ? "L" : product.measurementUnit === "METRO" ? "m" : "u"})`
                   : "Cantidad"}
+                {currentSku && (
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">
+                    (Stock: {currentStock}{product.allowFractional && product.measurementUnit !== "UNIDAD" ? ` ${product.measurementUnit === "KG" ? "kg" : product.measurementUnit === "LITRO" ? "L" : product.measurementUnit === "METRO" ? "m" : "u"}` : " disponibles"})
+                  </span>
+                )}
               </Label>
               {product.allowFractional ? (
-                <div className="flex items-center gap-4 bg-zinc-50 dark:bg-zinc-800/50 p-2 rounded-2xl border border-zinc-200 dark:border-zinc-700 w-[230px]">
-                  <input
-                    type="number"
-                    min="0.001"
-                    step="0.001"
-                    value={quantity}
-                    onChange={(e) => {
-                      const v = parseFloat(e.target.value);
-                      if (!isNaN(v) && v > 0 && v <= (currentStock || 9999))
-                        setQuantity(v);
+                <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/50 p-2 rounded-2xl border border-zinc-200 dark:border-zinc-700 w-[280px]">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-700 shadow-sm"
+                    onClick={() => {
+                      const step = product.measurementUnit === "KG" ? 0.1 : product.measurementUnit === "LITRO" ? 0.25 : 0.5;
+                      const newVal = Math.max(step, parseFloat((quantity - step).toFixed(3)));
+                      setQuantity(newVal);
+                      setQuantityInput(String(newVal));
                     }}
-                    className="flex-1 text-center font-bold text-lg bg-transparent border-none outline-none focus:ring-2 focus:ring-primary/30 rounded-xl px-2 py-1 w-[170px]"
+                    disabled={!currentSku || quantity <= 0.001}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={quantityInput}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9.,]/g, "").replace(",", ".");
+                      setQuantityInput(raw);
+                      const v = parseFloat(raw);
+                      if (!isNaN(v) && v > 0 && v <= (currentStock || 9999)) {
+                        setQuantity(v);
+                      }
+                    }}
+                    onBlur={() => {
+                      const v = parseFloat(quantityInput);
+                      if (isNaN(v) || v <= 0) {
+                        setQuantity(0.001);
+                        setQuantityInput("0.001");
+                      } else if (v > currentStock && currentStock > 0) {
+                        setQuantity(currentStock);
+                        setQuantityInput(String(currentStock));
+                      } else {
+                        setQuantity(v);
+                        setQuantityInput(String(v));
+                      }
+                    }}
+                    className="flex-1 text-center font-bold text-lg bg-transparent border-none outline-none focus:ring-2 focus:ring-primary/30 rounded-xl px-2 py-1 w-[100px]"
                     disabled={!currentSku || currentStock === 0}
                   />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-700 shadow-sm"
+                    onClick={() => {
+                      const step = product.measurementUnit === "KG" ? 0.1 : product.measurementUnit === "LITRO" ? 0.25 : 0.5;
+                      const newVal = Math.min(currentStock || 9999, parseFloat((quantity + step).toFixed(3)));
+                      setQuantity(newVal);
+                      setQuantityInput(String(newVal));
+                    }}
+                    disabled={!currentSku || (currentStock > 0 && quantity >= currentStock)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
                   <span className="pr-3 font-semibold text-muted-foreground">
                     {product.measurementUnit === "KG"
                       ? "kg"
@@ -538,10 +591,12 @@ export default function ProductDetailPage() {
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-700 shadow-sm"
-                    onClick={() =>
-                      setQuantity(Math.min(currentStock || 1, quantity + 1))
-                    }
-                    disabled={!currentSku || quantity >= currentStock}
+                    onClick={() => {
+                      if (currentStock > 0) {
+                        setQuantity(Math.min(currentStock, quantity + 1));
+                      }
+                    }}
+                    disabled={!currentSku || currentStock === 0 || quantity >= currentStock}
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
