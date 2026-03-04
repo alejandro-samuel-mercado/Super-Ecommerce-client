@@ -130,7 +130,7 @@ export const NotificationWidget = () => {
               )}
             </div>
 
-            <ScrollArea className="flex-1 p-2">
+            <ScrollArea className="flex-1 p-2 overflow-y-auto">
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-muted-foreground opacity-50">
                   <Bell className="h-12 w-12 mb-2 stroke-1" />

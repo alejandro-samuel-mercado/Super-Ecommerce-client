@@ -56,7 +56,7 @@ export const ErrorProvider: React.FC<{ children: ReactNode }> = ({
     const recentErrors = errorHistory.filter((t) => now - t < 30000);
 
     if (recentErrors.length >= 3 && !isMaintenanceMode) {
-      console.warn("🚨 AUTO-MAINTENANCE TRIGGERED: Too many critical errors.");
+      console.warn(" AUTO-MAINTENANCE TRIGGERED: Too many critical errors.");
       setIsMaintenanceMode(true);
       router.push("/maintenance");
     }

@@ -48,6 +48,7 @@ export function FloatingChat() {
     socket.on(
       "message_received",
       (msg: Message & { conversationId?: number }) => {
+       
         setIsTyping(false);
         setMessages((prev) => [...prev, msg]);
 
