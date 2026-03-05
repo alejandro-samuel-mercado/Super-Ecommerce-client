@@ -43,25 +43,24 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
     }
 
     const defaultSku = product.skus[0];
+    const defaultSkuPrice = typeof defaultSku?.price === "number" ? defaultSku.price : parseFloat(defaultSku?.price || "0");
 
     addItem(
       {
-        skuId: defaultSku.id?.toString() || `${product.id}-unknown`,
+        skuId: defaultSku?.id?.toString() || `${product.id}-unknown`,
         productId: product.id,
         productName: product.name,
         productImage: product.images?.[0] || "/placeholder.jpg",
-        price:
-          product.price ||
-          (typeof defaultSku.price === "number"
-            ? defaultSku.price
-            : parseFloat(defaultSku.price || "0")),
+        price: defaultSkuPrice || product.price || product.basePrice || 0,
         qty: 1,
         currencyCode: product.currencyCode,
         attributes:
-          defaultSku.variantOptions?.reduce(
+          defaultSku?.variantOptions?.reduce(
             (acc, opt) => ({ ...acc, [opt.name]: opt.value }),
             {},
           ) || {},
+        allowFractional: product.allowFractional ?? false,
+        measurementUnit: product.measurementUnit ?? "UNIDAD",
       },
       user !== null,
     );
@@ -82,6 +81,11 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
     toggleFavorite(product.id);
   
   };
+
+  const displaySku = product.skus?.[0];
+  const displayPrice = displaySku 
+    ? (typeof displaySku.price === "number" ? displaySku.price : parseFloat(displaySku.price || "0")) || product.price || product.basePrice || 0
+    : product.price || product.basePrice || 0;
 
   return (
     <Link
@@ -196,7 +200,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
             </span>
             <span className="text-sm text-muted-foreground line-through opacity-60">
               {formatPrice(
-                product.price || product.basePrice,
+                displayPrice,
                 product.currencyCode,
               )}
             </span>
@@ -206,7 +210,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
             className={`font-bold text-lg ${isOutOfStock ? "text-muted-foreground" : "text-primary"}`}
           >
             {formatPrice(
-              product.price || product.basePrice,
+              displayPrice,
               product.currencyCode,
             )}
           </span>

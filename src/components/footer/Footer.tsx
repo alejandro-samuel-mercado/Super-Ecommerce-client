@@ -106,7 +106,7 @@ export function Footer() {
         </svg>
       </div>
 
-      <div className="container mx-auto px-4 max-lg:px-14 max-md:px-10 pb-8 relative z-10">
+      <div className="container mx-auto px-10 max-lg:px-14 max-md:px-10 pb-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-20 mb-12">
           <div>
             <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">

@@ -5,19 +5,19 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import {
-  Notification,
-  notificationService,
+      Notification,
+      notificationService,
 } from "@/services/notification.service";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertTriangle,
-  Bell,
-  Check,
-  Info,
-  ShoppingBag,
-  Tag,
-  Trash2,
-  XCircle,
+      AlertTriangle,
+      Bell,
+      Check,
+      Info,
+      ShoppingBag,
+      Tag,
+      Trash2,
+      XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -107,14 +107,14 @@ export const NotificationWidget = () => {
   if (!user) return null;
 
   return (
-    <div className="fixed bottom-24 right-6 z-40 ">
+    <div className="fixed bottom-24 right-6 z-[999]">
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="absolute bottom-16 right-0 w-80 md:w-96 bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[500px]"
+            className="absolute bottom-16 right-0 w-80 md:w-96 bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-10rem)]"
           >
             <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
               <h3 className="font-bold text-lg">Notificaciones</h3>

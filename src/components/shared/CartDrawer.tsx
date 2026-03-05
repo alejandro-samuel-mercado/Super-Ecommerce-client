@@ -15,7 +15,7 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useUIStore } from "@/store/ui";
 import { useMutation } from "@tanstack/react-query";
-import { AlertCircle, Minus, Plus, ShoppingCart, X } from "lucide-react";
+import { AlertCircle, Loader2, Minus, Plus, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -48,7 +48,7 @@ export function CartDrawer() {
 
   const triggerPreview = useCallback(() => {
     previewMutation.mutate();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+ 
   }, [debouncedItems]);
 
   useEffect(() => {
@@ -58,7 +58,8 @@ export function CartDrawer() {
   }, [debouncedItems, isCartOpen, triggerPreview]);
 
   const stockIssues = preview?.stockIssues || [];
-  const hasStockError = preview?.hasStockError || false;
+  const hasStockError = preview?.hasStockError || stockIssues.length > 0;
+  const isUpdating = previewMutation.isPending || debouncedItems !== items;
 
   return (
     <Sheet open={isCartOpen} onOpenChange={(open) => !open && closeCart()}>
@@ -85,10 +86,14 @@ export function CartDrawer() {
           ) : (
             <div className="space-y-6">
               {hasStockError && (
-                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-                  <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
-                  <p className="text-xs font-bold text-destructive">
-                    Hay problemas de stock. Ajusta las cantidades.
+                <div className={`p-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 transition-all ${isUpdating ? "bg-amber-100 border border-amber-200" : "bg-destructive/10 border border-destructive/20"}`}>
+                  {isUpdating ? (
+                    <Loader2 className="h-5 w-5 text-amber-600 shrink-0 animate-spin" />
+                  ) : (
+                    <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
+                  )}
+                  <p className={`text-xs font-bold ${isUpdating ? "text-amber-800" : "text-destructive"}`}>
+                    {isUpdating ? "Validando cambios..." : "Hay problemas de stock. Ajusta las cantidades."}
                   </p>
                 </div>
               )}
@@ -148,7 +153,20 @@ export function CartDrawer() {
                         {item.allowFractional ? (
                          
                           <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 rounded-md hover:bg-zinc-100"
+                              onClick={() => {
+                                const step = item.measurementUnit === "KG" ? 0.1 : item.measurementUnit === "LITRO" ? 0.25 : 0.5;
+                                const newVal = Math.max(step, parseFloat((item.qty - step).toFixed(3)));
+                                updateQuantity(item.skuId, newVal, user !== null);
+                              }}
+                            >
+                              <Minus className="h-3.5 w-3.5" />
+                            </Button>
                             <input
+                              key={`input-${item.skuId}-${item.qty}`}
                               type="text"
                               inputMode="decimal"
                               defaultValue={item.qty}
@@ -160,7 +178,7 @@ export function CartDrawer() {
                                   e.target.value = String(item.qty);
                                 }
                               }}
-                              className="w-20 text-center text-xs font-bold bg-transparent border-none outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5"
+                              className="w-14 text-center text-xs font-bold bg-transparent border-none outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 py-0.5"
                             />
                             <span className="text-xs text-muted-foreground pr-1 font-semibold">
                               {item.measurementUnit === "KG"
@@ -172,6 +190,23 @@ export function CartDrawer() {
                                     : (item.measurementUnit?.toLowerCase() ??
                                       "u")}
                             </span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 rounded-md hover:bg-zinc-100"
+                              onClick={() => {
+                                const step = item.measurementUnit === "KG" ? 0.1 : item.measurementUnit === "LITRO" ? 0.25 : 0.5;
+                                const maxVal = stockLimit ?? 9999;
+                                const newVal = Math.min(maxVal, parseFloat((item.qty + step).toFixed(3)));
+                                updateQuantity(item.skuId, newVal, user !== null);
+                              }}
+                              disabled={
+                                stockLimit !== undefined &&
+                                item.qty >= stockLimit
+                              }
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                            </Button>
                           </>
                         ) : (
                           <>

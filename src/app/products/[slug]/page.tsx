@@ -579,7 +579,10 @@ export default function ProductDetailPage() {
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-700 shadow-sm"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    onClick={() => {
+                        setQuantity(Math.max(1, quantity - 1));
+                        setQuantityInput(String(Math.max(1, quantity - 1)));
+                    }}
                     disabled={quantity <= 1}
                   >
                     <Minus className="h-4 w-4" />
@@ -593,7 +596,9 @@ export default function ProductDetailPage() {
                     className="h-10 w-10 rounded-xl hover:bg-white dark:hover:bg-zinc-700 shadow-sm"
                     onClick={() => {
                       if (currentStock > 0) {
-                        setQuantity(Math.min(currentStock, quantity + 1));
+                        const newQ = Math.min(currentStock, quantity + 1);
+                        setQuantity(newQ);
+                        setQuantityInput(String(newQ));
                       }
                     }}
                     disabled={!currentSku || currentStock === 0 || quantity >= currentStock}

@@ -11,14 +11,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PublicConfig, configService } from "@/services/config";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    Gift,
-    Heart,
-    LogOut,
-    Mail,
-    MapPin,
-    MessageSquare,
-    Package,
-    User as UserIcon
+      Gift,
+      Heart,
+      LogOut,
+      Mail,
+      MapPin,
+      MessageSquare,
+      Package,
+      User as UserIcon
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";

@@ -12,14 +12,19 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { formatPrice } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { Download, Eye, ReceiptText } from "lucide-react";
-import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { CheckCircle2, Download, Eye, ReceiptText, Upload } from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 export function OrdersTab() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isDownloading, setIsDownloading] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadOrder, setUploadOrder] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ["orders"],
@@ -84,31 +89,41 @@ export function OrdersTab() {
   };
 
   const handleDownload = async (orderId: string) => {
-    setIsDownloading(orderId);
+    // ... existing handleDownload ...
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("El archivo es demasiado grande (máx 5MB)");
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleUploadProof = async () => {
+    if (!selectedFile || !uploadOrder) return;
+    
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("receipt", selectedFile);
+
     try {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${baseUrl}/api/sales/${orderId}/invoice`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
+      await http(`/api/sales/${uploadOrder.id}/payment-proof`, {
+        method: "POST",
+        body: formData,
       });
-
-      if (!response.ok) throw new Error("Failed to download invoice");
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `factura-${orderId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      toast.success("Factura descargada");
-    } catch (error) {
-      toast.error("Error al descargar factura");
+      
+      toast.success("Comprobante subido con éxito");
+      setUploadOrder(null);
+      setSelectedFile(null);
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    } catch (error: any) {
+      toast.error(error.message || "Error al subir el comprobante");
     } finally {
-      setIsDownloading(null);
+      setIsUploading(false);
     }
   };
 
@@ -183,6 +198,22 @@ export function OrdersTab() {
                   >
                     <Eye className="h-5 w-5 text-primary" />
                   </Button>
+                  
+                  {order.paymentStatus === 'PENDING' && (order.paymentType === 'MERCADO_PAGO' || order.paymentType === 'TRANSFER') && (
+                    <Button
+                      variant="outline"
+                      className={`h-12 w-12 rounded-2xl border-2 transition-all p-0 ${order.paymentProofUrl ? 'border-green-500/40 hover:bg-green-50' : 'border-amber-500/40 hover:bg-amber-50'}`}
+                      onClick={() => setUploadOrder(order)}
+                      title={order.paymentProofUrl ? "Ver/Cambiar comprobante" : "Informar Pago"}
+                    >
+                      {order.paymentProofUrl ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <Upload className="h-5 w-5 text-amber-600" />
+                      )}
+                    </Button>
+                  )}
+
                   <Button
                     variant="outline"
                     className="h-12 w-12 rounded-2xl border-2 border-primary/40 hover:bg-primary/10 hover:border-primary transition-all p-0 disabled:opacity-50"

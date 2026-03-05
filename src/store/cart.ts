@@ -15,7 +15,7 @@ interface CartState {
     isLoggedIn?: boolean,
   ) => Promise<void>;
   clearCart: (isLoggedIn?: boolean) => Promise<void>;
-  syncWithBackend: (currencyCode?: string) => Promise<void>;
+  syncWithBackend: (currencyCode?: string, mergeLocal?: boolean) => Promise<void>;
   getTotalItems: () => number;
   getSubtotal: () => number;
 }
@@ -33,7 +33,7 @@ export const useCartStore = create<CartState>()(
             return {
               items: state.items.map((i) =>
                 i.skuId === newItem.skuId
-                  ? { ...i, qty: i.qty + newItem.qty }
+                  ? { ...i, qty: Number(i.qty) + Number(newItem.qty) }
                   : i,
               ),
             };
@@ -81,16 +81,21 @@ export const useCartStore = create<CartState>()(
         }
       },
 
-      syncWithBackend: async (currencyCode) => {
+      syncWithBackend: async (currencyCode, mergeLocal = false) => {
         try {
-          const localItems = get().items.map((i) => ({
-            skuId: Number(i.skuId),
-            quantity: i.qty,
-          }));
-          const remoteCart = await cartService.mergeCart(
-            localItems,
-            currencyCode,
-          );
+          let remoteCart;
+
+          // Merge local anonymous items ONLY if mergeLocal is true
+          if (mergeLocal) {
+            const localItems = get().items.map((i) => ({
+              skuId: Number(i.skuId),
+              quantity: i.qty,
+            }));
+            remoteCart = await cartService.mergeCart(localItems, currencyCode);
+          } else {
+            // Otherwise, we just fetch the true cart from the backend DB directly
+            remoteCart = await cartService.getCart(currencyCode);
+          }
 
           if (remoteCart && remoteCart.items) {
             const mergedItems = remoteCart.items.map((item: any) => ({
@@ -105,7 +110,7 @@ export const useCartStore = create<CartState>()(
                   (acc: any, opt: any) => ({ ...acc, [opt.name]: opt.value }),
                   {},
                 ) || {},
-              stock: item.sku.branchInventory?.[0]?.stock || 99,
+              stock: item.sku.stock || 99,
               allowFractional: item.sku.product.allowFractional,
               measurementUnit: item.sku.product.measurementUnit,
             }));

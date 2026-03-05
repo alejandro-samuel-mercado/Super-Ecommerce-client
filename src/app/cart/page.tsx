@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+      Select,
+      SelectContent,
+      SelectItem,
+      SelectTrigger,
+      SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,17 +28,17 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-    AlertCircle,
-    Award,
-    Check,
-    Loader2,
-    MapPin,
-    Minus,
-    Plus,
-    ShieldCheck,
-    Tag,
-    Trash2,
-    User,
+      AlertCircle,
+      Award,
+      Check,
+      Loader2,
+      MapPin,
+      Minus,
+      Plus,
+      ShieldCheck,
+      Tag,
+      Trash2,
+      User,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -129,6 +129,9 @@ function CartContent() {
   const [couponCode, setCouponCode] = useState("");
   const [pointsToUse, setPointsToUse] = useState<number>(0);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [deliveryData, setDeliveryData] = useState<DeliveryData>({
+    method: "pickup",
+  });
   const [preview, setPreview] = useState<OrderPreviewResponse>({
     subtotal: 0,
     discount: 0,
@@ -176,9 +179,7 @@ function CartContent() {
   });
   const [createAccount, setCreateAccount] = useState(false);
 
-  const [deliveryData, setDeliveryData] = useState<DeliveryData>({
-    method: "pickup",
-  });
+  
 
   const [nearestBranch, setNearestBranch] = useState<string | null>(null);
 
@@ -228,8 +229,11 @@ function CartContent() {
     mutationFn: async (address: {
       city: string;
       state: string;
-      zip: string;
+      zipCode: string;
       country?: string;
+      address?: string;
+     
+      
     }) => {
       return shippingService.calculateCost({
         ...address,
@@ -257,27 +261,39 @@ function CartContent() {
     },
   });
 
-  // Auto-calcular envío cuando el método sea "shipping" 
+  const prevShippingDepsRef = useRef<string>("");
+
   useEffect(() => {
     if (
+      user &&
       deliveryData.method === "shipping" &&
-      customerData.city &&
-      customerData.state &&
-      customerData.zipCode
+      deliveryData.shippingAddress?.zip &&
+      deliveryData.shippingAddress.state &&
+      deliveryData.shippingAddress.city
     ) {
-      shippingMutation.mutate({
-        city: customerData.city,
-        state: customerData.state,
-        zip: customerData.zipCode,
-        country: customerData.country,
+      const currentDeps = JSON.stringify({
+         method: deliveryData.method,
+         addr: deliveryData.shippingAddress,
       });
+
+      if (currentDeps !== prevShippingDepsRef.current) {
+        if (!shippingMutation.isPending) {
+          prevShippingDepsRef.current = currentDeps;
+          shippingMutation.mutate({
+            address: `${deliveryData.shippingAddress.street}, ${deliveryData.shippingAddress.city}, ${deliveryData.shippingAddress.state}`,
+            zipCode: deliveryData.shippingAddress.zip,
+            city: deliveryData.shippingAddress.city,
+            state: deliveryData.shippingAddress.state,
+            country: customerData.country,
+          });
+        }
+      }
     }
   }, [
+    user,
     deliveryData.method,
-    customerData.city,
-    customerData.state,
-    customerData.zipCode,
-    customerData.country,
+    deliveryData.shippingAddress,
+    shippingMutation.isPending,
   ]);
 
   useEffect(() => {
@@ -316,7 +332,6 @@ function CartContent() {
   const debouncedItems = useDebounce(items, 300);
   const debouncedPointsToUse = useDebounce(pointsToUse, 500);
 
-  // Calculate client-side subtotal
   const clientSubtotal = items.reduce(
     (sum, item) => sum + item.price * item.qty,
     0,
@@ -394,7 +409,7 @@ function CartContent() {
 
   const dependencyString = useMemo(() => {
     return JSON.stringify({
-      items: items.map((i) => ({ id: i.skuId, q: i.qty })),
+      items: debouncedItems.map((i) => ({ id: i.skuId, q: i.qty })),
       coupon: appliedCoupon,
       method: deliveryData.method,
       points: debouncedPointsToUse,
@@ -402,7 +417,7 @@ function CartContent() {
       gateway: selectedGateway,
     });
   }, [
-    items,
+    debouncedItems,
     appliedCoupon,
     deliveryData.method,
     debouncedPointsToUse,
@@ -414,16 +429,15 @@ function CartContent() {
 
   useEffect(() => {
     if (
-      user &&
-      items.length > 0 &&
-      dependencyString !== prevDepsRef.current &&
-      !previewMutation.isPending
+      debouncedItems.length > 0 &&
+      dependencyString !== prevDepsRef.current
     ) {
-      prevDepsRef.current = dependencyString;
-      previewMutation.mutate();
+      if (!previewMutation.isPending) {
+        prevDepsRef.current = dependencyString;
+        previewMutation.mutate();
+      }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dependencyString, user]);
+  }, [dependencyString, debouncedItems.length, previewMutation.isPending]);
 
   const couponMutation = useMutation({
     mutationFn: async (code: string) => {
@@ -639,12 +653,24 @@ function CartContent() {
     );
   }
   const isDebouncing = items !== debouncedItems;
-  const isUpdating =
-    isDebouncing ||
+  const [forceUnlock, setForceUnlock] = useState(false);
+  const isUpdatingRaw =
     previewMutation.isPending ||
     shippingMutation.isPending ||
     couponMutation.isPending ||
     createOrderMutation.isPending;
+
+  useEffect(() => {
+    if (isUpdatingRaw) {
+      setForceUnlock(false);
+      const timer = setTimeout(() => {
+        setForceUnlock(true); 
+      }, 5000); // 5 segundos de timeout extremo para descongelar UI
+      return () => clearTimeout(timer);
+    }
+  }, [isUpdatingRaw]);
+
+  const isUpdating = isUpdatingRaw && !forceUnlock;
 
   return (
     <main className="min-h-screen  pb-40 pt-40 md:pt-20 max-sm:top-10 ">
@@ -721,18 +747,35 @@ function CartContent() {
                   </div>
 
                   {hasStockError && (
-                    <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-2xl flex items-start gap-4 animate-in fade-in slide-in-from-top-1">
-                      <AlertCircle className="h-6 w-6 text-destructive shrink-0 mt-0.5" />
+                    <div className={`mb-6 p-4 rounded-2xl flex items-start gap-4 animate-in fade-in slide-in-from-top-1 transition-all ${isUpdating ? "bg-amber-100 border border-amber-200" : "bg-destructive/10 border border-destructive/20"}`}>
+                      {isUpdating ? (
+                        <Loader2 className="h-6 w-6 text-amber-600 shrink-0 mt-0.5 animate-spin" />
+                      ) : (
+                        <AlertCircle className="h-6 w-6 text-destructive shrink-0 mt-0.5" />
+                      )}
                       <div>
-                        <h4 className="font-bold text-destructive">
-                          Stock Insuficiente
+                        <h4 className={`font-bold ${isUpdating ? "text-amber-800" : "text-destructive"}`}>
+                          {isUpdating ? "Validando cantidad..." : "Stock Insuficiente"}
                         </h4>
-                        <p className="text-sm text-destructive/80">
-                          Algunos artículos en tu carrito no tienen stock
-                          suficiente en esta sucursal. Por favor, ajusta las
-                          cantidades para continuar.
+                        <p className={`text-sm ${isUpdating ? "text-amber-700/80" : "text-destructive/80"}`}>
+                          {isUpdating ? "Estamos comprobando la disponibilidad de stock..." : `Algunos artículos en tu carrito no tienen stock suficiente ${deliveryData.method === "pickup" ? "en esta sucursal" : "para envío"}. Por favor, ajusta las cantidades para continuar.`}
                         </p>
                       </div>
+                    </div>
+                  )}
+
+                  {!user && (
+                    <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-xl flex items-center justify-between shadow-sm">
+                      <p className="text-sm font-medium text-primary">
+                        Inicia sesión para poder procesar tu compra.
+                      </p>
+                      <Button
+                        variant="default"
+                        className="rounded-full bg-primary hover:bg-primary/90 text-white"
+                        onClick={() => router.push(`/login?redirect=${encodeURIComponent("/cart?reloaded=true")}`)}
+                      >
+                        Iniciar Sesión
+                      </Button>
                     </div>
                   )}
 
@@ -817,7 +860,20 @@ function CartContent() {
                           <div className="flex flex-col items-end justify-between gap-4">
                             {item.allowFractional ? (
                               <div className="flex items-center gap-2 bg-white/40 backdrop-blur-sm p-1.5 rounded-2xl border border-white/60">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-9 w-9 rounded-xl hover:bg-white/60 text-primary"
+                                  onClick={() => {
+                                    const step = item.measurementUnit === "KG" ? 0.1 : item.measurementUnit === "LITRO" ? 0.25 : 0.5;
+                                    const newVal = Math.max(step, parseFloat((item.qty - step).toFixed(3)));
+                                    handleQuantityChange(item, newVal);
+                                  }}
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </Button>
                                 <input
+                                  key={`input-${item.skuId}-${item.qty}`}
                                   type="text"
                                   inputMode="decimal"
                                   defaultValue={item.qty}
@@ -829,7 +885,7 @@ function CartContent() {
                                       e.target.value = String(item.qty);
                                     }
                                   }}
-                                  className="w-20 text-center font-bold text-lg text-primary bg-transparent outline-none"
+                                  className="w-14 text-center font-bold text-lg text-primary bg-transparent outline-none"
                                 />
                                 <span className="text-xs font-bold text-muted-foreground uppercase pr-2">
                                   {item.measurementUnit === "KG"
@@ -838,9 +894,26 @@ function CartContent() {
                                       ? "L"
                                       : item.measurementUnit === "METRO"
                                         ? "m"
-                                        : item.measurementUnit?.toLowerCase() ||
-                                          "u"}
+                                        : (item.measurementUnit?.toLowerCase() ??
+                                          "u")}
                                 </span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-9 w-9 rounded-xl hover:bg-white/60 text-primary"
+                                  onClick={() => {
+                                    const step = item.measurementUnit === "KG" ? 0.1 : item.measurementUnit === "LITRO" ? 0.25 : 0.5;
+                                    const maxVal = stockLimit ?? 9999;
+                                    const newVal = Math.min(maxVal, parseFloat((item.qty + step).toFixed(3)));
+                                    handleQuantityChange(item, newVal);
+                                  }}
+                                  disabled={
+                                    stockLimit !== undefined &&
+                                    item.qty >= stockLimit
+                                  }
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
                               </div>
                             ) : (
                               <div className="flex items-center gap-4 bg-white/40 backdrop-blur-sm p-1.5 rounded-2xl border border-white/60">
@@ -1794,7 +1867,7 @@ function CartContent() {
                   <Button
                     className="w-full h-14 text-lg font-bold rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleNext}
-                    disabled={!canProceed() || isUpdating}
+                    disabled={(!user && currentStep === "cart") || !canProceed() || isUpdating}
                   >
                     {isUpdating ? (
                       <>
@@ -1803,8 +1876,7 @@ function CartContent() {
                       </>
                     ) : (
                       <>
-                        {currentStep === "cart" && !user && "Iniciar Sesión para Continuar"}
-                        {currentStep === "cart" && user &&
+                        {currentStep === "cart" &&
                           cartContent.step1.summary.proceedToCheckout}
                         {currentStep === "data" &&
                           cartContent.step2.continueButton}

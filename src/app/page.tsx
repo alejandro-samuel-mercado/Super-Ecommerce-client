@@ -10,7 +10,7 @@ import { TrendingProducts } from "@/components/features/home/TrendingProducts";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen relative">
+    <main className="min-h-screen relative  md:px-10">
       <Hero />
       <Marquee />
       <Benefits />

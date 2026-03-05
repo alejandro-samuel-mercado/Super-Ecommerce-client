@@ -53,7 +53,7 @@ export function SecondaryAds() {
   };
 
    return (
-     <section className=" px-0 py-12 ml-[-30px] w-[calc(100%+30px)] max-md:py-6 overflow-hidden ">
+     <section className=" px-0 py-12 ml-[-50px] w-[calc(100%+100px)] max-md:py-6 overflow-hidden ">
        <div className="relative group overflow-hidden shadow-2xl bg-zinc-100 max-md:aspect-[30/9] aspect-[30/6] ">
          <AnimatePresence initial={false} custom={direction}>
            <motion.div

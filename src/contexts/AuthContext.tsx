@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { user: userData, accessToken: token, refreshToken } = event.data;
         setAuth(userData, token, refreshToken);
         useFavoritesStore.getState().syncFavorites();
-        useCartStore.getState().syncWithBackend();
+        useCartStore.getState().syncWithBackend(undefined, true);
 
       }
     };
@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("accessToken", token);
     if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
     useFavoritesStore.getState().syncFavorites();
-    await useCartStore.getState().syncWithBackend();
+    await useCartStore.getState().syncWithBackend(undefined, true);
   };
 
   const loginWithGoogle = async () => {
@@ -148,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("accessToken", token);
     if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
     useFavoritesStore.getState().syncFavorites();
-    await useCartStore.getState().syncWithBackend();
+    await useCartStore.getState().syncWithBackend(undefined, true);
   };
 
   const logout = () => {

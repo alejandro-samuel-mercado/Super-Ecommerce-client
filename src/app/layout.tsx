@@ -68,7 +68,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       />
 
       {!isHomePage && <Navbar />}
-      <div className={!isHomePage ? "pt-16  md:pt-2  " : "max-sm:px-2 max-md:px-6 max-xl:px-10"}>
+      <div className={!isHomePage ? "pt-16  md:pt-2  " : "max-sm:px-2 max-md:px-6 max-xl:px-10 overflow-x-hidden"}>
         {children}
       </div>
       <Footer />

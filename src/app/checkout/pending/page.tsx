@@ -87,10 +87,31 @@ function CheckoutPendingContent() {
                     Tu pago está pendiente de aprobación.
                   </p>
                   <p className="text-lg font-medium text-muted-foreground max-w-2xl leading-relaxed">
-                    No es necesario que realices otra acción. Tu entidad
-                    bancaria o billetera virtual está procesando el pago. Esto
-                    suele tomar desde unos minutos hasta 48hs en casos
-                    excepcionales.
+                    Si elegiste <strong className="text-amber-600">Pago Fácil</strong> o <strong className="text-amber-600">Rapipago</strong>, recuerda que debes enviar el comprobante de pago para que procesemos tu envío.
+                  </p>
+
+                  <div className="bg-amber-500/10 border-2 border-amber-500/20 p-6 rounded-3xl space-y-4">
+                    <p className="text-sm font-black text-amber-700 uppercase tracking-widest">Vías de envío de comprobante:</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-green-500/20 text-green-600 flex items-center justify-center font-bold">W</div>
+                        <div>
+                          <p className="text-[10px] font-black text-muted-foreground uppercase">WhatsApp</p>
+                          <p className="text-sm font-bold">+54 9 11 1234-5678</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-blue-500/20 text-blue-600 flex items-center justify-center font-bold">@</div>
+                        <div>
+                          <p className="text-[10px] font-black text-muted-foreground uppercase">Email</p>
+                          <p className="text-sm font-bold">pagos@tienda.com</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-base font-medium text-muted-foreground max-w-2xl leading-relaxed">
+                    Una vez que recibamos tu comprobante, validaremos el pago en el sistema. Recibirás un correo automático cuando tu pedido sea confirmado.
                   </p>
                 </div>
               </div>
