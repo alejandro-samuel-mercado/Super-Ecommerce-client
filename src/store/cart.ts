@@ -1,10 +1,12 @@
 import { cartService } from "@/services/cart";
 import { CartItem } from "@/types";
+import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface CartState {
   items: CartItem[];
+  lastSyncedCurrency: string | null;
   addItem: (item: CartItem, isLoggedIn?: boolean) => Promise<void>;
   removeItem: (skuId: string, isLoggedIn?: boolean) => Promise<void>;
   updateQuantity: (
@@ -22,6 +24,7 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      lastSyncedCurrency: null,
 
       addItem: async (newItem, isLoggedIn = false) => {
         set((state) => {
@@ -70,7 +73,7 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: async (isLoggedIn = false) => {
-        set({ items: [] });
+        set({ items: [], lastSyncedCurrency: null });
         if (isLoggedIn) {
           try {
             await cartService.clearCart();
@@ -94,7 +97,7 @@ export const useCartStore = create<CartState>()(
               productId: item.sku.productId,
               skuId: item.sku.id.toString(),
               productName: item.sku.product.name,
-              price: Number(item.sku.price),
+              price: item.convertedPrice != null ? Number(item.convertedPrice) : Number(item.sku.price),
               productImage: item.sku.product.images?.[0] || "",
               qty: item.quantity,
               attributes:
@@ -106,7 +109,15 @@ export const useCartStore = create<CartState>()(
               allowFractional: item.sku.product.allowFractional,
               measurementUnit: item.sku.product.measurementUnit,
             }));
-            set({ items: mergedItems });
+            set({ items: mergedItems, lastSyncedCurrency: currencyCode || null });
+
+            if (remoteCart.stockAdjustments && remoteCart.stockAdjustments.length > 0) {
+              for (const adj of remoteCart.stockAdjustments) {
+                toast.warning(`Stock ajustado: ${adj.productName}`, {
+                  description: `Solo hay ${adj.availableStock} unidades disponibles. Tu carrito se ajustó de ${adj.requestedQty} a ${adj.adjustedQty}.`
+                });
+              }
+            }
           }
         } catch (e) {}
       },

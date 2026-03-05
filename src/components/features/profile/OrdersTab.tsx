@@ -6,10 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { formatPrice } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -58,18 +58,28 @@ export function OrdersTab() {
     switch (status) {
       case "PAID":
         return "default";
-      case "ENTREGADO":
-        return "default";
-      case "EN_CAMINO":
-        return "secondary";
       case "PENDING":
         return "outline";
       case "CANCELLED":
-        return "destructive";
       case "REJECTED":
         return "destructive";
       default:
         return "secondary";
+    }
+  };
+
+  const getDeliveryColor = (status: string) => {
+    switch (status) {
+      case "DELIVERED":
+        return "default";
+      case "SHIPPED":
+        return "secondary";
+      case "REQUIRES_ACTION":
+        return "destructive";
+      case "PENDING_DELIVERY":
+        return "outline";
+      default:
+        return "outline";
     }
   };
 
@@ -131,14 +141,26 @@ export function OrdersTab() {
                     })}
                   </p>
                 </div>
-                <Badge
-                  variant={getStatusColor(order.status)}
-                  className="rounded-full px-4 py-1 font-black text-[10px] tracking-widest uppercase"
-                >
-                  {profile.orders.statuses[
-                    order.status as keyof typeof profile.orders.statuses
-                  ] || order.status}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant={getStatusColor(order.status)}
+                    className="rounded-full px-4 py-1 font-black text-[10px] tracking-widest uppercase"
+                  >
+                    {profile.orders.statuses[
+                      order.status as keyof typeof profile.orders.statuses
+                    ] || order.status}
+                  </Badge>
+                  {order.deliveryStatus && (
+                    <Badge
+                      variant={getDeliveryColor(order.deliveryStatus)}
+                      className="rounded-full px-4 py-1 font-black text-[10px] tracking-widest uppercase"
+                    >
+                      {profile.orders.statuses[
+                        order.deliveryStatus as keyof typeof profile.orders.statuses
+                      ] || order.deliveryStatus}
+                    </Badge>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center justify-between">
@@ -205,7 +227,7 @@ export function OrdersTab() {
               <div className="grid grid-cols-2 gap-8 py-6 border-y border-primary/5">
                 <div>
                   <p className="text-[10px] text-primary/60 font-black tracking-[0.4em] mb-2">
-                    ESTADO
+                    ESTADO PAGO
                   </p>
                   <Badge
                     variant={getStatusColor(selectedOrder.status)}
@@ -214,6 +236,19 @@ export function OrdersTab() {
                     {profile.orders.statuses[
                       selectedOrder.status as keyof typeof profile.orders.statuses
                     ] || selectedOrder.status}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-[10px] text-primary/60 font-black tracking-[0.4em] mb-2">
+                    ESTADO ENVÍO
+                  </p>
+                  <Badge
+                    variant={getDeliveryColor(selectedOrder.deliveryStatus)}
+                    className="rounded-full px-4 font-black"
+                  >
+                    {profile.orders.statuses[
+                      selectedOrder.deliveryStatus as keyof typeof profile.orders.statuses
+                    ] || selectedOrder.deliveryStatus}
                   </Badge>
                 </div>
                 <div>

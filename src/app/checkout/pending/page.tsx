@@ -142,8 +142,8 @@ function CheckoutPendingContent() {
                       ?
                     </div>
                     <p className="text-sm font-bold text-foreground/80 leading-normal">
-                      Tu stock se mantiene reservado mientras el pago se valida
-                      correctamente.
+                      Tu pedido está registrado y será confirmado una vez que
+                      se acredite el pago.
                     </p>
                   </div>
                 </div>

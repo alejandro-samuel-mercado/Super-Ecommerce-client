@@ -94,7 +94,9 @@ function CheckoutSuccessContent() {
           };
           setSale(mappedData);
           clearCart();
-          setTimeout(() => handleDownloadInvoice(data.id), 2000);
+          if (data.paymentStatus === 'PAID') {
+            setTimeout(() => handleDownloadInvoice(data.id), 2000);
+          }
         }
       } catch (error) {
         toast.error("Error al cargar detalles de la orden");

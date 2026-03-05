@@ -114,14 +114,14 @@ export const orderService = {
     const branchId =
       data.deliveryMethod === "pickup" && data.pickupBranchId
         ? data.pickupBranchId
-        : "1";
+        : undefined;
 
-    const payload = {
+    const payload: Record<string, any> = {
       ...data,
       deliveryType: data.deliveryMethod === "pickup" ? "PICKUP" : "DELIVERY",
-      paymentType: data.paymentType || "MERCADO_PAGO", 
-      branchId,
+      paymentType: data.paymentType || "MERCADO_PAGO",
     };
+    if (branchId) payload.branchId = branchId;
 
     const response = await http<{
       success: boolean;
@@ -151,9 +151,10 @@ export const orderService = {
     );
 
     return {
-      valid: true,
+      valid: response.data.valid !== false,
       discount: response.data.discountAmount,
       type: response.data.type,
+      message: response.data.message,
     };
   },
 
