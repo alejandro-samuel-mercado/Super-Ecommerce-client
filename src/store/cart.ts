@@ -28,11 +28,11 @@ export const useCartStore = create<CartState>()(
 
       addItem: async (newItem, isLoggedIn = false) => {
         set((state) => {
-          const existing = state.items.find((i) => i.skuId === newItem.skuId);
+          const existing = state.items.find((i) => String(i.skuId) === String(newItem.skuId));
           if (existing) {
             return {
               items: state.items.map((i) =>
-                i.skuId === newItem.skuId
+                String(i.skuId) === String(newItem.skuId)
                   ? { ...i, qty: Number(i.qty) + Number(newItem.qty) }
                   : i,
               ),
@@ -50,7 +50,7 @@ export const useCartStore = create<CartState>()(
 
       removeItem: async (skuId, isLoggedIn = false) => {
         set((state) => ({
-          items: state.items.filter((i) => i.skuId !== skuId),
+          items: state.items.filter((i) => String(i.skuId) !== String(skuId)),
         }));
         if (isLoggedIn) {
           try {
@@ -62,7 +62,7 @@ export const useCartStore = create<CartState>()(
       updateQuantity: async (skuId, quantity, isLoggedIn = false) => {
         set((state) => ({
           items: state.items.map((i) =>
-            i.skuId === skuId ? { ...i, qty: quantity } : i,
+            String(i.skuId) === String(skuId) ? { ...i, qty: quantity } : i,
           ),
         }));
         if (isLoggedIn) {

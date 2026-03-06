@@ -26,6 +26,7 @@ export interface PublicConfig {
   freeShippingThreshold: number;
   enabledPaymentMethods: string[];
   detectedCurrency?: string;
+  taxRate: number;
   baseCurrency: string;
 }
 

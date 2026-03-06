@@ -59,17 +59,27 @@ export function OrdersTab() {
     );
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusDetails = (order: any) => {
+    const status = order.paymentStatus;
+    const mpPaymentId = order.mpPaymentId;
+    const paymentType = order.paymentType;
+
     switch (status) {
       case "PAID":
-        return "default";
+        return { color: "default" as const, label: "Pagado" };
       case "PENDING":
-        return "outline";
+        if (paymentType !== 'CASH' && paymentType !== 'TRANSFER') {
+          if (mpPaymentId) {
+            return { color: "secondary" as const, label: "Pago en Proceso", className: "bg-blue-100 text-blue-800 border-blue-200" };
+          }
+          return { color: "outline" as const, label: "Incompleto / Abandonado", className: "text-muted-foreground italic" };
+        }
+        return { color: "outline" as const, label: "Pendiente de Pago" };
       case "CANCELLED":
       case "REJECTED":
-        return "destructive";
+        return { color: "destructive" as const, label: status === "CANCELLED" ? "Cancelado" : "Rechazado" };
       default:
-        return "secondary";
+        return { color: "secondary" as const, label: status };
     }
   };
 
@@ -158,12 +168,10 @@ export function OrdersTab() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge
-                    variant={getStatusColor(order.status)}
-                    className="rounded-full px-4 py-1 font-black text-[10px] tracking-widest uppercase"
+                    variant={getStatusDetails(order).color}
+                    className={`rounded-full px-4 py-1 font-black text-[10px] tracking-widest uppercase ${getStatusDetails(order).className || ''}`}
                   >
-                    {profile.orders.statuses[
-                      order.status as keyof typeof profile.orders.statuses
-                    ] || order.status}
+                    {getStatusDetails(order).label}
                   </Badge>
                   {order.deliveryStatus && (
                     <Badge
@@ -261,12 +269,10 @@ export function OrdersTab() {
                     ESTADO PAGO
                   </p>
                   <Badge
-                    variant={getStatusColor(selectedOrder.status)}
-                    className="rounded-full px-4 font-black"
+                    variant={getStatusDetails(selectedOrder).color}
+                    className={`rounded-full px-4 font-black ${getStatusDetails(selectedOrder).className || ''}`}
                   >
-                    {profile.orders.statuses[
-                      selectedOrder.status as keyof typeof profile.orders.statuses
-                    ] || selectedOrder.status}
+                    {getStatusDetails(selectedOrder).label}
                   </Badge>
                 </div>
                 <div>

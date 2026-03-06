@@ -37,7 +37,12 @@ function LoginContent() {
 
   useEffect(() => {
     if (!isLoading && user) {
+if(redirectUrl?.includes("cart")){
+  window.location.href = redirectUrl;
+}else{
+
       router.replace(redirectUrl || "/profile");
+}
     }
   }, [isLoading, user, router, redirectUrl]);
 
@@ -65,7 +70,7 @@ function LoginContent() {
       toast.success(auth.login.successMessage);
       router.push(redirectUrl || "/");
     } catch (error) {
-      // El api client 
+      
       console.debug("Login failed handled by global interceptor");
     } finally {
       setIsSubmitting(false);

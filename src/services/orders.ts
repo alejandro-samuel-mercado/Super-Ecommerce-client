@@ -12,6 +12,12 @@ export interface OrderPreviewRequest {
   branchId?: string;
   pointsToUse?: number;
   currencyCode?: string;
+  address?: {
+    city?: string;
+    state?: string;
+    country?: string;
+    zip?: string;
+  } | null;
 }
 
 export interface OrderPreviewResponse {
@@ -49,6 +55,15 @@ export interface OrderPreviewResponse {
     val: number;
     discountAmount: number;
   }>;
+  branchAvailability?: Array<{
+    branchId: number;
+    isAvailable: boolean;
+    missingItems?: Array<{
+      productName: string;
+      requested: number;
+      available: number;
+    }>;
+  }>;
 }
 
 export interface CreateOrderRequest {
@@ -74,6 +89,12 @@ export interface CreateOrderRequest {
   pickupBranchId?: string;
   paymentType: "MERCADO_PAGO" | "CASH" | "CARD" | "DEBIT" | "POINTS";
   deliveryAddress?: string;
+  address?: {
+    city?: string;
+    state?: string;
+    country?: string;
+    zip?: string;
+  } | null;
   couponCode?: string;
   pointsToUse?: number;
   createAccount?: boolean;

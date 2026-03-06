@@ -1,7 +1,6 @@
 "use client";
 
 import { cart as cartContent } from "@/../content/cart";
-import { contact } from "@/../content/contact";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,36 +8,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-      Select,
-      SelectContent,
-      SelectItem,
-      SelectTrigger,
-      SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getIdempotencyKey } from "@/lib/idempotency";
 import { formatPrice } from "@/lib/utils";
+import { Branch, branchService } from "@/services/branch";
 import { PublicConfig, configService } from "@/services/config";
-import { OrderPreviewResponse, orderService } from "@/services/orders";
+import { OrderPreviewRequest, OrderPreviewResponse, orderService } from "@/services/orders";
 import { PaymentGatewayOption, paymentService } from "@/services/payment";
 import { ShippingZone, shippingService } from "@/services/shipping";
 import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-      AlertCircle,
-      Award,
-      Check,
-      Loader2,
-      MapPin,
-      Minus,
-      Plus,
-      ShieldCheck,
-      Tag,
-      Trash2,
-      User,
+    AlertCircle,
+    Award,
+    Check,
+    Loader2,
+    MapPin,
+    Minus,
+    Plus,
+    ShieldCheck,
+    Tag,
+    Trash2,
+    User
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -123,21 +123,24 @@ function CartContent() {
   const removeItem = useCartStore((state) => state.removeItem);
   const clearCart = useCartStore((state) => state.clearCart);
 
+  const clientSubtotal = items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 0), 0);
+
   const { currency } = useCurrencyStore();
 
   const [currentStep, setCurrentStep] = useState<Step>("cart");
   const [couponCode, setCouponCode] = useState("");
   const [pointsToUse, setPointsToUse] = useState<number>(0);
+  const [appliedPoints, setAppliedPoints] = useState<number>(0);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [deliveryData, setDeliveryData] = useState<DeliveryData>({
-    method: "pickup",
+    method:  "pickup"
   });
   const [preview, setPreview] = useState<OrderPreviewResponse>({
-    subtotal: 0,
+    subtotal: clientSubtotal,
     discount: 0,
     shipping: 0,
     tax: 0,
-    total: 0,
+    total: clientSubtotal,
     paymentType: "MERCADO_PAGO",
     items: [],
     stockIssues: [],
@@ -179,12 +182,11 @@ function CartContent() {
   });
   const [createAccount, setCreateAccount] = useState(false);
 
-  
-
-  const [nearestBranch, setNearestBranch] = useState<string | null>(null);
+  const [nearestBranch, setNearestBranch] = useState<number | null>(null);
 
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [storeConfig, setStoreConfig] = useState<PublicConfig | null>(null);
+  const [branches, setBranches] = useState<Branch[]>([]);
 
   const [paymentOptions, setPaymentOptions] = useState<PaymentGatewayOption[]>(
     [],
@@ -198,6 +200,15 @@ function CartContent() {
       .getAvailableZones()
       .then((zones) => setShippingZones(zones))
       .catch(console.error);
+    branchService
+      .getAll()
+      .then((data) => {
+        console.log("Branches loaded:", data);
+        setBranches(data.filter((b) => b.active || (b as any).isActive));
+      })
+      .catch((err) => {
+        console.error("Error loading branches:", err);
+      });
   }, []);
 
   useEffect(() => {
@@ -229,16 +240,13 @@ function CartContent() {
     mutationFn: async (address: {
       city: string;
       state: string;
-      zipCode: string;
+      zip: string;
       country?: string;
-      address?: string;
-     
-      
     }) => {
       return shippingService.calculateCost({
         ...address,
         items: items.map((item) => ({
-          skuId: item.skuId,
+          skuId: String(item.skuId),
           quantity: item.qty,
         })),
       });
@@ -246,7 +254,6 @@ function CartContent() {
     onSuccess: (data) => {
       setPreview((prev) => {
         const newShipping = Number(data.cost);
-
         const newTotal =
           (prev.subtotal || 0) -
           (prev.discount || 0) -
@@ -261,56 +268,27 @@ function CartContent() {
     },
   });
 
-  const prevShippingDepsRef = useRef<string>("");
-
   useEffect(() => {
     if (
-      user &&
       deliveryData.method === "shipping" &&
-      deliveryData.shippingAddress?.zip &&
-      deliveryData.shippingAddress.state &&
-      deliveryData.shippingAddress.city
+      customerData.city &&
+      customerData.state &&
+      customerData.zipCode
     ) {
-      const currentDeps = JSON.stringify({
-         method: deliveryData.method,
-         addr: deliveryData.shippingAddress,
+      shippingMutation.mutate({
+        city: customerData.city,
+        state: customerData.state,
+        zip: customerData.zipCode,
+        country: customerData.country,
       });
-
-      if (currentDeps !== prevShippingDepsRef.current) {
-        if (!shippingMutation.isPending) {
-          prevShippingDepsRef.current = currentDeps;
-          shippingMutation.mutate({
-            address: `${deliveryData.shippingAddress.street}, ${deliveryData.shippingAddress.city}, ${deliveryData.shippingAddress.state}`,
-            zipCode: deliveryData.shippingAddress.zip,
-            city: deliveryData.shippingAddress.city,
-            state: deliveryData.shippingAddress.state,
-            country: customerData.country,
-          });
-        }
-      }
     }
   }, [
-    user,
     deliveryData.method,
-    deliveryData.shippingAddress,
-    shippingMutation.isPending,
+    customerData.city,
+    customerData.state,
+    customerData.zipCode,
+    customerData.country,
   ]);
-
-  useEffect(() => {
-    if (deliveryData.method === "pickup") {
-      setPreview((prev) => ({
-        ...prev,
-        shipping: 0,
-        total: Math.max(
-          0,
-          (prev.subtotal || 0) -
-            (prev.discount || 0) -
-            (prev.pointsDiscount || 0) +
-            (prev.tax || 0),
-        ),
-      }));
-    }
-  }, [deliveryData.method]);
 
   const isAddressValid = useMemo(() => {
     if (shippingZones.length === 0) return true;
@@ -329,13 +307,8 @@ function CartContent() {
     customerData.city,
   ]);
 
-  const debouncedItems = useDebounce(items, 300);
-  const debouncedPointsToUse = useDebounce(pointsToUse, 500);
+  const debouncedItems = useDebounce(items, 150);
 
-  const clientSubtotal = items.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0,
-  );
 
   // Prefiltrar datos del cliente si está autenticado
   useEffect(() => {
@@ -371,23 +344,33 @@ function CartContent() {
   // Previsualización de la orden
   const previewMutation = useMutation({
     mutationFn: async () => {
-      return orderService.preview({
+      const payload: OrderPreviewRequest = {
         items: debouncedItems.map((item) => ({
-          skuId: item.skuId,
+          skuId: String(item.skuId),
           quantity: item.qty,
         })),
         couponCode: appliedCoupon || undefined,
-        paymentType: (selectedGateway as any) || "MERCADO_PAGO",
+        paymentType: selectedGateway as any,
         deliveryMethod: deliveryData.method,
-        branchId:
-          deliveryData.method === "pickup" ? deliveryData.pickupBranchId : "1",
-        pointsToUse: debouncedPointsToUse || undefined,
+        pointsToUse: appliedPoints,
         currencyCode: currency || undefined,
-      });
+      };
+
+      if (deliveryData.method === "pickup" && deliveryData.pickupBranchId) {
+        payload.branchId = deliveryData.pickupBranchId;
+      } else if (deliveryData.method === "shipping") {
+        payload.address = {
+           city: customerData.city,
+           state: customerData.state,
+           country: customerData.country,
+           zip: customerData.zipCode
+        };
+      }
+
+      return orderService.preview(payload);
     },
     onSuccess: (data) => {
       if (data && typeof data.subtotal === "number") {
-        // Actualizar previsualización pero mantener el envío anterior momentáneamente o 0, luego re-calcular
         setPreview(data);
       }
       setStockIssues(data?.stockIssues || []);
@@ -412,32 +395,62 @@ function CartContent() {
       items: debouncedItems.map((i) => ({ id: i.skuId, q: i.qty })),
       coupon: appliedCoupon,
       method: deliveryData.method,
-      points: debouncedPointsToUse,
+      branchId: deliveryData.method === "pickup" ? deliveryData.pickupBranchId : undefined,
+      points: appliedPoints,
       currency: currency,
       gateway: selectedGateway,
+      address: deliveryData.method === "shipping"
+        ? {
+            city: customerData.city?.trim() || "",
+            state: customerData.state?.trim() || "",
+            zip: customerData.zipCode?.trim() || ""
+          } 
+        : null,
+      userId: user?.id
     });
   }, [
     debouncedItems,
     appliedCoupon,
     deliveryData.method,
-    debouncedPointsToUse,
+    deliveryData.pickupBranchId,
+    appliedPoints,
     currency,
     selectedGateway,
+    customerData.city,
+    customerData.state,
+    customerData.zipCode,
+    user?.id
   ]);
 
   const prevDepsRef = useRef<string>("");
 
   useEffect(() => {
     if (
-      debouncedItems.length > 0 &&
-      dependencyString !== prevDepsRef.current
+      user &&
+      items.length > 0 &&
+      dependencyString !== prevDepsRef.current &&
+      !previewMutation.isPending
     ) {
-      if (!previewMutation.isPending) {
-        prevDepsRef.current = dependencyString;
-        previewMutation.mutate();
-      }
+      prevDepsRef.current = dependencyString;
+      previewMutation.mutate();
     }
-  }, [dependencyString, debouncedItems.length, previewMutation.isPending]);
+  }, [dependencyString, user, previewMutation.isPending]);
+
+  useEffect(() => {
+    if (deliveryData.method === "pickup") {
+      setPreview((prev) => ({
+        ...prev,
+        shipping: 0,
+        total: Math.max(
+          0,
+          (prev.subtotal || 0) -
+            (prev.discount || 0) -
+            (prev.pointsDiscount || 0) +
+            (prev.tax || 0),
+        ),
+      }));
+    }
+  }, [deliveryData.method]);
 
   const couponMutation = useMutation({
     mutationFn: async (code: string) => {
@@ -479,8 +492,14 @@ function CartContent() {
             deliveryData.method === "shipping"
               ? `${customerData.address}, ${customerData.city}, ${customerData.state}, ${customerData.zipCode}, ${customerData.country}`
               : undefined,
+          address: deliveryData.method === "shipping" ? {
+            city: customerData.city,
+            state: customerData.state,
+            country: customerData.country,
+            zip: customerData.zipCode
+          } : undefined,
           couponCode: appliedCoupon || undefined,
-          pointsToUse,
+          pointsToUse: appliedPoints,
           createAccount,
           paymentType: (selectedGateway as any) || "MERCADO_PAGO",
         },
@@ -536,27 +555,34 @@ function CartContent() {
       return;
     }
 
+    if (branches.length === 0) {
+      toast.error("No hay sucursales disponibles");
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
 
-        let nearest = contact.branches[0];
+        let nearest = branches[0];
         let minDistance = Infinity;
 
-        contact.branches.forEach((branch) => {
-          const distance = Math.sqrt(
-            Math.pow(branch.coordinates.lat - latitude, 2) +
-              Math.pow(branch.coordinates.lng - longitude, 2),
-          );
+        branches.forEach((branch) => {
+          if (branch.latitude && branch.longitude) {
+            const distance = Math.sqrt(
+              Math.pow(Number(branch.latitude) - latitude, 2) +
+                Math.pow(Number(branch.longitude) - longitude, 2),
+            );
 
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearest = branch;
+            if (distance < minDistance) {
+              minDistance = distance;
+              nearest = branch;
+            }
           }
         });
 
         setNearestBranch(nearest.id);
-        setDeliveryData((prev) => ({ ...prev, pickupBranchId: nearest.id }));
+        setDeliveryData((prev) => ({ ...prev, pickupBranchId: String(nearest.id) }));
         toast.success(`Sucursal más cercana: ${nearest.name}`);
       },
       () => {
@@ -584,7 +610,11 @@ function CartContent() {
         );
       case "delivery":
         if (deliveryData.method === "pickup") {
-          return !!deliveryData.pickupBranchId;
+          if (!deliveryData.pickupBranchId) return false;
+          const availability = preview?.branchAvailability?.find(
+            (b) => String(b.branchId) === deliveryData.pickupBranchId
+          );
+          return availability ? availability.isAvailable : true;
         }
         if (storeConfig && !storeConfig.enableShipping) {
           return false;
@@ -626,6 +656,14 @@ function CartContent() {
     }
   };
 
+  const isDebouncing = items !== debouncedItems;
+  const isUpdating =
+    isDebouncing ||
+    previewMutation.isPending ||
+    shippingMutation.isPending ||
+    couponMutation.isPending ||
+    createOrderMutation.isPending;
+
   if (isAuthLoading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -652,28 +690,13 @@ function CartContent() {
       </main>
     );
   }
-  const isDebouncing = items !== debouncedItems;
-  const [forceUnlock, setForceUnlock] = useState(false);
-  const isUpdatingRaw =
-    previewMutation.isPending ||
-    shippingMutation.isPending ||
-    couponMutation.isPending ||
-    createOrderMutation.isPending;
 
-  useEffect(() => {
-    if (isUpdatingRaw) {
-      setForceUnlock(false);
-      const timer = setTimeout(() => {
-        setForceUnlock(true); 
-      }, 5000); // 5 segundos de timeout extremo para descongelar UI
-      return () => clearTimeout(timer);
-    }
-  }, [isUpdatingRaw]);
 
-  const isUpdating = isUpdatingRaw && !forceUnlock;
 
   return (
-    <main className="min-h-screen  pb-40 pt-40 md:pt-20 max-sm:top-10 ">
+    <main className="min-h-screen relative pb-40 pt-40 md:pt-20 max-sm:top-10">
+
+
       <div className="container mx-auto px-4 max-w-6xl md:p-20">
         <h1 className="text-4xl font-bold mb-10 text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           {cartContent.title}
@@ -817,11 +840,18 @@ function CartContent() {
 
                               {item.attributes &&
                                 Object.keys(item.attributes).length > 0 && (
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    {Object.entries(item.attributes)
-                                      .map(([key, value]) => `${key}: ${value}`)
-                                      .join(" / ")}
-                                  </p>
+                                  <div className="flex flex-wrap gap-2 mt-2">
+                                    {Object.entries(item.attributes).map(
+                                      ([key, value]) => (
+                                        <div
+                                          key={key}
+                                          className="text-xs font-semibold px-2 py-1 bg-secondary/30 text-secondary-foreground rounded-md uppercase tracking-wider border border-secondary/40"
+                                        >
+                                          {key}: {String(value)}
+                                        </div>
+                                      ),
+                                    )}
+                                  </div>
                                 )}
                             </div>
                             <p className="font-bold text-xl text-primary mt-2">
@@ -866,7 +896,7 @@ function CartContent() {
                                   className="h-9 w-9 rounded-xl hover:bg-white/60 text-primary"
                                   onClick={() => {
                                     const step = item.measurementUnit === "KG" ? 0.1 : item.measurementUnit === "LITRO" ? 0.25 : 0.5;
-                                    const newVal = Math.max(step, parseFloat((item.qty - step).toFixed(3)));
+                                    const newVal = Math.max(step, parseFloat((Number(item.qty) - step).toFixed(3)));
                                     handleQuantityChange(item, newVal);
                                   }}
                                 >
@@ -904,7 +934,7 @@ function CartContent() {
                                   onClick={() => {
                                     const step = item.measurementUnit === "KG" ? 0.1 : item.measurementUnit === "LITRO" ? 0.25 : 0.5;
                                     const maxVal = stockLimit ?? 9999;
-                                    const newVal = Math.min(maxVal, parseFloat((item.qty + step).toFixed(3)));
+                                    const newVal = Math.min(maxVal, parseFloat((Number(item.qty) + step).toFixed(3)));
                                     handleQuantityChange(item, newVal);
                                   }}
                                   disabled={
@@ -1065,11 +1095,23 @@ function CartContent() {
                                 </span>
                               </div>
                             )}
-                          {pointsToUse > 0 && (
+                          {pointsToUse > 0 && pointsToUse !== appliedPoints && (
+                            <Button
+                              className="h-12 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 shadow-md hover:shadow-lg transition-all"
+                              onClick={() => setAppliedPoints(pointsToUse)}
+                              disabled={isUpdating}
+                            >
+                              Canjear
+                            </Button>
+                          )}
+                          {(pointsToUse > 0 || appliedPoints > 0) && (
                             <Button
                               variant="ghost"
                               className="h-12 rounded-xl text-destructive hover:bg-destructive/10"
-                              onClick={() => setPointsToUse(0)}
+                              onClick={() => {
+                                setPointsToUse(0);
+                                setAppliedPoints(0);
+                              }}
                               disabled={isUpdating}
                             >
                               Limpiar
@@ -1487,39 +1529,94 @@ function CartContent() {
                         </Button>
                       </div>
                       <div className="space-y-3">
-                        {contact.branches.map((branch) => (
-                          <Button
-                            key={branch.id}
-                            variant={
-                              deliveryData.pickupBranchId === branch.id
-                                ? "secondary"
-                                : "outline"
-                            }
-                            className={`w-full justify-start h-auto py-4 px-6 rounded-xl border-2 transition-all ${
-                              deliveryData.pickupBranchId === branch.id
-                                ? "border-primary bg-primary/5 hover:bg-primary/10"
-                                : "border-transparent bg-white/50 hover:border-primary/30"
-                            }`}
-                            onClick={() =>
-                              setDeliveryData((prev) => ({
-                                ...prev,
-                                pickupBranchId: branch.id,
-                              }))
-                            }
-                          >
-                            <MapPin
-                              className={`h-5 w-5 mr-3 shrink-0 ${deliveryData.pickupBranchId === branch.id ? "text-primary" : "text-muted-foreground"}`}
-                            />
-                            <div className="text-left">
-                              <span className="font-bold block text-gray-700">
-                                {branch.name}
-                              </span>
-                              <span className="text-sm text-muted-foreground font-normal">
-                                {branch.address}
-                              </span>
-                            </div>
-                          </Button>
-                        ))}
+                        {branches.map((branch) => {
+                          const availability = preview?.branchAvailability?.find(
+                            (b) => b.branchId === branch.id
+                          );
+                          
+                          const isBranchAvailable = availability
+                            ? availability.isAvailable
+                            : true;
+                          const isSelected =
+                            deliveryData.pickupBranchId === String(branch.id);
+
+                          return (
+                            <Button
+                              key={branch.id}
+                              disabled={!isBranchAvailable}
+                              variant={isSelected ? "secondary" : "outline"}
+                              className={`w-full justify-start h-auto py-4 px-6 rounded-xl border-2 transition-all ${
+                                !isBranchAvailable
+                                  ? "opacity-60 bg-gray-50 border-gray-200 cursor-not-allowed"
+                                  : isSelected
+                                    ? "border-primary bg-primary/5 hover:bg-primary/10"
+                                    : "border-transparent bg-white/50 hover:border-primary/30"
+                              }`}
+                              onClick={() => {
+                                if (isBranchAvailable) {
+                                  setDeliveryData((prev) => ({
+                                    ...prev,
+                                    pickupBranchId: String(branch.id),
+                                  }));
+                                }
+                              }}
+                            >
+                              <MapPin
+                                className={`h-5 w-5 mr-3 shrink-0 ${
+                                  !isBranchAvailable
+                                    ? "text-gray-400"
+                                    : isSelected
+                                      ? "text-primary"
+                                      : "text-muted-foreground"
+                                }`}
+                              />
+                              <div className="text-left w-full">
+                                <div className="flex justify-between items-center w-full">
+                                  <span
+                                    className={`font-bold block ${
+                                      !isBranchAvailable
+                                        ? "text-gray-500 line-through"
+                                        : "text-gray-700"
+                                    }`}
+                                  >
+                                    {branch.name}
+                                  </span>
+                                  {!isBranchAvailable && (
+                                    <span className="text-[10px] font-bold text-destructive bg-destructive/10 px-2 py-1 rounded">
+                                      Stock Insuficiente
+                                    </span>
+                                  )}
+                                </div>
+                                <span
+                                  className={`text-sm font-normal ${
+                                    !isBranchAvailable
+                                      ? "text-gray-400"
+                                      : "text-muted-foreground"
+                                  }`}
+                                >
+                                  {branch.address}{" "}
+                                  {branch.city && `, ${branch.city}`}
+                                </span>
+                                
+                                {!isBranchAvailable && (
+                                  <div className="mt-2 text-[11px] leading-tight text-gray-500 bg-gray-100 p-2.5 rounded-lg border border-gray-200">
+                                    <strong className="block mb-0.5 text-gray-600">Stock físico insuficiente</strong>
+                                    Esta sucursal no posee la cantidad exacta de todos los productos de tu carrito. Reduce cantidades o elige <strong>Envío a Domicilio</strong>.
+                                    {availability?.missingItems && availability.missingItems.length > 0 && (
+                                      <ul className="mt-1.5 space-y-0.5 text-left border-t border-gray-200 pt-1.5">
+                                        {availability.missingItems.map((item, i) => (
+                                          <li key={i} className="text-[10px] text-destructive/80">
+                                            • {item.productName}: <b>Pidió {item.requested}</b> (Disp. {item.available})
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </Button>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -1668,15 +1765,15 @@ function CartContent() {
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {
-                                  contact.branches.find(
-                                    (b) => b.id === deliveryData.pickupBranchId,
+                                  branches.find(
+                                    (b) => String(b.id) === deliveryData.pickupBranchId,
                                   )?.name
                                 }
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {
-                                  contact.branches.find(
-                                    (b) => b.id === deliveryData.pickupBranchId,
+                                  branches.find(
+                                    (b) => String(b.id) === deliveryData.pickupBranchId,
                                   )?.address
                                 }
                               </p>
@@ -1727,116 +1824,131 @@ function CartContent() {
 
           <div className="lg:col-span-1">
             <Card className="p-6 md:p-8 rounded-[2rem] border-2 border-primary/70 bg-white/60 backdrop-blur-xl shadow-xl sticky top-0 overflow-hidden relative">
+              {/* Loader Localizado de la Tarjeta de Precios - Diseño Premium de Referencia */}
+              {isUpdating && (
+                <div className="absolute inset-0 z-20 bg-white/80 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+                  <div className="relative mb-4">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary/30" />
+                    <ShieldCheck className="h-6 w-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                  <p className="font-bold text-primary mb-1">
+                    Cálculo Seguro en Progreso
+                  </p>
+                  <p className="text-xs text-muted-foreground max-w-[200px]">
+                    Validando precios, impuestos y descuentos con precisión
+                    total para su seguridad.
+                  </p>
+                </div>
+              )}
+
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                 <span className="w-1 h-6 bg-gradient-to-b from-primary to-secondary rounded-full"></span>
                 {cartContent.step1.summary.titulo}
               </h2>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{cartContent.step1.summary.subtotal}</span>
-                  <span className="font-medium text-foreground">
-                    {formatPrice(preview?.subtotal || 0, currency)}
-                  </span>
+              <div className={`transition-opacity duration-200 ${isUpdating ? "opacity-30" : "opacity-100"}`}>
+                {/* Desglose Jerárquico de Precios */}
+                <div className="space-y-1 mb-6">
+                  {/* SUBTOTAL */}
+                  <div className="flex justify-between text-base font-semibold text-gray-800 pb-2 border-b border-primary/10">
+                    <span>{cartContent.step1.summary.subtotal}</span>
+                    <span>{formatPrice(isUpdating ? clientSubtotal : (preview?.subtotal || clientSubtotal), currency)}</span>
+                  </div>
+
+                  {/* CARGOS Y DESCUENTOS (Tabulados) */}
+                  <div className="pl-3 border-l-2 border-primary/20 space-y-2 pt-2">
+                    {/* Promociones automáticas */}
+                    {preview?.appliedDiscounts && preview.appliedDiscounts.length > 0 && (
+                      <div className="space-y-1">
+                        {preview.appliedDiscounts.map((discount, idx) => (
+                          <div
+                            key={idx}
+                            className="flex justify-between text-xs text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-100"
+                          >
+                            <span className="flex items-center gap-1">
+                              <Tag className="h-3 w-3" />
+                              {discount.name}
+                            </span>
+                            <span>-${discount.discountAmount.toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Copones */}
+                    {storeConfig?.enableCoupons !== false && preview?.discountDetails && (
+                      <div className="flex justify-between text-xs text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-100">
+                        <span className="flex items-center gap-1">
+                          <Tag className="h-3 w-3" />
+                          Cupón: {preview.discountDetails.code}
+                        </span>
+                        <span>-{formatPrice(preview?.discountDetails?.amount || 0, currency)}</span>
+                      </div>
+                    )}
+
+                    {/* Descuentos por Puntos */}
+                    {storeConfig?.enablePoints && (preview?.pointsDiscount ?? 0) > 0 && (
+                      <div className="flex justify-between text-xs text-amber-600 font-bold bg-amber-50 p-1.5 rounded-lg border border-amber-100">
+                        <span className="flex items-center gap-1">
+                          <Award className="h-3 w-3" />
+                          Descuento por Puntos
+                        </span>
+                        <span>-{formatPrice(preview?.pointsDiscount ?? 0, currency)}</span>
+                      </div>
+                    )}
+
+                    {/* Envío */}
+                    <div className="flex justify-between text-xs text-cyan-700 font-bold bg-cyan-50 p-1.5 rounded-lg border border-cyan-100">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {cartContent.step1.summary.shipping}
+                      </span>
+                      <span className={(deliveryData.method === "pickup" && deliveryData.pickupBranchId) ? "text-emerald-600" : ""}>
+                        {deliveryData.method === "pickup" && deliveryData.pickupBranchId
+                          ? "Gratis" 
+                          : typeof preview?.shipping === 'number' && preview.shipping > 0
+                            ? formatPrice(preview.shipping, currency)
+                            : "A definir"}
+                      </span>
+                    </div>
+
+                    {/* Impuestos */}
+                    {(preview?.tax > 0 || (storeConfig?.taxRate && Number(storeConfig.taxRate) > 0) || !storeConfig) && (
+                      <div className="flex justify-between text-xs text-indigo-600 font-bold bg-indigo-50 p-1.5 rounded-lg border border-indigo-100">
+                        <span className="flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          {cartContent.step1.summary.tax}
+                          {preview?.tax === 0 && storeConfig?.taxRate && <span className="text-[10px] font-normal opacity-70">({storeConfig.taxRate}%)</span>}
+                        </span>
+                        <span>{formatPrice(preview?.tax || (clientSubtotal * (Number(storeConfig?.taxRate || 0) / 100)), currency)}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Lista de promociones automáticas */}
-                {preview?.appliedDiscounts &&
-                  preview.appliedDiscounts.length > 0 && (
-                    <div className="space-y-1">
-                      {preview.appliedDiscounts.map((discount, idx) => (
-                        <div
-                          key={idx}
-                          className="flex justify-between text-xs text-green-600 font-medium bg-green-50/50 p-2 rounded-lg border border-green-100"
-                        >
-                          <span className="flex items-center gap-1">
-                            <Tag className="h-3 w-3" />
-                            {discount.name}
-                          </span>
-                          <span>-${discount.discountAmount.toFixed(2)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                <Separator className="my-6 bg-primary/20" />
 
-                {/* Mensaje de seguridad */}
-                {isUpdating && (
-                  <div className="absolute inset-0 z-20 bg-white/80 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
-                    <div className="relative mb-4">
-                      <Loader2 className="h-12 w-12 animate-spin text-primary/30" />
-                      <ShieldCheck className="h-6 w-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                    </div>
-                    <p className="font-bold text-primary mb-1">
-                      Cálculo Seguro en Progreso
-                    </p>
-                    <p className="text-xs text-muted-foreground max-w-[200px]">
-                      Validando precios, impuestos y descuentos con precisión
-                      total para su seguridad.
-                    </p>
-                  </div>
-                )}
-
-                {/* Cupones o descuento genérico */}
-                {storeConfig?.enableCoupons !== false &&
-                  preview?.discountDetails && (
-                    <div className="flex justify-between text-sm text-green-600 font-medium bg-green-100 p-2 rounded-lg">
-                      <span>Cupón: {preview.discountDetails.code}</span>
-                      <span>
-                        -
-                        {formatPrice(
-                          preview?.discountDetails?.amount || 0,
-                          currency,
-                        )}
-                      </span>
-                    </div>
-                  )}
-
-                {storeConfig?.enablePoints &&
-                  (preview?.pointsDiscount ?? 0) > 0 && (
-                    <div className="flex justify-between text-sm text-amber-600 font-medium bg-amber-50 p-2 rounded-lg">
-                      <span>Descuento por Puntos</span>
-                      <span>
-                        -{formatPrice(preview?.pointsDiscount ?? 0, currency)}
-                      </span>
-                    </div>
-                  )}
-
-                {preview?.shipping > 0 && (
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{cartContent.step1.summary.shipping}</span>
-                    <span className="font-medium text-foreground">
-                      {formatPrice(preview?.shipping || 0, currency)}
-                    </span>
-                  </div>
-                )}
-
-                {preview?.tax > 0 && (
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{cartContent.step1.summary.tax}</span>
-                    <span className="font-medium text-foreground">
-                      {formatPrice(preview?.tax || 0, currency)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <Separator className="my-6 bg-primary/10" />
-
-              <div className="flex justify-between items-end mb-8 relative">
-                <span className="text-lg font-bold text-muted-foreground">
-                  {cartContent.step1.summary.total}
-                </span>
-                <div className="flex flex-col items-end">
-                  <span
-                    className={`text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent transition-opacity duration-200 ${isUpdating ? "opacity-30" : "opacity-100"}`}
-                  >
-                    {formatPrice(preview?.total || 0, currency)}
+                <div className="flex justify-between items-end mb-8 relative">
+                  <span className="text-lg font-bold text-muted-foreground">
+                    {cartContent.step1.summary.total}
                   </span>
-                  {isUpdating && (
-                    <span className="text-[10px] text-primary font-bold animate-pulse absolute -bottom-5 right-0 whitespace-nowrap">
-                      Sincronizando con servidor seguro...
+                  <div className="flex flex-col items-end">
+                    <span className="text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+                      {formatPrice(
+                        isUpdating
+                          ? clientSubtotal + (clientSubtotal * (Number(storeConfig?.taxRate || 0) / 100))
+                          : (preview?.total !== undefined && preview.total !== null)
+                            ? preview.total 
+                            : clientSubtotal + (clientSubtotal * (Number(storeConfig?.taxRate || 0) / 100)), 
+                        currency
+                      )}
                     </span>
-                  )}
+                    {isUpdating && (
+                      <span className="text-[10px] text-primary font-bold animate-pulse absolute -bottom-5 right-0 whitespace-nowrap">
+                        Sincronizando con servidor seguro...
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -1849,7 +1961,8 @@ function CartContent() {
                       createOrderMutation.isPending ||
                       isUpdating ||
                       !selectedGateway ||
-                      isRedirecting
+                      isRedirecting ||
+                      preview === null
                     }
                   >
                     {createOrderMutation.isPending || isRedirecting ? (
@@ -1867,7 +1980,7 @@ function CartContent() {
                   <Button
                     className="w-full h-14 text-lg font-bold rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleNext}
-                    disabled={(!user && currentStep === "cart") || !canProceed() || isUpdating}
+                    disabled={(!user && currentStep === "cart") || !canProceed() || isUpdating || preview === null}
                   >
                     {isUpdating ? (
                       <>
