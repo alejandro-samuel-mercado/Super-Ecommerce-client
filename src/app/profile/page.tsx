@@ -93,8 +93,8 @@ function ProfileContent() {
       </div>
 
       {/* 2. Información del usuario */}
-      <div className="container mx-auto max-lg:px-20 max-md:px-10 max-sm:px-6 -mt-20 max-lg:-mt-24 relative z-10 max-sm:-mt-40">
-        <div className="flex flex-col max-sm:flex-col max-lg:flex-row items-start gap-6 mb-12 ">
+      <div className="container mx-auto max-lg:px-20 max-md:px-10 max-sm:px-6 -mt-28 max-lg:-mt-24 relative z-10 max-sm:-mt-40">
+        <div className="flex flex-col max-sm:flex-col lg:flex-row items-start gap-6 mb-12 ">
           {/* Avatar */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}

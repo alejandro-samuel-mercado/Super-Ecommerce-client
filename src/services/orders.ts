@@ -185,4 +185,15 @@ export const orderService = {
     );
     return response.data;
   },
+
+  getMySales: async (params?: { includePending?: boolean }): Promise<any[]> => {
+    const query = new URLSearchParams();
+    if (params?.includePending !== undefined) {
+      query.append("includePending", String(params.includePending));
+    }
+    const response = await http<{ success: boolean; data: any[] }>(
+      `/api/sales/my-sales?${query.toString()}`,
+    );
+    return response.data;
+  },
 };

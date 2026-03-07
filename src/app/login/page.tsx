@@ -30,10 +30,13 @@ export default function LoginPage() {
 
 function LoginContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPendingVerification, setIsPendingVerification] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
-  const { login, loginWithGoogle, user, isLoading } = useAuth();
+  const { login, loginWithGoogle, verify, resendCode, user, isLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -63,19 +66,104 @@ if(redirectUrl?.includes("cart")){
     );
   }
 
-  const onSubmit = async (data: LoginForm) => {
+    const onSubmit = async (data: LoginForm) => {
     setIsSubmitting(true);
     try {
       await login(data.email, data.password);
       toast.success(auth.login.successMessage);
       router.push(redirectUrl || "/");
-    } catch (error) {
-      
+    } catch (error: any) {
+      if (error?.code === 'EMAIL_NOT_VERIFIED') {
+        setVerificationEmail(data.email);
+        setIsPendingVerification(true);
+      }
       console.debug("Login failed handled by global interceptor");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const onVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (verificationCode.length !== 6) {
+      toast.error("El código debe tener 6 dígitos");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await verify(verificationEmail, verificationCode);
+    
+      router.push(redirectUrl || "/profile");
+    } catch (error) {
+      console.debug("Verification failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isPendingVerification) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-8 bg-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+        <div className="w-full max-w-md space-y-8 bg-card p-10 rounded-2xl border-2 border-border shadow-2xl relative z-10">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Verifica tu cuenta</h1>
+            <p className="text-muted-foreground mt-4">
+              Tu cuenta aún no está verificada. Ingresa el código enviado a <span className="font-semibold text-primary">{verificationEmail}</span>
+            </p>
+          </div>
+
+          <form onSubmit={onVerify} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="code" className="font-semibold ml-1">Código de Verificación</Label>
+              <Input
+                id="code"
+                type="text"
+                maxLength={6}
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ""))}
+                placeholder="000000"
+                className="rounded-xl h-16 text-center text-3xl tracking-[1rem] font-bold border-2 bg-muted/20 focus:bg-background transition-all border-border focus:border-primary"
+                required
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full rounded-full h-14 font-bold text-lg shadow-xl shadow-primary/25 hover:shadow-primary/40 transition-all bg-gradient-to-r from-primary to-secondary hover:scale-[1.02]"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Verificando..." : "Verificar Cuenta"}
+            </Button>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                ¿No recibiste el código?{" "}
+                <button
+                  type="button"
+                  onClick={() => resendCode(verificationEmail)}
+                  className="text-primary hover:underline font-semibold"
+                >
+                  Reenviar código
+                </button>
+              </p>
+            </div>
+          </form>
+
+          <div className="text-center">
+            <button 
+              type="button"
+              onClick={() => setIsPendingVerification(false)}
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              ← Volver al inicio de sesión
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   const handleGoogleLogin = async () => {
     try {
@@ -89,7 +177,7 @@ if(redirectUrl?.includes("cart")){
     <main className="min-h-screen pb-0 md:h-auto grid lg:grid-cols-2  max-sm:overflow-hidden ">
       {/* Lado decorativo */}
       <div className="hidden lg:flex flex-col justify-between relative overflow-hidden p-16 text-white  ">
-        <div className="absolute inset-0 bg-gradient-to-t from-primary via-indigo-600 to-purple-800 opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary via-indigo-600 to-secondary/80 opacity-90" />
         {" "}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary/30 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 animate-pulse" />
@@ -111,7 +199,7 @@ if(redirectUrl?.includes("cart")){
       </div>
 
       {/* Form side */}
-      <div className="flex items-center justify-center p-8 bg-background max-md:bg-gray-300/80  relative ">
+      <div className="flex items-center justify-center p-8 py-40 max-md:py-20  bg-background max-md:bg-gray-300/80  relative ">
         {/* Decoración de fondo para móviles */}
         <div className="absolute inset-0 lg:hidden -z-10 ">
           <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] bg-primary/5 rounded-full blur-3xl" />

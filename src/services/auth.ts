@@ -20,12 +20,35 @@ export const authService = {
       method: "POST",
       body: JSON.stringify(data),
     });
+    // El backend ahora retorna { success: true, message: '...', data: { user } }
+    // Sin tokens si requiere verificación.
     const { user, tokens } = res.data;
+    return {
+      user,
+      accessToken: tokens?.accessToken || null,
+      refreshToken: tokens?.refreshToken || null,
+      message: res.message
+    };
+  },
+
+  verifyEmail: async (email: string, code: string) => {
+    const res = await http<any>("/api/auth/verify", {
+      method: "POST",
+      body: JSON.stringify({ email, code }),
+    });
+    const { user, tokens } = res.data || res;
     return {
       user,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
+  },
+
+  resendVerification: async (email: string) => {
+    return await http<any>("/api/auth/resend-verify", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
   },
 
   logout: async () => {

@@ -18,7 +18,9 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
-  register: (data: any) => Promise<void>;
+  register: (data: any) => Promise<any>;
+  verify: (email: string, code: string) => Promise<void>;
+  resendCode: (email: string) => Promise<void>;
   logout: () => void;
   setAuth: (user: User, token: string) => void;
   refreshUser: () => Promise<void>;
@@ -138,17 +140,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (data: any) => {
+    const res = await authService.register(data);
+    const { user: userData, accessToken: token, refreshToken } = res;
+    
+    if (token) {
+        setUser(userData);
+        setAccessToken(token);
+        localStorage.setItem("accessToken", token);
+        if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+        useFavoritesStore.getState().syncFavorites();
+        await useCartStore.getState().syncWithBackend(undefined, true);
+    } else {
+        // El usuario está en PENDING_VERIFICATION, no guardamos tokens
+        setUser(userData);
+    }
+    return res;
+  };
+
+  const verify = async (email: string, code: string) => {
     const {
       user: userData,
       accessToken: token,
       refreshToken,
-    } = await authService.register(data);
+    } = await authService.verifyEmail(email, code);
+    
     setUser(userData);
     setAccessToken(token);
     localStorage.setItem("accessToken", token);
     if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
     useFavoritesStore.getState().syncFavorites();
     await useCartStore.getState().syncWithBackend(undefined, true);
+  };
+
+  const resendCode = async (email: string) => {
+    await authService.resendVerification(email);
   };
 
   const logout = () => {
@@ -177,6 +202,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         loginWithGoogle,
         register,
+        verify,
+        resendCode,
         logout,
         setAuth,
         refreshUser,

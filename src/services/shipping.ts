@@ -19,6 +19,7 @@ export const shippingService = {
     city?: string;
     zip?: string;
     items?: any[];
+    subtotal?: number;
   }): Promise<{ cost: number; success: boolean }> => {
     return http<{ cost: number; success: boolean }>(
       "/api/shipping/calculate-cost",

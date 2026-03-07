@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { PublicConfig, configService } from "@/services/config";
 import { useCartStore } from "@/store/cart";
 import { motion } from "framer-motion";
 import { Clock, Eye } from "lucide-react";
@@ -22,6 +23,7 @@ function CheckoutPendingContent() {
   const saleId =
     searchParams.get("saleId") || searchParams.get("external_reference");
   const clearCart = useCartStore((state) => state.clearCart);
+  const [config, setConfig] = useState<PublicConfig | null>(null);
 
   const [isValidating, setIsValidating] = useState(true);
 
@@ -38,6 +40,7 @@ function CheckoutPendingContent() {
     } else {
       setIsValidating(false);
       clearCart();
+      configService.getPublicConfig().then(setConfig).catch(console.error);
   }
   }, [clearCart, searchParams, router]);
 
@@ -97,16 +100,17 @@ function CheckoutPendingContent() {
                         <div className="h-10 w-10 rounded-xl bg-green-500/20 text-green-600 flex items-center justify-center font-bold">W</div>
                         <div>
                           <p className="text-[10px] font-black text-muted-foreground uppercase">WhatsApp</p>
-                          <p className="text-sm font-bold">+54 9 11 1234-5678</p>
+                          <p className="text-sm font-bold">{config?.contactPhone || ''}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-xl bg-blue-500/20 text-blue-600 flex items-center justify-center font-bold">@</div>
                         <div>
                           <p className="text-[10px] font-black text-muted-foreground uppercase">Email</p>
-                          <p className="text-sm font-bold">pagos@tienda.com</p>
+                          <p className="text-sm font-bold">{config?.contactEmail || ''}</p>
                         </div>
                       </div>
+                      
                     </div>
                   </div>
 
@@ -174,7 +178,7 @@ function CheckoutPendingContent() {
                     asChild
                     className="w-full h-20 bg-primary text-white text-lg font-black hover:bg-secondary transition-all rounded-2xl gap-3 shadow-md border-4 border-white/10"
                   >
-                    <Link href="/profile/orders">
+                    <Link href="/profile">
                       <Eye size={24} strokeWidth={3} />
                       Ver mi pedido
                     </Link>

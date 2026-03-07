@@ -38,6 +38,7 @@ import {
     ShieldCheck,
     Tag,
     Trash2,
+    Truck,
     User
 } from "lucide-react";
 import Image from "next/image";
@@ -122,6 +123,7 @@ function CartContent() {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
   const clearCart = useCartStore((state) => state.clearCart);
+  const addItem = useCartStore((state) => state.addItem);
 
   const clientSubtotal = items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 0), 0);
 
@@ -181,6 +183,7 @@ function CartContent() {
     };
   });
   const [createAccount, setCreateAccount] = useState(false);
+  const [recentPendingOrder, setRecentPendingOrder] = useState<any>(null);
 
   const [nearestBranch, setNearestBranch] = useState<number | null>(null);
 
@@ -210,6 +213,54 @@ function CartContent() {
         console.error("Error loading branches:", err);
       });
   }, []);
+
+  useEffect(() => {
+    if (user && items.length === 0 && currentStep === "cart") {
+      orderService
+        .getMySales({ includePending: true })
+        .then((sales) => {
+          const pending = sales.find((s: any) => {
+            const isPending = s.paymentStatus === "PENDING";
+            const isRecent =
+              new Date().getTime() - new Date(s.createdAt).getTime() <
+              24 * 60 * 60 * 1000;
+            return isPending && isRecent;
+          });
+          if (pending) {
+            setRecentPendingOrder(pending);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [user, items.length, currentStep]);
+
+  const handleRecoverOrder = async () => {
+    if (!recentPendingOrder) return;
+
+    try {
+      for (const item of recentPendingOrder.items) {
+        const cartItem = {
+          productId: item.sku?.productId,
+          skuId: item.skuId.toString(),
+          productName: item.productName || item.sku?.product?.name,
+          price: Number(item.unitPrice),
+          productImage: item.sku?.product?.images?.[0] || "",
+          qty: Number(item.quantity),
+          attributes:
+            item.sku?.variantOptions?.reduce(
+              (acc: any, opt: any) => ({ ...acc, [opt.name]: opt.value }),
+              {},
+            ) || {},
+          stock: item.sku?.stock || 99,
+        };
+        await addItem(cartItem, !!user);
+      }
+      setRecentPendingOrder(null);
+      toast.success("Carrito recuperado exitosamente");
+    } catch (error) {
+      toast.error("Error al recuperar el carrito");
+    }
+  };
 
   useEffect(() => {
     const fetchPaymentOptions = async () => {
@@ -249,6 +300,7 @@ function CartContent() {
           skuId: String(item.skuId),
           quantity: item.qty,
         })),
+        subtotal: preview?.subtotal || clientSubtotal,
       });
     },
     onSuccess: (data) => {
@@ -513,6 +565,7 @@ function CartContent() {
       toast.error(errorMessage);
     },
     onSuccess: async (data: any) => {
+      clearCart();
      
       try {
         setIsRedirecting(true);
@@ -523,9 +576,9 @@ function CartContent() {
         if (checkoutUrl) {
           window.location.href = checkoutUrl;
         } else if (saleId) {
-          router.push(`/profile/orders/${saleId}`);
+          router.push(`/profile`);
         } else {
-          router.push("/profile/orders");
+          router.push("/profile");
           setIsRedirecting(false);
         }
       } catch (error) {
@@ -620,10 +673,10 @@ function CartContent() {
           return false;
         }
         return (
-          deliveryData.shippingAddress?.street &&
-          deliveryData.shippingAddress?.city &&
-          deliveryData.shippingAddress?.state &&
-          deliveryData.shippingAddress?.zip
+          !!customerData.address &&
+          !!customerData.city &&
+          !!customerData.state &&
+          !!customerData.zipCode
         );
       case "payment":
         return !!selectedGateway;
@@ -679,11 +732,36 @@ function CartContent() {
   if (items.length === 0 && currentStep === "cart") {
     return (
       <main className="min-h-screen py-16 pt-40 max:md:pt-20">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4 text-center max-w-2xl">
           <h1 className="text-3xl font-bold mb-4">
             {cartContent.step1.emptyCart}
           </h1>
-          <Button onClick={() => router.push("/products")}>
+          
+          {recentPendingOrder && (
+            <Card className="mb-8 p-6 bg-primary/5 border-primary/20 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4">
+              <div className="flex flex-col items-center gap-4">
+                <div className="p-3 bg-primary/10 rounded-full">
+                  <AlertCircle className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold mb-2">¿Deseas recuperar tu carrito?</h2>
+                  <p className="text-muted-foreground mb-4">
+                    Tienes una orden pendiente de pago por <strong>{formatPrice(recentPendingOrder.total)}</strong>. 
+                    Puedes recuperar los productos y continuar comprando.
+                  </p>
+                  <Button 
+                    variant="default" 
+                    className="w-full sm:w-auto"
+                    onClick={handleRecoverOrder}
+                  >
+                    Recuperar Productos
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          <Button variant="outline" onClick={() => router.push("/products")}>
             {cartContent.step1.continueShopping}
           </Button>
         </div>
@@ -1787,12 +1865,12 @@ function CartContent() {
                                 {cartContent.step4.shipping}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {deliveryData.shippingAddress?.street}
+                                {customerData.address}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {deliveryData.shippingAddress?.city},{" "}
-                                {deliveryData.shippingAddress?.state}{" "}
-                                {deliveryData.shippingAddress?.zip}
+                                {customerData.city},{" "}
+                                {customerData.state}{" "}
+                                {customerData.zipCode}
                               </p>
                             </div>
                           </div>
@@ -1817,6 +1895,48 @@ function CartContent() {
                       </a>
                     </div>
                   </div>
+                  
+                  {/* FREE SHIPPING PROGRESS BAR */}
+                  {storeConfig?.enableShipping && storeConfig?.freeShippingThreshold && (
+                    <div className="mt-6 p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl border border-primary/10 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
+                      {(() => {
+                        const threshold = Number(storeConfig.freeShippingThreshold);
+                        const current = isUpdating ? clientSubtotal : (preview?.subtotal || clientSubtotal);
+                        const remaining = Math.max(0, threshold - current);
+                        const progress = Math.min(100, (current / threshold) * 100);
+                        const isFree = current >= threshold;
+
+                        return (
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                              <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
+                                <Truck size={14} className={isFree ? "animate-bounce" : ""} />
+                                {isFree ? "¡Envío Gratis Alcanzado!" : "Envío a Domicilio"}
+                              </span>
+                              {!isFree && (
+                                <span className="text-[10px] font-bold text-muted-foreground italic">
+                                  Faltan {formatPrice(remaining, currency)}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full transition-all duration-1000 ease-out rounded-full ${isFree ? 'bg-gradient-to-r from-emerald-400 to-emerald-600' : 'bg-gradient-to-r from-primary to-secondary'}`}
+                                style={{ width: `${progress}%` }}
+                              />
+                            </div>
+
+                            <p className="text-[10px] font-medium text-center text-muted-foreground leading-tight">
+                              {isFree 
+                                ? "¡Felicidades! Tu compra califica para envío sin costo." 
+                                : `Agrega ${formatPrice(remaining, currency)} más para desbloquear el ENVÍO GRATIS.`}
+                            </p>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
               )}
             </Card>
@@ -1903,12 +2023,14 @@ function CartContent() {
                         <MapPin className="h-3 w-3" />
                         {cartContent.step1.summary.shipping}
                       </span>
-                      <span className={(deliveryData.method === "pickup" && deliveryData.pickupBranchId) ? "text-emerald-600" : ""}>
+                      <span className={(deliveryData.method === "pickup" && deliveryData.pickupBranchId) || (deliveryData.method === "shipping" && preview?.shipping === 0) ? "text-emerald-600" : ""}>
                         {deliveryData.method === "pickup" && deliveryData.pickupBranchId
                           ? "Gratis" 
-                          : typeof preview?.shipping === 'number' && preview.shipping > 0
-                            ? formatPrice(preview.shipping, currency)
-                            : "A definir"}
+                          : deliveryData.method === "shipping" && preview?.shipping === 0
+                            ? "Gratis"
+                            : typeof preview?.shipping === 'number' && preview.shipping > 0
+                              ? formatPrice(preview.shipping, currency)
+                              : "A definir"}
                       </span>
                     </div>
 

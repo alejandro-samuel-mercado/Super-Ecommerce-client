@@ -40,10 +40,15 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPendingVerification, setIsPendingVerification] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const router = useRouter();
   const {
     register: registerUser,
     loginWithGoogle,
+    verify,
+    resendCode,
     user,
     isLoading,
   } = useAuth();
@@ -79,26 +84,116 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     setIsSubmitting(true);
     try {
-      await registerUser({
+      const res = await registerUser({
         name: `${data.firstName} ${data.lastName}`,
         email: data.email,
         password: data.password,
       });
-      toast.success(auth.register.successMessage);
-      router.push("/profile");
+      
+      if (res.user?.status === 'PENDING_VERIFICATION') {
+        setVerificationEmail(data.email);
+        setIsPendingVerification(true);
+        toast.info("Por favor verifica tu correo electrónico");
+      } else {
+        toast.success(auth.register.successMessage);
+        router.push("/profile");
+      }
     } catch (error) {
       console.debug("Registration failed handled by global interceptor");
     } finally {
       setIsSubmitting(false);
     }
   };
+  const onVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (verificationCode.length !== 6) {
+      toast.error("El código debe tener 6 dígitos");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await verify(verificationEmail, verificationCode);
+  
+      router.push("/profile");
+    } catch (error) {
+      console.debug("Verification failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isPendingVerification) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-8 bg-background relative overflow-hidden">
+        {/* Decoración similar al login/register */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 -z-10" />
+        
+        <div className="w-full max-w-md space-y-8 bg-card p-10 rounded-2xl border-2 border-border shadow-2xl relative z-10">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Verifica tu cuenta</h1>
+            <p className="text-muted-foreground mt-4">
+              Hemos enviado un código de 6 dígitos a <span className="font-semibold text-primary">{verificationEmail}</span>
+            </p>
+          </div>
+
+          <form onSubmit={onVerify} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="code" className="font-semibold ml-1">Código de Verificación</Label>
+              <Input
+                id="code"
+                type="text"
+                maxLength={6}
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ""))}
+                placeholder="000000"
+                className="rounded-xl h-16 text-center text-3xl tracking-[1rem] font-bold border-2 bg-muted/20 focus:bg-background transition-all border-border focus:border-primary"
+                required
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full rounded-full h-14 font-bold text-lg shadow-xl shadow-primary/25 hover:shadow-primary/40 transition-all bg-gradient-to-r from-primary to-secondary hover:scale-[1.02]"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Verificando..." : "Verificar Cuenta"}
+            </Button>
+            
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                ¿No recibiste el código?{" "}
+                <button
+                  type="button"
+                  onClick={() => resendCode(verificationEmail)}
+                  className="text-primary hover:underline font-semibold"
+                >
+                  Reenviar código
+                </button>
+              </p>
+            </div>
+          </form>
+
+          <div className="text-center">
+            <button 
+              type="button"
+              onClick={() => setIsPendingVerification(false)}
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              ← Volver al registro
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen grid lg:grid-cols-2 max-md:pb-20 max-md:pt-10 max-md:bg-gray-300/80 max-sm:overflow-hidden ">
       {/* Lado de búsqueda - Decorativo */}
-      <div className="hidden lg:flex flex-col justify-between relative overflow-hidden p-16 text-white bg-black">
+      <div className="hidden lg:flex flex-col justify-between relative overflow-hidden p-16 text-white bg-black pt-20">
         {/* Gradiente de fondo */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-600 via-rose-600 to-orange-600 opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary via-indigo-600 to-secondary/80 opacity-90  opacity-90" />
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
 
         {/* Formas decorativas */}
@@ -125,7 +220,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Formulario */}
-      <div className="flex items-center justify-center  p-8 bg-background max-md:bg-gray-300/80   relative">
+      <div className="flex items-center justify-center  p-8 py-40 max-md:py-20  bg-background max-md:bg-gray-300/80   relative">
         {/* Decoración de fondo */}
         <div className="absolute inset-0 lg:hidden -z-10">
           <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] bg-pink-500/5 rounded-full blur-3xl" />
@@ -193,7 +288,7 @@ export default function RegisterPage() {
                     id="firstName"
                     {...register("firstName")}
                     placeholder={auth.register.firstNamePlaceholder}
-                    className={`rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.firstName ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
+                    className={` rounded-xl h-12 border-2 bg-muted/20 focus:bg-background transition-all ${errors.firstName ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                   />
                   {errors.firstName && (
                     <p className="text-sm text-destructive ml-1">

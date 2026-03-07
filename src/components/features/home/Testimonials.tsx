@@ -191,7 +191,7 @@ export function Testimonials() {
 
               {!user && (
                 <p className="text-sm text-amber-600 text-center font-medium">
-                  ⚠️ Debes{" "}
+                    Debes{" "}
                   <Link
                     href="/login"
                     className="underline hover:text-amber-700"

@@ -21,6 +21,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 interface RequestOptions extends RequestInit {
   token?: string;
   skipRetry?: boolean;
+  responseType?: 'json' | 'blob';
 }
 
 let refreshHandler: (() => Promise<string | null>) | null = null;
@@ -137,6 +138,12 @@ export async function http<T>(
     }
 
     if (response.status === 204) return {} as T;
+    
+    // Handle blob response type
+    if (options.responseType === 'blob') {
+      return (await response.blob()) as any;
+    }
+
     const data = await response.json();
 
     if (

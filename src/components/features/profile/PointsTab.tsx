@@ -72,15 +72,7 @@ export function PointsTab() {
           <p className="text-3xl font-bold">{pointsData?.used || 0}</p>
         </Card>
 
-        <Card className="p-6 text-center border-4 border-primary/20">
-          <div className="h-8 w-8 mx-auto mb-2 rounded-full bg-muted flex items-center justify-center">
-            <span className="text-lg">⏰</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {profile.points.expired}
-          </p>
-          <p className="text-3xl font-bold">{pointsData?.expired || 0}</p>
-        </Card>
+        
       </div>
 
       <Card className="p-6 border-4 border-primary/20">
