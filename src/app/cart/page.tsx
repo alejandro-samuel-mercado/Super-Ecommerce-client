@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+      Select,
+      SelectContent,
+      SelectItem,
+      SelectTrigger,
+      SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,18 +28,18 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-    AlertCircle,
-    Award,
-    Check,
-    Loader2,
-    MapPin,
-    Minus,
-    Plus,
-    ShieldCheck,
-    Tag,
-    Trash2,
-    Truck,
-    User
+      AlertCircle,
+      Award,
+      Check,
+      Loader2,
+      MapPin,
+      Minus,
+      Plus,
+      ShieldCheck,
+      Tag,
+      Trash2,
+      Truck,
+      User
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -406,6 +406,7 @@ function CartContent() {
         deliveryMethod: deliveryData.method,
         pointsToUse: appliedPoints,
         currencyCode: currency || undefined,
+        userId: user?.id ? Number(user.id) : undefined,
       };
 
       if (deliveryData.method === "pickup" && deliveryData.pickupBranchId) {
@@ -510,6 +511,7 @@ function CartContent() {
         code,
         clientSubtotal,
         currency || undefined,
+        user?.id ? Number(user.id) : undefined,
       );
     },
     onSuccess: (data) => {
@@ -520,8 +522,9 @@ function CartContent() {
         toast.error(data.message || cartContent.step1.coupon.invalid);
       }
     },
-    onError: () => {
-      toast.error(cartContent.errors.coupon);
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || cartContent.errors.coupon;
+      toast.error(message);
     },
   });
 
@@ -1682,7 +1685,7 @@ function CartContent() {
                                     Esta sucursal no posee la cantidad exacta de todos los productos de tu carrito. Reduce cantidades o elige <strong>Envío a Domicilio</strong>.
                                     {availability?.missingItems && availability.missingItems.length > 0 && (
                                       <ul className="mt-1.5 space-y-0.5 text-left border-t border-gray-200 pt-1.5">
-                                        {availability.missingItems.map((item, i) => (
+                                        {availability.missingItems.map((item:any, i:any) => (
                                           <li key={i} className="text-[10px] text-destructive/80">
                                             • {item.productName}: <b>Pidió {item.requested}</b> (Disp. {item.available})
                                           </li>
@@ -1997,12 +2000,24 @@ function CartContent() {
 
                     {/* Copones */}
                     {storeConfig?.enableCoupons !== false && preview?.discountDetails && (
-                      <div className="flex justify-between text-xs text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-100">
-                        <span className="flex items-center gap-1">
-                          <Tag className="h-3 w-3" />
-                          Cupón: {preview.discountDetails.code}
-                        </span>
-                        <span>-{formatPrice(preview?.discountDetails?.amount || 0, currency)}</span>
+                      <div className="space-y-2">
+                        {preview.discountDetails?.error ? (
+                          <div className="flex flex-col gap-1 text-xs text-destructive font-bold bg-destructive/10 p-2 rounded-lg border border-destructive/20 animate-pulse">
+                            <span className="flex items-center gap-1">
+                              <AlertCircle className="h-3 w-3" />
+                              Error en cupón {appliedCoupon}:
+                            </span>
+                            <span className="font-medium opacity-90">{preview.discountDetails?.error}</span>
+                          </div>
+                        ) : (
+                          <div className="flex justify-between text-xs text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-100">
+                            <span className="flex items-center gap-1">
+                              <Tag className="h-3 w-3" />
+                              Cupón: {preview.discountDetails.code}
+                            </span>
+                            <span>-{formatPrice(preview?.discountDetails?.amount || 0, currency)}</span>
+                          </div>
+                        )}
                       </div>
                     )}
 

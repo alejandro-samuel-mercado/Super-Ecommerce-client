@@ -12,6 +12,7 @@ export interface OrderPreviewRequest {
   branchId?: string;
   pointsToUse?: number;
   currencyCode?: string;
+  userId?: number;
   address?: {
     city?: string;
     state?: string;
@@ -26,44 +27,23 @@ export interface OrderPreviewResponse {
   pointsDiscount?: number;
   paymentType: "MERCADO_PAGO" | "CASH" | "CARD" | "DEBIT" | "POINTS";
   shipping: number;
-  items?: Array<{
-    skuId: number;
-    quantity: number;
-    availableStock: number;
-    unitPrice: number;
-  }>;
+  items?: any[];
   tax: number;
   total: number;
   hasStockError?: boolean;
-  stockIssues?: Array<{
-    skuId: number;
-    skuCode: string;
-    productName: string;
-    available: number;
-    requested: number;
-  }>;
+  stockIssues?: any[];
   discountDetails?: {
     code: string;
     type: string;
     value: number;
     amount: number;
-  };
-  appliedDiscounts?: Array<{
-    id: number;
-    name: string;
-    type: string;
-    val: number;
-    discountAmount: number;
-  }>;
-  branchAvailability?: Array<{
-    branchId: number;
-    isAvailable: boolean;
-    missingItems?: Array<{
-      productName: string;
-      requested: number;
-      available: number;
-    }>;
-  }>;
+    error?: string;
+  } | null;
+  appliedDiscounts?: any[];
+  branchAvailability?: any[];
+  totalPointsEarned?: number;
+  pointsUsed?: number;
+  currencyCode?: string;
 }
 
 export interface CreateOrderRequest {
@@ -162,12 +142,13 @@ export const orderService = {
     code: string,
     amount: number,
     currencyCode?: string,
+    userId?: number,
   ): Promise<CouponValidationResponse> => {
     const response = await http<{ success: boolean; data: any }>(
       "/api/coupons/validate",
       {
         method: "POST",
-        body: JSON.stringify({ code, amount, currencyCode }),
+        body: JSON.stringify({ code, amount, currencyCode, userId }),
       },
     );
 

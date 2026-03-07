@@ -161,13 +161,27 @@ export interface Order {
 
 export interface OrderPreview {
   subtotal: number;
+  userId: number;
   shipping: number;
   discount: number;
   total: number;
-  items: CartItem[];
+  items: any[];
   tax: number;
   currencyCode?: string;
   currencySymbol?: string;
+  discountDetails?: {
+    code?: string;
+    type?: string;
+    value?: number;
+    amount?: number;
+    error?: string;
+  } | null;
+  appliedDiscounts?: any[];
+  stockIssues?: any[];
+  hasStockError?: boolean;
+  pointsDiscount?: number;
+  totalPointsEarned?: number;
+  pointsUsed?: number;
 }
 
 export interface SearchResult<T> {
