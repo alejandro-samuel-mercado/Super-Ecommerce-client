@@ -4,13 +4,13 @@ import { ProductCard } from "@/components/shared/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogFooter,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -24,16 +24,17 @@ import { productService } from "@/services/products";
 import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useFavoritesStore } from "@/store/favorites";
+import { SKU, VariantOption } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    ChevronRight,
-    Heart,
-    Minus,
-    Plus,
-    ShoppingCart,
-    Star,
-    ZoomIn,
+   ChevronRight,
+   Heart,
+   Minus,
+   Plus,
+   ShoppingCart,
+   Star,
+   ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,7 +43,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function ProductDetailPage() {
-  const params = useParams<{ slug: any }>();
+  const params = useParams<{ slug: string }>();
   const slug = params.slug;
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -143,7 +144,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const currentSku = product?.skus?.find((sku) => sku.id === selectedSku);
+  const currentSku = product?.skus?.find((sku: SKU) => sku.id === selectedSku);
   const currentPrice = currentSku
     ? typeof currentSku.price === "number"
       ? currentSku.price
@@ -159,7 +160,7 @@ export default function ProductDetailPage() {
   const savings = hasDiscount ? currentPrice - discountedPrice : 0;
 
   const totalStock =
-    product?.skus?.reduce((acc, sku) => acc + Number(sku.stock || 0), 0) || 0;
+    product?.skus?.reduce((acc: number, sku: SKU) => acc + Number(sku.stock || 0), 0) || 0;
   const isOutOfStock = totalStock === 0;
   const currentStock = currentSku ? Number(currentSku.stock || 0) : 0;
 
@@ -183,14 +184,15 @@ export default function ProductDetailPage() {
         skuId: currentSku.id.toString(),
         productId: product.id,
         productName: product.name,
-        productImage: product.images[0] || "/placeholder.jpg",
+        productImage: product?.images?.[0] || "/placeholder.jpg",
         price: currentPrice,
         qty: quantity,
-        currencyCode: product.currencyCode || currency || undefined,
-        attributes: currentSku.variantOptions.reduce(
-          (acc, opt) => ({ ...acc, [opt.name]: opt.value }),
-          {},
-        ),
+        currencyCode: product?.currencyCode || currency || undefined,
+        attributes:
+          currentSku?.variantOptions?.reduce(
+            (acc: Record<string, string>, opt: VariantOption) => ({ ...acc, [opt.name]: opt.value }),
+            {},
+          ) || {},
         allowFractional: product.allowFractional ?? false,
         measurementUnit: product.measurementUnit ?? "UNIDAD",
       },
@@ -233,7 +235,7 @@ export default function ProductDetailPage() {
           >
             Productos
           </Link>
-          {product.category && (
+          {product?.category && (
             <>
               <ChevronRight className="h-4 w-4" />
               <Link
@@ -245,7 +247,7 @@ export default function ProductDetailPage() {
             </>
           )}
           <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground">{product.name}</span>
+          <span className="text-foreground">{product?.name}</span>
         </nav>
 
         {isOutOfStock && (
@@ -281,10 +283,10 @@ export default function ProductDetailPage() {
           {/* Gallery */}
           <div className="space-y-6 ">
             <div className="relative aspect-square rounded-[2rem] overflow-hidden  border-4 border-white/50 shadow-2xl shadow-primary/10 group m-5 max-lg:m-20 max-sm:m-8">
-              {product.images[selectedImage] && (
+              {product?.images?.[selectedImage] && (
                 <Image
                   src={product.images[selectedImage]}
-                  alt={product.name}
+                  alt={product?.name || ""}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -296,9 +298,9 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {product.images.length > 1 && (
+            {product?.images && product.images.length > 1 && (
               <div className="flex gap-4 overflow-x-auto py-3  px-1 pl-20 max-sm:pl-6 bg-zinc-500/20 backdrop-blur-xl rounded-3xl mx-5 ">
-                {product.images.map((image, idx) => (
+                {product.images.map((image: string, idx: number) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
@@ -326,15 +328,14 @@ export default function ProductDetailPage() {
 
             <div className="flex items-start justify-between mb-6">
               <h1 className="text-3xl lg:text-4xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight">
-                {product.name}
+                {product?.name}
               </h1>
               <Button
                 variant="outline"
                 size="icon"
                 className={`rounded-full border-2 h-12 w-12 transition-all ${isFav ? "border-red-200 bg-red-50 text-red-500 hover:bg-red-100 hover:border-red-300" : "hover:border-primary/50 hover:text-primary"}`}
                 onClick={() => {
-                  toggleFavorite(product.id);
-                  
+                  if (product?.id) toggleFavorite(product.id);
                 }}
               >
                 <Heart className={`h-6 w-6 ${isFav ? "fill-current" : ""}`} />
@@ -369,12 +370,12 @@ export default function ProductDetailPage() {
                 <span className="text-5xl font-black text-foreground tracking-tight">
                   {formatPrice(
                     hasDiscount ? discountedPrice : currentPrice,
-                    product.currencyCode || currency,
+                    product?.currencyCode || currency,
                   )}
                 </span>
-                {product.allowFractional &&
-                  product.measurementUnit &&
-                  product.measurementUnit !== "UNIDAD" && (
+                {product?.allowFractional &&
+                  product?.measurementUnit &&
+                  product?.measurementUnit !== "UNIDAD" && (
                     <span className="text-xl font-bold text-muted-foreground">
                       /
                       {product.measurementUnit === "KG"
@@ -461,7 +462,7 @@ export default function ProductDetailPage() {
                   Seleccionar Variante
                 </Label>
                 <div className="flex flex-wrap gap-3">
-                  {product.skus.map((sku) => {
+                  {product.skus.map((sku: SKU) => {
                     const skuStock = Number(sku.stock || 0);
                     return (
                       <button
@@ -478,9 +479,9 @@ export default function ProductDetailPage() {
                           <div className="absolute inset-0 bg-primary/5"></div>
                         )}
                         <span className="relative z-10 flex items-center gap-2">
-                          {sku.variantOptions.map((opt) => opt.name).join(" ")}{" "}
+                          {sku.variantOptions.map((opt: VariantOption) => opt.name).join(" ")}{" "}
                           :
-                          {sku.variantOptions.map((opt) => opt.value).join(" ")}
+                          {sku.variantOptions.map((opt: VariantOption) => opt.value).join(" ")}
                           {skuStock === 0 && (
                             <span className="text-[10px] bg-black/10 px-1 rounded">
                               Agotado
@@ -721,7 +722,7 @@ export default function ProductDetailPage() {
                         </td>
                       </tr>
                       {currentSku?.variantOptions &&
-                        currentSku.variantOptions.map((variant, idx) => (
+                        currentSku.variantOptions.map((variant: VariantOption, idx: number) => (
                           <tr key={idx} className="border-b border-black/30">
                             <td className="py-4 font-semibold text-foreground/70 capitalize">
                               {variant.name}

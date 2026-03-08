@@ -47,20 +47,20 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
 
     addItem(
       {
-        skuId: defaultSku?.id?.toString() || `${product.id}-unknown`,
-        productId: product.id,
-        productName: product.name,
-        productImage: product.images?.[0] || "/placeholder.jpg",
-        price: defaultSkuPrice || product.price || product.basePrice || 0,
+        skuId: defaultSku?.id?.toString() || `${product?.id}-unknown`,
+        productId: product?.id || 0,
+        productName: product?.name || "Producto",
+        productImage: product?.images?.[0] || "/placeholder.jpg",
+        price: defaultSkuPrice || product?.price || product?.basePrice || 0,
         qty: 1,
-        currencyCode: product.currencyCode,
+        currencyCode: product?.currencyCode,
         attributes:
           defaultSku?.variantOptions?.reduce(
             (acc, opt) => ({ ...acc, [opt.name]: opt.value }),
             {},
           ) || {},
-        allowFractional: product.allowFractional ?? false,
-        measurementUnit: product.measurementUnit ?? "UNIDAD",
+        allowFractional: product?.allowFractional ?? false,
+        measurementUnit: product?.measurementUnit ?? "UNIDAD",
       },
       user !== null,
     );
@@ -78,8 +78,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite(product.id);
-  
+    if (product?.id) toggleFavorite(product.id);
   };
 
   const displaySku = product.skus?.[0];
@@ -164,7 +163,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
       <h3
         className={`font-medium mb-1 line-clamp-2 group-hover:text-primary transition-colors duration-300 ${isOutOfStock ? "text-muted-foreground" : "text-gray-800 dark:text-gray-100"}`}
       >
-        {product.name}
+        {product?.name}
       </h3>
 
       {/* Rating */}
@@ -225,7 +224,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
           )}
       </div>
 
-      {product.category && (
+      {product?.category && (
         <p className="text-xs text-muted-foreground mt-1">
           {product.category.name}
         </p>
