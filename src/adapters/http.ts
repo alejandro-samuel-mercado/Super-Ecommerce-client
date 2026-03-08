@@ -61,6 +61,8 @@ export async function http<T>(
           }
         } catch (e) {}
       }
+ 
+   
     }
   }
 
@@ -139,7 +141,6 @@ export async function http<T>(
 
     if (response.status === 204) return {} as T;
     
-    // Handle blob response type
     if (options.responseType === 'blob') {
       return (await response.blob()) as any;
     }
@@ -181,8 +182,7 @@ export async function http<T>(
     const netError = {
       status: 0,
       code: "NETWORK_ERROR",
-      message:
-        (error as Error).message || "No se pudo conectar con el servidor",
+      message: "No se pudo conectar con el servidor. Por favor, verifique su conexión a internet o intente más tarde.",
       title: "Problema de Conexión",
     };
 

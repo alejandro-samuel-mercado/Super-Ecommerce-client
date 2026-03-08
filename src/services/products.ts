@@ -31,32 +31,47 @@ export const productService = {
       }
     });
 
-    const response = await http<{
-      success: boolean;
-      data: SearchResult<Product>;
-    }>(`/api/products?${query.toString()}`);
-    return response.data;
+    try {
+      const response = await http<{
+        success: boolean;
+        data: SearchResult<Product>;
+      }>(`/api/products?${query.toString()}`);
+      return response.data;
+    } catch (error) {
+      return { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
+    }
   },
 
   getProduct: async (slugOrId: string | number) => {
-    const response: any = await http(`/api/products/${slugOrId}`);
-    const producto: Product = response.data;
-    return producto;
+    try {
+      const response: any = await http(`/api/products/${slugOrId}`);
+      return response.data;
+    } catch (error) {
+      return null;
+    }
   },
 
   searchProducts: async (q: string): Promise<SearchResult<Product>> => {
-    const response = await http<{
-      success: boolean;
-      data: SearchResult<Product>;
-    }>(`/api/products/search?q=${encodeURIComponent(q)}`);
-    return response.data;
+    try {
+      const response = await http<{
+        success: boolean;
+        data: SearchResult<Product>;
+      }>(`/api/products/search?q=${encodeURIComponent(q)}`);
+      return response.data;
+    } catch (error) {
+      return { data: [], total: 0, page: 1, limit: 10, totalPages: 0 };
+    }
   },
 
   getCategories: async () => {
-    const response = await http<{ success: boolean; data: string[] }>(
-      "/api/categories",
-    );
-    return response.data;
+    try {
+      const response = await http<{ success: boolean; data: string[] }>(
+        "/api/categories",
+      );
+      return response.data || [];
+    } catch (error) {
+      return [];
+    }
   },
 
   getBrands: async (): Promise<string[]> => {
