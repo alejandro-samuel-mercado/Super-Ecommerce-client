@@ -61,8 +61,18 @@ export async function http<T>(
           }
         } catch (e) {}
       }
- 
-   
+
+      // Leer cookie de Vercel para geolocalización
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(";").shift();
+      };
+
+      const vercelCountry = getCookie("vercel-country");
+      if (vercelCountry) {
+        headers.set("x-client-country", vercelCountry);
+      }
     }
   }
 
