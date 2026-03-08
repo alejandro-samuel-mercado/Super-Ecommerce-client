@@ -43,6 +43,7 @@ export interface OrderPreviewResponse {
   branchAvailability?: any[];
   totalPointsEarned?: number;
   pointsUsed?: number;
+  freeShippingThreshold?: number;
   currencyCode?: string;
 }
 
@@ -111,7 +112,6 @@ export const orderService = {
     idempotencyKey: string,
     options: any = {},
   ): Promise<CreateOrderResponse> => {
-    
     const branchId =
       data.deliveryMethod === "pickup" && data.pickupBranchId
         ? data.pickupBranchId
@@ -152,11 +152,13 @@ export const orderService = {
       },
     );
 
+    // Si llegamos aquí, la API respondió 200 (éxito). Los errores se lanzan via http adapter.
+    const data = response.data;
     return {
-      valid: response.data?.valid === true,
-      discount: response.data?.discountAmount || 0,
-      type: response.data?.type || "",
-      message: response.data?.message || (response.data?.valid === false ? "Cupón inválido" : ""),
+      valid: !!(data && data.id),
+      discount: data?.discountAmount || 0,
+      type: data?.type || "",
+      message: "",
     };
   },
 

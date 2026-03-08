@@ -21,7 +21,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 interface RequestOptions extends RequestInit {
   token?: string;
   skipRetry?: boolean;
-  responseType?: 'json' | 'blob';
+  responseType?: "json" | "blob";
 }
 
 let refreshHandler: (() => Promise<string | null>) | null = null;
@@ -62,7 +62,9 @@ export async function http<T>(
         } catch (e) {}
       }
 
-      // Leer cookie de Vercel para geolocalización
+
+
+      // Leer cookie para geolocalización
       const getCookie = (name: string) => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -150,8 +152,8 @@ export async function http<T>(
     }
 
     if (response.status === 204) return {} as T;
-    
-    if (options.responseType === 'blob') {
+
+    if (options.responseType === "blob") {
       return (await response.blob()) as any;
     }
 
@@ -192,7 +194,8 @@ export async function http<T>(
     const netError = {
       status: 0,
       code: "NETWORK_ERROR",
-      message: "No se pudo conectar con el servidor. Por favor, verifique su conexión a internet o intente más tarde.",
+      message:
+        "No se pudo conectar con el servidor. Por favor, verifique su conexión a internet o intente más tarde.",
       title: "Problema de Conexión",
     };
 

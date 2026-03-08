@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,25 +21,29 @@ import { getIdempotencyKey } from "@/lib/idempotency";
 import { formatPrice } from "@/lib/utils";
 import { Branch, branchService } from "@/services/branch";
 import { PublicConfig, configService } from "@/services/config";
-import { OrderPreviewRequest, OrderPreviewResponse, orderService } from "@/services/orders";
+import {
+  OrderPreviewRequest,
+  OrderPreviewResponse,
+  orderService,
+} from "@/services/orders";
 import { PaymentGatewayOption, paymentService } from "@/services/payment";
 import { ShippingZone, shippingService } from "@/services/shipping";
 import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-    AlertCircle,
-    Award,
-    Check,
-    Loader2,
-    MapPin,
-    Minus,
-    Plus,
-    ShieldCheck,
-    Tag,
-    Trash2,
-    Truck,
-    User
+  AlertCircle,
+  Award,
+  Check,
+  Loader2,
+  MapPin,
+  Minus,
+  Plus,
+  ShieldCheck,
+  Tag,
+  Trash2,
+  Truck,
+  User,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -113,7 +117,9 @@ function CartContent() {
     ) {
       const params = new URLSearchParams(window.location.search);
       params.set("reloaded", "true");
-      window.location.replace(`${window.location.pathname}?${params.toString()}`);
+      window.location.replace(
+        `${window.location.pathname}?${params.toString()}`,
+      );
     }
   }, [searchParams]);
 
@@ -125,7 +131,10 @@ function CartContent() {
   const clearCart = useCartStore((state) => state.clearCart);
   const addItem = useCartStore((state) => state.addItem);
 
-  const clientSubtotal = items.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 0), 0);
+  const clientSubtotal = items.reduce(
+    (sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 0),
+    0,
+  );
 
   const { currency } = useCurrencyStore();
 
@@ -135,7 +144,7 @@ function CartContent() {
   const [appliedPoints, setAppliedPoints] = useState<number>(0);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [deliveryData, setDeliveryData] = useState<DeliveryData>({
-    method:  "pickup"
+    method: "pickup",
   });
   const [preview, setPreview] = useState<OrderPreviewResponse>({
     subtotal: clientSubtotal,
@@ -147,7 +156,9 @@ function CartContent() {
     items: [],
     stockIssues: [],
   });
-  const [lastNotifiedCoupon, setLastNotifiedCoupon] = useState<string | null>(null);
+  const [lastNotifiedCoupon, setLastNotifiedCoupon] = useState<string | null>(
+    null,
+  );
   const [stockIssues, setStockIssues] = useState<any[]>([]);
   const hasStockError = useMemo(() => stockIssues.length > 0, [stockIssues]);
 
@@ -268,7 +279,7 @@ function CartContent() {
       if (!currency) return;
       setIsPaymentLoading(true);
       try {
-        const options = await paymentService.getPaymentOptions(currency, customerData.country);
+        const options = await paymentService.getPaymentOptions(currency);
         setPaymentOptions(options);
 
         if (options.length > 0) {
@@ -286,7 +297,7 @@ function CartContent() {
     };
 
     fetchPaymentOptions();
-  }, [currency, customerData.country]);
+  }, [currency]);
 
   const shippingMutation = useMutation({
     mutationFn: async (address: {
@@ -362,7 +373,6 @@ function CartContent() {
 
   const debouncedItems = useDebounce(items, 150);
 
-
   // Prefiltrar datos del cliente si está autenticado
   useEffect(() => {
     if (user) {
@@ -414,10 +424,10 @@ function CartContent() {
         payload.branchId = deliveryData.pickupBranchId;
       } else if (deliveryData.method === "shipping") {
         payload.address = {
-           city: customerData.city,
-           state: customerData.state,
-           country: customerData.country,
-           zip: customerData.zipCode
+          city: customerData.city,
+          state: customerData.state,
+          country: customerData.country,
+          zip: customerData.zipCode,
         };
       }
 
@@ -426,14 +436,18 @@ function CartContent() {
     onSuccess: (data) => {
       if (data && typeof data.subtotal === "number") {
         setPreview(data);
-        
+
         // Si hay un cupón aplicado pero la previsualización devuelve un error para él
         if (appliedCoupon && data.discountDetails?.error) {
           toast.error(data.discountDetails.error);
           setAppliedCoupon(null);
           setCouponCode("");
           setLastNotifiedCoupon(null);
-        } else if (appliedCoupon && !data.discountDetails?.error && data.discountDetails?.code === appliedCoupon) {
+        } else if (
+          appliedCoupon &&
+          !data.discountDetails?.error &&
+          data.discountDetails?.code === appliedCoupon
+        ) {
           // Si el cupón se aplicó con éxito y no ha sido notificado aún
           if (lastNotifiedCoupon !== appliedCoupon) {
             toast.success(cartContent.step1.coupon.success);
@@ -456,27 +470,29 @@ function CartContent() {
     if (currency) {
       syncWithBackend(currency);
     }
-    
   }, [currency, syncWithBackend]);
-
 
   const dependencyString = useMemo(() => {
     return JSON.stringify({
       items: debouncedItems.map((i) => ({ id: i.skuId, q: i.qty })),
       coupon: appliedCoupon,
       method: deliveryData.method,
-      branchId: deliveryData.method === "pickup" ? deliveryData.pickupBranchId : undefined,
+      branchId:
+        deliveryData.method === "pickup"
+          ? deliveryData.pickupBranchId
+          : undefined,
       points: appliedPoints,
       currency: currency,
       gateway: selectedGateway,
-      address: deliveryData.method === "shipping"
-        ? {
-            city: customerData.city?.trim() || "",
-            state: customerData.state?.trim() || "",
-            zip: customerData.zipCode?.trim() || ""
-          } 
-        : null,
-      userId: user?.id
+      address:
+        deliveryData.method === "shipping"
+          ? {
+              city: customerData.city?.trim() || "",
+              state: customerData.state?.trim() || "",
+              zip: customerData.zipCode?.trim() || "",
+            }
+          : null,
+      userId: user?.id,
     });
   }, [
     debouncedItems,
@@ -489,7 +505,7 @@ function CartContent() {
     customerData.city,
     customerData.state,
     customerData.zipCode,
-    user?.id
+    user?.id,
   ]);
 
   const prevDepsRef = useRef<string>("");
@@ -539,7 +555,10 @@ function CartContent() {
       }
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || cartContent.errors.coupon;
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        cartContent.errors.coupon;
       toast.error(message);
     },
   });
@@ -563,12 +582,15 @@ function CartContent() {
             deliveryData.method === "shipping"
               ? `${customerData.address}, ${customerData.city}, ${customerData.state}, ${customerData.zipCode}, ${customerData.country}`
               : undefined,
-          address: deliveryData.method === "shipping" ? {
-            city: customerData.city,
-            state: customerData.state,
-            country: customerData.country,
-            zip: customerData.zipCode
-          } : undefined,
+          address:
+            deliveryData.method === "shipping"
+              ? {
+                  city: customerData.city,
+                  state: customerData.state,
+                  country: customerData.country,
+                  zip: customerData.zipCode,
+                }
+              : undefined,
           couponCode: appliedCoupon || undefined,
           pointsToUse: appliedPoints,
           createAccount,
@@ -585,7 +607,7 @@ function CartContent() {
     },
     onSuccess: async (data: any) => {
       clearCart();
-     
+
       try {
         setIsRedirecting(true);
 
@@ -654,7 +676,10 @@ function CartContent() {
         });
 
         setNearestBranch(nearest.id);
-        setDeliveryData((prev) => ({ ...prev, pickupBranchId: String(nearest.id) }));
+        setDeliveryData((prev) => ({
+          ...prev,
+          pickupBranchId: String(nearest.id),
+        }));
         toast.success(`Sucursal más cercana: ${nearest.name}`);
       },
       () => {
@@ -684,7 +709,7 @@ function CartContent() {
         if (deliveryData.method === "pickup") {
           if (!deliveryData.pickupBranchId) return false;
           const availability = preview?.branchAvailability?.find(
-            (b) => String(b.branchId) === deliveryData.pickupBranchId
+            (b) => String(b.branchId) === deliveryData.pickupBranchId,
           );
           return availability ? availability.isAvailable : true;
         }
@@ -709,7 +734,9 @@ function CartContent() {
     const currentIndex = steps.indexOf(currentStep);
 
     if (currentStep === "cart" && !user) {
-      router.push(`/login?redirect=${encodeURIComponent("/cart?reloaded=true")}`);
+      router.push(
+        `/login?redirect=${encodeURIComponent("/cart?reloaded=true")}`,
+      );
       return;
     }
 
@@ -755,7 +782,7 @@ function CartContent() {
           <h1 className="text-3xl font-bold mb-4">
             {cartContent.step1.emptyCart}
           </h1>
-          
+
           {recentPendingOrder && (
             <Card className="mb-8 p-6 bg-primary/5 border-primary/20 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4">
               <div className="flex flex-col items-center gap-4">
@@ -763,13 +790,16 @@ function CartContent() {
                   <AlertCircle className="h-8 w-8 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold mb-2">¿Deseas recuperar tu carrito?</h2>
+                  <h2 className="text-xl font-semibold mb-2">
+                    ¿Deseas recuperar tu carrito?
+                  </h2>
                   <p className="text-muted-foreground mb-4">
-                    Tienes una orden pendiente de pago por <strong>{formatPrice(recentPendingOrder.total)}</strong>. 
+                    Tienes una orden pendiente de pago por{" "}
+                    <strong>{formatPrice(recentPendingOrder.total)}</strong>.
                     Puedes recuperar los productos y continuar comprando.
                   </p>
-                  <Button 
-                    variant="default" 
+                  <Button
+                    variant="default"
                     className="w-full sm:w-auto"
                     onClick={handleRecoverOrder}
                   >
@@ -780,7 +810,11 @@ function CartContent() {
             </Card>
           )}
 
-          <Button className="border-border border-4" variant="outline" onClick={() => router.push("/products")}>
+          <Button
+            className="border-border border-4"
+            variant="outline"
+            onClick={() => router.push("/products")}
+          >
             {cartContent.step1.continueShopping}
           </Button>
         </div>
@@ -788,21 +822,15 @@ function CartContent() {
     );
   }
 
-
-
   return (
     <main className="min-h-screen relative pb-40 pt-40 md:pt-20 max-sm:top-10">
-
-
       <div className="container mx-auto px-4 max-w-6xl md:p-20">
         <h1 className="text-4xl font-bold mb-10 text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           {cartContent.title}
         </h1>
 
-      
         <div className="mb-12">
           <div className="flex items-center justify-between max-w-3xl mx-auto relative px-4">
-           
             <div className="absolute top-5 left-4 right-4 h-1 bg-muted rounded-full -z-10"></div>
 
             <div
@@ -848,7 +876,6 @@ function CartContent() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-       
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-6 md:p-8 rounded-[2rem] border-2 border-primary/40 bg-white/60 backdrop-blur-xl shadow-xl shadow-primary/5">
               {/* Step 1: Carrito */}
@@ -867,18 +894,28 @@ function CartContent() {
                   </div>
 
                   {hasStockError && (
-                    <div className={`mb-6 p-4 rounded-2xl flex items-start gap-4 animate-in fade-in slide-in-from-top-1 transition-all ${isUpdating ? "bg-amber-100 border border-amber-200" : "bg-destructive/10 border border-destructive/20"}`}>
+                    <div
+                      className={`mb-6 p-4 rounded-2xl flex items-start gap-4 animate-in fade-in slide-in-from-top-1 transition-all ${isUpdating ? "bg-amber-100 border border-amber-200" : "bg-destructive/10 border border-destructive/20"}`}
+                    >
                       {isUpdating ? (
                         <Loader2 className="h-6 w-6 text-amber-600 shrink-0 mt-0.5 animate-spin" />
                       ) : (
                         <AlertCircle className="h-6 w-6 text-destructive shrink-0 mt-0.5" />
                       )}
                       <div>
-                        <h4 className={`font-bold ${isUpdating ? "text-amber-800" : "text-destructive"}`}>
-                          {isUpdating ? "Validando cantidad..." : "Stock Insuficiente"}
+                        <h4
+                          className={`font-bold ${isUpdating ? "text-amber-800" : "text-destructive"}`}
+                        >
+                          {isUpdating
+                            ? "Validando cantidad..."
+                            : "Stock Insuficiente"}
                         </h4>
-                        <p className={`text-sm ${isUpdating ? "text-amber-700/80" : "text-destructive/80"}`}>
-                          {isUpdating ? "Estamos comprobando la disponibilidad de stock..." : `Algunos artículos en tu carrito no tienen stock suficiente ${deliveryData.method === "pickup" ? "en esta sucursal" : "para envío"}. Por favor, ajusta las cantidades para continuar.`}
+                        <p
+                          className={`text-sm ${isUpdating ? "text-amber-700/80" : "text-destructive/80"}`}
+                        >
+                          {isUpdating
+                            ? "Estamos comprobando la disponibilidad de stock..."
+                            : `Algunos artículos en tu carrito no tienen stock suficiente ${deliveryData.method === "pickup" ? "en esta sucursal" : "para envío"}. Por favor, ajusta las cantidades para continuar.`}
                         </p>
                       </div>
                     </div>
@@ -892,7 +929,11 @@ function CartContent() {
                       <Button
                         variant="default"
                         className="rounded-full bg-primary hover:bg-primary/90 text-white"
-                        onClick={() => router.push(`/login?redirect=${encodeURIComponent("/cart?reloaded=true")}`)}
+                        onClick={() =>
+                          router.push(
+                            `/login?redirect=${encodeURIComponent("/cart?reloaded=true")}`,
+                          )
+                        }
                       >
                         Iniciar Sesión
                       </Button>
@@ -992,8 +1033,18 @@ function CartContent() {
                                   size="icon"
                                   className="h-9 w-9 rounded-xl hover:bg-white/60 text-primary"
                                   onClick={() => {
-                                    const step = item.measurementUnit === "KG" ? 0.1 : item.measurementUnit === "LITRO" ? 0.25 : 0.5;
-                                    const newVal = Math.max(step, parseFloat((Number(item.qty) - step).toFixed(3)));
+                                    const step =
+                                      item.measurementUnit === "KG"
+                                        ? 0.1
+                                        : item.measurementUnit === "LITRO"
+                                          ? 0.25
+                                          : 0.5;
+                                    const newVal = Math.max(
+                                      step,
+                                      parseFloat(
+                                        (Number(item.qty) - step).toFixed(3),
+                                      ),
+                                    );
                                     handleQuantityChange(item, newVal);
                                   }}
                                 >
@@ -1005,7 +1056,9 @@ function CartContent() {
                                   inputMode="decimal"
                                   defaultValue={item.qty}
                                   onBlur={(e) => {
-                                    const v = parseFloat(e.target.value.replace(",", "."));
+                                    const v = parseFloat(
+                                      e.target.value.replace(",", "."),
+                                    );
                                     if (!isNaN(v) && v > 0) {
                                       handleQuantityChange(item, v);
                                     } else {
@@ -1029,9 +1082,19 @@ function CartContent() {
                                   size="icon"
                                   className="h-9 w-9 rounded-xl hover:bg-white/60 text-primary"
                                   onClick={() => {
-                                    const step = item.measurementUnit === "KG" ? 0.1 : item.measurementUnit === "LITRO" ? 0.25 : 0.5;
+                                    const step =
+                                      item.measurementUnit === "KG"
+                                        ? 0.1
+                                        : item.measurementUnit === "LITRO"
+                                          ? 0.25
+                                          : 0.5;
                                     const maxVal = stockLimit ?? 9999;
-                                    const newVal = Math.min(maxVal, parseFloat((Number(item.qty) + step).toFixed(3)));
+                                    const newVal = Math.min(
+                                      maxVal,
+                                      parseFloat(
+                                        (Number(item.qty) + step).toFixed(3),
+                                      ),
+                                    );
                                     handleQuantityChange(item, newVal);
                                   }}
                                   disabled={
@@ -1224,16 +1287,14 @@ function CartContent() {
                       <Award className="h-4 w-4" />
                       <span>
                         ¡Ganarás{" "}
-                        {(() => {
-                          // Usar el multiplicador de evento si existe, sino el de la config general, sino 0
-                          const pointsRate =
-                            storeConfig.activeEvent?.pointsPerCurrency ||
-                            storeConfig.pointsPerCurrency ||
-                            0.001;
-
-                    
-                          return Math.floor(clientSubtotal * pointsRate);
-                        })()}{" "}
+                        {preview?.totalPointsEarned ??
+                          (() => {
+                            const pointsRate =
+                              storeConfig.activeEvent?.pointsPerCurrency ||
+                              storeConfig.pointsPerCurrency ||
+                              0.001;
+                            return Math.floor(clientSubtotal * pointsRate);
+                          })()}{" "}
                         puntos con esta compra!
                       </span>
                     </div>
@@ -1627,10 +1688,11 @@ function CartContent() {
                       </div>
                       <div className="space-y-3">
                         {branches.map((branch) => {
-                          const availability = preview?.branchAvailability?.find(
-                            (b) => b.branchId === branch.id
-                          );
-                          
+                          const availability =
+                            preview?.branchAvailability?.find(
+                              (b) => b.branchId === branch.id,
+                            );
+
                           const isBranchAvailable = availability
                             ? availability.isAvailable
                             : true;
@@ -1694,20 +1756,33 @@ function CartContent() {
                                   {branch.address}{" "}
                                   {branch.city && `, ${branch.city}`}
                                 </span>
-                                
+
                                 {!isBranchAvailable && (
                                   <div className="mt-2 text-[11px] leading-tight text-gray-500 bg-gray-100 p-2.5 rounded-lg border border-gray-200">
-                                    <strong className="block mb-0.5 text-gray-600">Stock físico insuficiente</strong>
-                                    Esta sucursal no posee la cantidad exacta de todos los productos de tu carrito. Reduce cantidades o elige <strong>Envío a Domicilio</strong>.
-                                    {availability?.missingItems && availability.missingItems.length > 0 && (
-                                      <ul className="mt-1.5 space-y-0.5 text-left border-t border-gray-200 pt-1.5">
-                                        {availability.missingItems.map((item:any, i:any) => (
-                                          <li key={i} className="text-[10px] text-destructive/80">
-                                            • {item.productName}: <b>Pidió {item.requested}</b> (Disp. {item.available})
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    )}
+                                    <strong className="block mb-0.5 text-gray-600">
+                                      Stock físico insuficiente
+                                    </strong>
+                                    Esta sucursal no posee la cantidad exacta de
+                                    todos los productos de tu carrito. Reduce
+                                    cantidades o elige{" "}
+                                    <strong>Envío a Domicilio</strong>.
+                                    {availability?.missingItems &&
+                                      availability.missingItems.length > 0 && (
+                                        <ul className="mt-1.5 space-y-0.5 text-left border-t border-gray-200 pt-1.5">
+                                          {availability.missingItems.map(
+                                            (item: any, i: any) => (
+                                              <li
+                                                key={i}
+                                                className="text-[10px] text-destructive/80"
+                                              >
+                                                • {item.productName}:{" "}
+                                                <b>Pidió {item.requested}</b>{" "}
+                                                (Disp. {item.available})
+                                              </li>
+                                            ),
+                                          )}
+                                        </ul>
+                                      )}
                                   </div>
                                 )}
                               </div>
@@ -1819,7 +1894,6 @@ function CartContent() {
                                     )}
                                   </div>
                                 </div>
-                                
                               </Label>
                             ))}
                           </div>
@@ -1863,14 +1937,18 @@ function CartContent() {
                               <p className="text-sm text-muted-foreground">
                                 {
                                   branches.find(
-                                    (b) => String(b.id) === deliveryData.pickupBranchId,
+                                    (b) =>
+                                      String(b.id) ===
+                                      deliveryData.pickupBranchId,
                                   )?.name
                                 }
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 {
                                   branches.find(
-                                    (b) => String(b.id) === deliveryData.pickupBranchId,
+                                    (b) =>
+                                      String(b.id) ===
+                                      deliveryData.pickupBranchId,
                                   )?.address
                                 }
                               </p>
@@ -1887,8 +1965,7 @@ function CartContent() {
                                 {customerData.address}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {customerData.city},{" "}
-                                {customerData.state}{" "}
+                                {customerData.city}, {customerData.state}{" "}
                                 {customerData.zipCode}
                               </p>
                             </div>
@@ -1914,48 +1991,61 @@ function CartContent() {
                       </a>
                     </div>
                   </div>
-                  
+
                   {/* FREE SHIPPING PROGRESS BAR */}
-                  {storeConfig?.enableShipping && storeConfig?.freeShippingThreshold && (
-                    <div className="mt-6 p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl border border-primary/10 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
-                      {(() => {
-                        const threshold = Number(storeConfig.freeShippingThreshold);
-                        const current = isUpdating ? clientSubtotal : (preview?.subtotal || clientSubtotal);
-                        const remaining = Math.max(0, threshold - current);
-                        const progress = Math.min(100, (current / threshold) * 100);
-                        const isFree = current >= threshold;
+                  {storeConfig?.enableShipping &&
+                    storeConfig?.freeShippingThreshold && (
+                      <div className="mt-6 p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl border border-primary/10 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
+                        {(() => {
+                          const threshold = preview?.freeShippingThreshold
+                            ? Number(preview.freeShippingThreshold)
+                            : Number(storeConfig.freeShippingThreshold);
+                          const current = isUpdating
+                            ? clientSubtotal
+                            : preview?.subtotal || clientSubtotal;
+                          const remaining = Math.max(0, threshold - current);
+                          const progress = Math.min(
+                            100,
+                            (current / threshold) * 100,
+                          );
+                          const isFree = current >= threshold;
 
-                        return (
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                              <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
-                                <Truck size={14} className={isFree ? "animate-bounce" : ""} />
-                                {isFree ? "¡Envío Gratis Alcanzado!" : "Envío a Domicilio"}
-                              </span>
-                              {!isFree && (
-                                <span className="text-[10px] font-bold text-muted-foreground italic">
-                                  Faltan {formatPrice(remaining, currency)}
+                          return (
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center">
+                                <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
+                                  <Truck
+                                    size={14}
+                                    className={isFree ? "animate-bounce" : ""}
+                                  />
+                                  {isFree
+                                    ? "¡Envío Gratis Alcanzado!"
+                                    : "Envío a Domicilio"}
                                 </span>
-                              )}
-                            </div>
-                            
-                            <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full transition-all duration-1000 ease-out rounded-full ${isFree ? 'bg-gradient-to-r from-emerald-400 to-emerald-600' : 'bg-gradient-to-r from-primary to-secondary'}`}
-                                style={{ width: `${progress}%` }}
-                              />
-                            </div>
+                                {!isFree && (
+                                  <span className="text-[10px] font-bold text-muted-foreground italic">
+                                    Faltan {formatPrice(remaining, currency)}
+                                  </span>
+                                )}
+                              </div>
 
-                            <p className="text-[10px] font-medium text-center text-muted-foreground leading-tight">
-                              {isFree 
-                                ? "¡Felicidades! Tu compra califica para envío sin costo." 
-                                : `Agrega ${formatPrice(remaining, currency)} más para desbloquear el ENVÍO GRATIS.`}
-                            </p>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  )}
+                              <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full transition-all duration-1000 ease-out rounded-full ${isFree ? "bg-gradient-to-r from-emerald-400 to-emerald-600" : "bg-gradient-to-r from-primary to-secondary"}`}
+                                  style={{ width: `${progress}%` }}
+                                />
+                              </div>
+
+                              <p className="text-[10px] font-medium text-center text-muted-foreground leading-tight">
+                                {isFree
+                                  ? "¡Felicidades! Tu compra califica para envío sin costo."
+                                  : `Agrega ${formatPrice(remaining, currency)} más para desbloquear el ENVÍO GRATIS.`}
+                              </p>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
                 </div>
               )}
             </Card>
@@ -1985,68 +2075,97 @@ function CartContent() {
                 {cartContent.step1.summary.titulo}
               </h2>
 
-              <div className={`transition-opacity duration-200 ${isUpdating ? "opacity-30" : "opacity-100"}`}>
+              <div
+                className={`transition-opacity duration-200 ${isUpdating ? "opacity-30" : "opacity-100"}`}
+              >
                 {/* Desglose Jerárquico de Precios */}
                 <div className="space-y-1 mb-6">
                   {/* SUBTOTAL */}
                   <div className="flex justify-between text-base font-semibold text-gray-800 pb-2 border-b border-primary/10">
                     <span>{cartContent.step1.summary.subtotal}</span>
-                    <span>{formatPrice(isUpdating ? clientSubtotal : (preview?.subtotal || clientSubtotal), currency)}</span>
+                    <span>
+                      {formatPrice(
+                        isUpdating
+                          ? clientSubtotal
+                          : preview?.subtotal || clientSubtotal,
+                        currency,
+                      )}
+                    </span>
                   </div>
 
                   {/* CARGOS Y DESCUENTOS (Tabulados) */}
                   <div className="pl-3 border-l-2 border-primary/20 space-y-2 pt-2">
                     {/* Promociones automáticas */}
-                    {preview?.appliedDiscounts && preview.appliedDiscounts.length > 0 && (
-                      <div className="space-y-1">
-                        {preview.appliedDiscounts.map((discount, idx) => (
-                          <div
-                            key={idx}
-                            className="flex justify-between text-xs text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-100"
-                          >
-                            <span className="flex items-center gap-1">
-                              <Tag className="h-3 w-3" />
-                              {discount.name}
-                            </span>
-                            <span>-${discount.discountAmount.toFixed(2)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {preview?.appliedDiscounts &&
+                      preview.appliedDiscounts.length > 0 && (
+                        <div className="space-y-1">
+                          {preview.appliedDiscounts.map((discount, idx) => (
+                            <div
+                              key={idx}
+                              className="flex justify-between text-xs text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-100"
+                            >
+                              <span className="flex items-center gap-1">
+                                <Tag className="h-3 w-3" />
+                                {discount.name}
+                              </span>
+                              <span>
+                                -
+                                {formatPrice(discount.discountAmount, currency)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
                     {/* Copones */}
-                    {storeConfig?.enableCoupons !== false && preview?.discountDetails && (
-                      <div className="space-y-2">
-                        {preview.discountDetails?.error ? (
-                          <div className="flex flex-col gap-1 text-xs text-destructive font-bold bg-destructive/10 p-2 rounded-lg border border-destructive/20 animate-pulse">
-                            <span className="flex items-center gap-1">
-                              <AlertCircle className="h-3 w-3" />
-                              Error en cupón {appliedCoupon}:
-                            </span>
-                            <span className="font-medium opacity-90">{preview.discountDetails?.error}</span>
-                          </div>
-                        ) : (
-                          <div className="flex justify-between text-xs text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-100">
-                            <span className="flex items-center gap-1">
-                              <Tag className="h-3 w-3" />
-                              Cupón: {preview.discountDetails.code}
-                            </span>
-                            <span>-{formatPrice(preview?.discountDetails?.amount || 0, currency)}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    {storeConfig?.enableCoupons !== false &&
+                      preview?.discountDetails && (
+                        <div className="space-y-2">
+                          {preview.discountDetails?.error ? (
+                            <div className="flex flex-col gap-1 text-xs text-destructive font-bold bg-destructive/10 p-2 rounded-lg border border-destructive/20 animate-pulse">
+                              <span className="flex items-center gap-1">
+                                <AlertCircle className="h-3 w-3" />
+                                Error en cupón {appliedCoupon}:
+                              </span>
+                              <span className="font-medium opacity-90">
+                                {preview.discountDetails?.error}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex justify-between text-xs text-emerald-600 font-bold bg-emerald-50 p-1.5 rounded-lg border border-emerald-100">
+                              <span className="flex items-center gap-1">
+                                <Tag className="h-3 w-3" />
+                                Cupón: {preview.discountDetails.code}
+                              </span>
+                              <span>
+                                -
+                                {formatPrice(
+                                  preview?.discountDetails?.amount || 0,
+                                  currency,
+                                )}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                     {/* Descuentos por Puntos */}
-                    {storeConfig?.enablePoints && (preview?.pointsDiscount ?? 0) > 0 && (
-                      <div className="flex justify-between text-xs text-amber-600 font-bold bg-amber-50 p-1.5 rounded-lg border border-amber-100">
-                        <span className="flex items-center gap-1">
-                          <Award className="h-3 w-3" />
-                          Descuento por Puntos
-                        </span>
-                        <span>-{formatPrice(preview?.pointsDiscount ?? 0, currency)}</span>
-                      </div>
-                    )}
+                    {storeConfig?.enablePoints &&
+                      (preview?.pointsDiscount ?? 0) > 0 && (
+                        <div className="flex justify-between text-xs text-amber-600 font-bold bg-amber-50 p-1.5 rounded-lg border border-amber-100">
+                          <span className="flex items-center gap-1">
+                            <Award className="h-3 w-3" />
+                            Descuento por Puntos
+                          </span>
+                          <span>
+                            -
+                            {formatPrice(
+                              preview?.pointsDiscount ?? 0,
+                              currency,
+                            )}
+                          </span>
+                        </div>
+                      )}
 
                     {/* Envío */}
                     <div className="flex justify-between text-xs text-cyan-700 font-bold bg-cyan-50 p-1.5 rounded-lg border border-cyan-100">
@@ -2054,26 +2173,52 @@ function CartContent() {
                         <MapPin className="h-3 w-3" />
                         {cartContent.step1.summary.shipping}
                       </span>
-                      <span className={(deliveryData.method === "pickup" && deliveryData.pickupBranchId) || (deliveryData.method === "shipping" && preview?.shipping === 0) ? "text-emerald-600" : ""}>
-                        {deliveryData.method === "pickup" && deliveryData.pickupBranchId
-                          ? "Gratis" 
-                          : deliveryData.method === "shipping" && preview?.shipping === 0
+                      <span
+                        className={
+                          (deliveryData.method === "pickup" &&
+                            deliveryData.pickupBranchId) ||
+                          (deliveryData.method === "shipping" &&
+                            preview?.shipping === 0)
+                            ? "text-emerald-600"
+                            : ""
+                        }
+                      >
+                        {deliveryData.method === "pickup" &&
+                        deliveryData.pickupBranchId
+                          ? "Gratis"
+                          : deliveryData.method === "shipping" &&
+                              preview?.shipping === 0
                             ? "Gratis"
-                            : typeof preview?.shipping === 'number' && preview.shipping > 0
+                            : typeof preview?.shipping === "number" &&
+                                preview.shipping > 0
                               ? formatPrice(preview.shipping, currency)
                               : "A definir"}
                       </span>
                     </div>
 
                     {/* Impuestos */}
-                    {(preview?.tax > 0 || (storeConfig?.taxRate && Number(storeConfig.taxRate) > 0) || !storeConfig) && (
+                    {(preview?.tax > 0 ||
+                      (storeConfig?.taxRate &&
+                        Number(storeConfig.taxRate) > 0) ||
+                      !storeConfig) && (
                       <div className="flex justify-between text-xs text-indigo-600 font-bold bg-indigo-50 p-1.5 rounded-lg border border-indigo-100">
                         <span className="flex items-center gap-1">
                           <AlertCircle className="h-3 w-3" />
                           {cartContent.step1.summary.tax}
-                          {preview?.tax === 0 && storeConfig?.taxRate && <span className="text-[10px] font-normal opacity-70">({storeConfig.taxRate}%)</span>}
+                          {preview?.tax === 0 && storeConfig?.taxRate && (
+                            <span className="text-[10px] font-normal opacity-70">
+                              ({storeConfig.taxRate}%)
+                            </span>
+                          )}
                         </span>
-                        <span>{formatPrice(preview?.tax || (clientSubtotal * (Number(storeConfig?.taxRate || 0) / 100)), currency)}</span>
+                        <span>
+                          {formatPrice(
+                            preview?.tax ||
+                              clientSubtotal *
+                                (Number(storeConfig?.taxRate || 0) / 100),
+                            currency,
+                          )}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -2089,11 +2234,16 @@ function CartContent() {
                     <span className="text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
                       {formatPrice(
                         isUpdating
-                          ? clientSubtotal + (clientSubtotal * (Number(storeConfig?.taxRate || 0) / 100))
-                          : (preview?.total !== undefined && preview.total !== null)
-                            ? preview.total 
-                            : clientSubtotal + (clientSubtotal * (Number(storeConfig?.taxRate || 0) / 100)), 
-                        currency
+                          ? clientSubtotal +
+                              clientSubtotal *
+                                (Number(storeConfig?.taxRate || 0) / 100)
+                          : preview?.total !== undefined &&
+                              preview.total !== null
+                            ? preview.total
+                            : clientSubtotal +
+                              clientSubtotal *
+                                (Number(storeConfig?.taxRate || 0) / 100),
+                        currency,
                       )}
                     </span>
                     {isUpdating && (
@@ -2133,7 +2283,12 @@ function CartContent() {
                   <Button
                     className="w-full h-14 text-lg font-bold rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleNext}
-                    disabled={(!user && currentStep === "cart") || !canProceed() || isUpdating || preview === null}
+                    disabled={
+                      (!user && currentStep === "cart") ||
+                      !canProceed() ||
+                      isUpdating ||
+                      preview === null
+                    }
                   >
                     {isUpdating ? (
                       <>

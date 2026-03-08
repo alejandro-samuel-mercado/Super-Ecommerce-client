@@ -62,7 +62,7 @@ export const useCartStore = create<CartState>()(
       updateQuantity: async (skuId, quantity, isLoggedIn = false) => {
         set((state) => ({
           items: state.items.map((i) =>
-            String(i.skuId) === String(skuId) ? { ...i, qty: quantity } : i,
+            String(i.skuId) === String(skuId) ? { ...i, qty: Number(quantity) } : i,
           ),
         }));
         if (isLoggedIn) {
@@ -104,7 +104,7 @@ export const useCartStore = create<CartState>()(
               productName: item.sku.product.name,
               price: item.convertedPrice != null ? Number(item.convertedPrice) : Number(item.sku.price),
               productImage: item.sku.product.images?.[0] || "",
-              qty: item.quantity,
+              qty: Number(item.quantity),
               attributes:
                 item.sku.variantOptions?.reduce(
                   (acc: any, opt: any) => ({ ...acc, [opt.name]: opt.value }),
