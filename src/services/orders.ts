@@ -153,10 +153,10 @@ export const orderService = {
     );
 
     return {
-      valid: response.data.valid !== false,
-      discount: response.data.discountAmount,
-      type: response.data.type,
-      message: response.data.message,
+      valid: response.data?.valid === true,
+      discount: response.data?.discountAmount || 0,
+      type: response.data?.type || "",
+      message: response.data?.message || (response.data?.valid === false ? "Cupón inválido" : ""),
     };
   },
 

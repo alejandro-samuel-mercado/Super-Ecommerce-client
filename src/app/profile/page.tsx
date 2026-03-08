@@ -11,14 +11,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PublicConfig, configService } from "@/services/config";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-      Gift,
-      Heart,
-      LogOut,
-      Mail,
-      MapPin,
-      MessageSquare,
-      Package,
-      User as UserIcon
+    Gift,
+    Heart,
+    LogOut,
+    Mail,
+    MapPin,
+    MessageSquare,
+    Package,
+    User as UserIcon
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -140,7 +140,7 @@ function ProfileContent() {
                   {user.city || "Ciudad no especificada"}
                 </span>
                 <span className="bg-card px-3 py-1 rounded-full text-[10px] border-4 border-secondary/30 uppercase font-black tracking-widest text-primary">
-                  {(user.role as any).name==="CUSTOMER"?"Cliente":"Personal"}
+                  {(user.role as any)?.name==="CUSTOMER"?"Cliente":"Personal"}
                 </span>
               </div>
             </motion.div>

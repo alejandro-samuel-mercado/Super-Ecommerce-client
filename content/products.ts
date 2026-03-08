@@ -1,7 +1,7 @@
 export const products = {
   listing: {
     title: "Todos los Productos",
-    itemsPerPage: 15,
+    itemsPerPage: 20,
     sortOptions: [
       { value: "recent", label: "Más Recientes" },
       { value: "old", label: "Más Antiguos" },

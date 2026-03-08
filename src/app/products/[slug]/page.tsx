@@ -701,9 +701,9 @@ export default function ProductDetailPage() {
               </TabsContent>
 
               <TabsContent value="specifications" className="mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <table className="w-full text-left border-collapse">
-                    <tbody>
+                <div className="grid grid-cols-1 gap-8  px-40">
+                  <table className="w-full border-collapse mx-auto">
+                    <tbody className="">
                       <tr className="border-b border-black/30">
                         <td className="py-4 font-semibold text-foreground/70 w-1/3">
                           SKU

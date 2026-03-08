@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-      Select,
-      SelectContent,
-      SelectItem,
-      SelectTrigger,
-      SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,18 +28,18 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-      AlertCircle,
-      Award,
-      Check,
-      Loader2,
-      MapPin,
-      Minus,
-      Plus,
-      ShieldCheck,
-      Tag,
-      Trash2,
-      Truck,
-      User
+    AlertCircle,
+    Award,
+    Check,
+    Loader2,
+    MapPin,
+    Minus,
+    Plus,
+    ShieldCheck,
+    Tag,
+    Trash2,
+    Truck,
+    User
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -147,6 +147,7 @@ function CartContent() {
     items: [],
     stockIssues: [],
   });
+  const [lastNotifiedCoupon, setLastNotifiedCoupon] = useState<string | null>(null);
   const [stockIssues, setStockIssues] = useState<any[]>([]);
   const hasStockError = useMemo(() => stockIssues.length > 0, [stockIssues]);
 
@@ -267,7 +268,7 @@ function CartContent() {
       if (!currency) return;
       setIsPaymentLoading(true);
       try {
-        const options = await paymentService.getPaymentOptions(currency);
+        const options = await paymentService.getPaymentOptions(currency, customerData.country);
         setPaymentOptions(options);
 
         if (options.length > 0) {
@@ -285,7 +286,7 @@ function CartContent() {
     };
 
     fetchPaymentOptions();
-  }, [currency]);
+  }, [currency, customerData.country]);
 
   const shippingMutation = useMutation({
     mutationFn: async (address: {
@@ -425,6 +426,22 @@ function CartContent() {
     onSuccess: (data) => {
       if (data && typeof data.subtotal === "number") {
         setPreview(data);
+        
+        // Si hay un cupón aplicado pero la previsualización devuelve un error para él
+        if (appliedCoupon && data.discountDetails?.error) {
+          toast.error(data.discountDetails.error);
+          setAppliedCoupon(null);
+          setCouponCode("");
+          setLastNotifiedCoupon(null);
+        } else if (appliedCoupon && !data.discountDetails?.error && data.discountDetails?.code === appliedCoupon) {
+          // Si el cupón se aplicó con éxito y no ha sido notificado aún
+          if (lastNotifiedCoupon !== appliedCoupon) {
+            toast.success(cartContent.step1.coupon.success);
+            setLastNotifiedCoupon(appliedCoupon);
+          }
+        } else if (!appliedCoupon) {
+          setLastNotifiedCoupon(null);
+        }
       }
       setStockIssues(data?.stockIssues || []);
     },
@@ -517,7 +534,6 @@ function CartContent() {
     onSuccess: (data) => {
       if (data.valid) {
         setAppliedCoupon(couponCode);
-        toast.success(cartContent.step1.coupon.success);
       } else {
         toast.error(data.message || cartContent.step1.coupon.invalid);
       }
@@ -764,7 +780,7 @@ function CartContent() {
             </Card>
           )}
 
-          <Button variant="outline" onClick={() => router.push("/products")}>
+          <Button className="border-border border-4" variant="outline" onClick={() => router.push("/products")}>
             {cartContent.step1.continueShopping}
           </Button>
         </div>
