@@ -115,7 +115,7 @@ export const NotificationWidget = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="absolute bottom-16 right-0 w-80 md:w-96 bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-10rem)]"
+            className="absolute bottom-16 right-0 w-80 md:w-96 bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-12rem)] max-sm:max-h-[calc(100vh-20rem)]"
           >
             <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
               <h3 className="font-bold text-lg">Notificaciones</h3>
