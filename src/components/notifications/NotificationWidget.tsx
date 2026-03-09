@@ -107,7 +107,7 @@ export const NotificationWidget = () => {
   if (!user) return null;
 
   return (
-    <div className="fixed bottom-24 right-6 z-[999]">
+    <div className="fixed bottom-24 right-6 z-[998]">
       <AnimatePresence>
         {isOpen && (
           <motion.div

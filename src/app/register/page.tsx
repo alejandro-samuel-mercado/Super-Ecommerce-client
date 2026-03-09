@@ -189,7 +189,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen grid lg:grid-cols-2 max-md:pb-20 max-md:pt-10 max-md:bg-gray-300/80 max-sm:overflow-hidden ">
+    <main className="min-h-screen grid lg:grid-cols-2 max-md:pb-20 max-md:pt-0 max-md:bg-background/80 max-sm:overflow-hidden ">
       {/* Lado de búsqueda - Decorativo */}
       <div className="hidden lg:flex flex-col justify-between relative overflow-hidden p-16 text-white bg-black pt-20">
         {/* Gradiente de fondo */}
@@ -220,7 +220,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Formulario */}
-      <div className="flex items-center justify-center  p-8 py-40 max-md:py-20  bg-background max-md:bg-gray-300/80   relative">
+      <div className="flex items-center justify-center  p-8 py-40 max-md:py-20  bg-background max-md:bg-background/80   relative">
         {/* Decoración de fondo */}
         <div className="absolute inset-0 lg:hidden -z-10">
           <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] bg-pink-500/5 rounded-full blur-3xl" />

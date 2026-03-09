@@ -41,6 +41,7 @@ export default function RootLayout({
 import { SplashScreen } from "@/components/ui/SplashScreen";
 import { configService } from "@/services/config";
 import { useQuery } from "@tanstack/react-query";
+import { MobileBottomNav } from "@/components/nav/MobileBottomNav";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -77,6 +78,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <CookieBanner />
       <Toaster expand={true} richColors closeButton />
       <FloatingEssentials />
+      <MobileBottomNav />
     </>
   );
 }

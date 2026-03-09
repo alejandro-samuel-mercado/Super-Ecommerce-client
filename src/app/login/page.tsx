@@ -174,7 +174,7 @@ if(redirectUrl?.includes("cart")){
   };
 
   return (
-    <main className="min-h-screen pb-0 md:h-auto grid lg:grid-cols-2  max-sm:overflow-hidden ">
+    <main className="min-h-screen  md:h-auto grid lg:grid-cols-2  max-md:pb-20 max-md:pt-0 max-md:bg-background/80 max-sm:overflow-hidden ">
       {/* Lado decorativo */}
       <div className="hidden lg:flex flex-col justify-between relative overflow-hidden p-16 text-white  ">
         <div className="absolute inset-0 bg-gradient-to-t from-primary via-indigo-600 to-secondary/80 opacity-90" />
@@ -199,7 +199,7 @@ if(redirectUrl?.includes("cart")){
       </div>
 
       {/* Form side */}
-      <div className="flex items-center justify-center p-8 py-40 max-md:py-20  bg-background max-md:bg-gray-300/80  relative ">
+      <div className="flex items-center justify-center  p-8 py-40 max-md:py-20  bg-background max-md:bg-background/80   relative ">
         {/* Decoración de fondo para móviles */}
         <div className="absolute inset-0 lg:hidden -z-10 ">
           <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] bg-primary/5 rounded-full blur-3xl" />

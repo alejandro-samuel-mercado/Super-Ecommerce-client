@@ -335,7 +335,7 @@ function ProductsContent() {
   );
 
   return (
-    <main className="  pb-40 pt-20 md:pt-32 max-md:pt-10 ">
+    <main className="  pb-40 pt-24 max-md:pt-10 ">
       <div className="mx-auto max-w-[80%] max-md:max-w-[90%] max-lg:max-w-[95%] max-sm:max-w-[80%]">
         <div className="flex items-center justify-between mb-8">
           {/* Botón de filtros  */}

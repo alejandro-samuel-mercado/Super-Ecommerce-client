@@ -10,7 +10,7 @@ import { useUIStore } from "@/store/ui";
 import { Product } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { Heart, Menu, ShoppingCart, User, X } from "lucide-react";
+import { Heart, Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -28,6 +28,7 @@ export function Navbar() {
   const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
   const [categoriesTree, setCategoriesTree] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -252,6 +253,43 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-1 lg:gap-4" ref={searchRef}>
+            {/* Mobile Expandable Search */}
+            <AnimatePresence>
+              {isMobileSearchExpanded && (
+                <motion.form
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: "160px", opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  onSubmit={handleSearchSubmit}
+                  className="sm:hidden flex items-center relative"
+                >
+                  <input
+                    autoFocus
+                    type="text"
+                    placeholder="Buscar..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-9 px-3 pr-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-xs text-white placeholder:text-white/70 focus:outline-none focus:ring-1 focus:ring-white/50"
+                  />
+                  <button type="submit" className="absolute right-2 text-white">
+                    <Search className="h-4 w-4" />
+                  </button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+
+            <Button
+              variant="ghost"
+              className={`rounded-lg hover:bg-white/50 p-2 h-auto w-auto sm:hidden ${scrolled ? "text-white" : "text-primary"}`}
+              onClick={() => setIsMobileSearchExpanded(!isMobileSearchExpanded)}
+            >
+              {isMobileSearchExpanded ? (
+                <X className="!h-7 !w-7" />
+              ) : (
+                <Search className="!h-7 !w-7" />
+              )}
+            </Button>
+
             <Button
               variant="ghost"
               className={`rounded-lg hover:bg-white/50 p-2 h-auto w-auto hidden sm:flex ${scrolled ? "text-white" : "hover:bg-secondary/60 hover:text-white"}`}
@@ -270,7 +308,7 @@ export function Navbar() {
 
             <Button
               variant="ghost"
-              className={`relative rounded-lg hover:bg-white/50 p-2 h-auto w-auto ${scrolled ? "text-white" : "hover:bg-secondary/60 hover:text-white"}`}
+              className={`relative rounded-lg hover:bg-white/50 p-2 h-auto w-auto hidden sm:flex ${scrolled ? "text-white" : "hover:bg-secondary/60 hover:text-white"}`}
               onClick={toggleCart}
             >
               <ShoppingCart className="!h-7 !w-7" />
@@ -296,6 +334,22 @@ export function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* Wave effect for mobile (only when at top) */}
+      {!scrolled && (
+        <div className="sm:hidden absolute top-full left-0 w-full h-8 pointer-events-none -translate-y-1">
+          <svg
+            viewBox="0 0 500 150"
+            preserveAspectRatio="none"
+            className="h-full w-full rotate-180"
+          >
+            <path
+              d="M0.00,49.98 C150.00,150.00 349.20,-49.98 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
+              fill="rgba(255, 255, 255, 0.95)"
+            ></path>
+          </svg>
+        </div>
+      )}
     </motion.header>
   );
 }

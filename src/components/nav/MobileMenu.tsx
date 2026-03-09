@@ -66,13 +66,13 @@ const {user}= useAuth()
             <Link
               href="/"
               onClick={closeMobileMenu}
-              className="flex justify-between items-center text-3xl max-sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-all py-2"
+              className="flex justify-between items-center text-3xl max-sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-all py-2 mt-4"
             >
               Inicio
               <ChevronRight className="w-6 h-6 text-gray-400" />
             </Link>
 
-            <div className="py-2">
+            <div className="">
               <button
                 onClick={() => setIsCategoriesOpen((prev) => !prev)}
                 className="w-full flex justify-between items-center text-3xl max-sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent py-2"

@@ -7,11 +7,11 @@ import { MusicPlayer } from "./MusicPlayer";
 
 export function FloatingEssentials() {
   return (
-    <>
+    <div className="hidden sm:block">
       <FloatingChat />
       <FloatingMenu />
       <NotificationWidget />
       <MusicPlayer />
-    </>
+    </div>
   );
 }

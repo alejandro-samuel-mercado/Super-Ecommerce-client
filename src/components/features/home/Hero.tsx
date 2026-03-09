@@ -13,18 +13,18 @@ import { useUIStore } from "@/store/ui";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-   ChevronLeft,
-   ChevronRight,
-   Headphones,
-   Heart,
-   Menu,
-   Package,
-   Search,
-   ShieldCheck,
-   ShoppingCart,
-   Truck,
-   User,
-   X
+      ChevronLeft,
+      ChevronRight,
+      Headphones,
+      Heart,
+      Menu,
+      Package,
+      Search,
+      ShieldCheck,
+      ShoppingCart,
+      Truck,
+      User,
+      X
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -63,6 +63,7 @@ export function Hero() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const searchContainerRef = useRef<HTMLFormElement>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
@@ -261,7 +262,7 @@ export function Hero() {
         className={`fixed lg:top-5 z-50 transition-all duration-300 max-sm:w-full   left-0 right-0 ${
           scrolled
             ? "flex max-sm:max-w-[90%] max-sm:left-0 max-sm:right-0 max-sm:mx-auto   bg-secondary/60 backdrop-blur-md shadow-sm py-3 max-md:py-2 max-sm:py-1 w-[95%] lg:w-[80%] left-1/2 right-1/2 -ml-[47.5%] lg:-ml-[40%] -mr-[47.5%] lg:-mr-[40%] rounded-[1.5rem] lg:rounded-full top-2 max-sm:top-6"
-            : "max-lg:py-3 max-sm:py-1 max-lg:px-4 max-sm:px-1 py-4 max-lg:bg-gradient-to-r from-secondary to-primary lg:left-1/2 lg:right-1/2 lg:-ml-[40%] lg:-mr-[40%] lg:w-[80%]  w-full left-0 right-0 shadow-md lg:shadow-none top-0"
+            : "max-lg:py-3 max-sm:py-2 max-lg:px-4 max-sm:px-1 py-4 max-lg:bg-gradient-to-r from-secondary to-primary lg:left-1/2 lg:right-1/2 lg:-ml-[40%] lg:-mr-[40%] lg:w-[80%]  w-full left-0 right-0 shadow-md lg:shadow-none top-0"
         }`}
       >
         <div className="container mx-auto px-4 lg:px-6 w-full">
@@ -449,7 +450,43 @@ export function Hero() {
             </div>
 
             {/* Iconos - Lado Derecho */}
-            <div className="flex items-center gap-1 max-lg:gap-4 mr-0 max-lg:mr-2 max-sm:mr-0">
+            <div className="flex items-center gap-1 max-lg:gap-4 mr-0 max-lg:mr-2 max-sm:mr-0 pl-2">
+              <AnimatePresence>
+                {isMobileSearchExpanded && (
+                  <motion.form
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: "140px", opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    onSubmit={handleSearchSubmit}
+                    className="sm:hidden flex items-center relative"
+                  >
+                    <input
+                      autoFocus
+                      type="text"
+                      placeholder="Buscar..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full h-9 px-3 pr-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-xs text-white placeholder:text-white/70 focus:outline-none focus:ring-1 focus:ring-white/50"
+                    />
+                    <button type="submit" className="absolute right-2 text-white">
+                      <Search className="h-4 w-4" />
+                    </button>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+
+              <Button
+                variant="ghost"
+                className="rounded-lg hover:bg-white/30 sm:hidden p-2 h-auto w-auto text-white"
+                onClick={() => setIsMobileSearchExpanded(!isMobileSearchExpanded)}
+              >
+                {isMobileSearchExpanded ? (
+                  <X className="!h-6 !w-6" />
+                ) : (
+                  <Search className="!h-6 !w-6" />
+                )}
+              </Button>
+
               <Button
                 variant="ghost"
                 className="rounded-lg hover:bg-white/30 hidden sm:flex p-2 h-auto w-auto"
@@ -468,10 +505,10 @@ export function Hero() {
 
               <Button
                 variant="ghost"
-                className="relative rounded-lg hover:bg-white/30 p-2 h-auto w-auto"
+                className="relative rounded-lg hover:bg-white/30 hidden sm:flex p-2 h-auto w-auto"
                 onClick={toggleCart}
               >
-                <ShoppingCart className="!h-6 !w-6 max-lg:!h-10 max-lg:!w-10  max-sm:!h-8 max-sm:!w-8 text-white font-bold" />
+                <ShoppingCart className="!h-6 !w-6 max-lg:!h-10 max-lg:!w-10  text-white font-bold" />
                 {mounted && getTotalItems() > 0 && (
                   <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 md:h-6 md:w-6 flex items-center justify-center font-bold border-2 border-white">
                     {getTotalItems()}
@@ -494,10 +531,42 @@ export function Hero() {
             </div>
           </div>
         </div>
+        {!scrolled && (
+          <div className="sm:hidden absolute top-full left-0 w-full h-6 -mt-1 pointer-events-none -translate-y-1">
+         <svg
+  viewBox="0 0 500 150"
+  preserveAspectRatio="none"
+  className="h-full w-full rotate-180"
+>
+  {/* fondo */}
+  <path
+    d="M0,50 C150,150 350,-50 500,50 L500,150 L0,150 Z"
+    fill="url(#hero-nav-gradient)"
+  />
+
+  {/* borde */}
+  <path
+    d="M0,50 C150,150 350,-50 500,50"
+    fill="none"
+    stroke="#ffffff"
+    strokeWidth="8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  />
+
+  <defs>
+    <linearGradient id="hero-nav-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="hsl(var(--primary))" />
+      <stop offset="100%" stopColor="hsl(var(--secondary))" />
+    </linearGradient>
+  </defs>
+</svg>
+          </div>
+        )}
       </div>
 
       {/* Tarjeta de Calificación Flotante - Lado Izquierdo */}
-      <div className="px-20 mx-auto max-xl:px-10 max-lg:px-5 max-md:px-0 max-md:mt-12 max-sm:pt-2 ">
+      <div className="px-20 mx-auto max-xl:px-10 max-lg:px-5 max-md:px-0 max-md:mt-12 max-sm:pt-4 ">
         <motion.div
           animate={{
             rotate: [1, -1, 1],

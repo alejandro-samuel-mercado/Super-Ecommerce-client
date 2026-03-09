@@ -217,7 +217,7 @@ export default function ProductDetailPage() {
   const averageRating = product?.averageRating || 0;
 
   return (
-    <main className="min-h-screen py-8 pb-40 relative overflow-hidden pt-28 max-md:pt-20 max-sm:pt-8">
+    <main className="min-h-screen py-8 pb-40 relative overflow-hidden max-sm:px-0 sm:px-20 pt-28 max-md:pt-20 max-sm:pt-8">
       {/* Blobs decorativos */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>

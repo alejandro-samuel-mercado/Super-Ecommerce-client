@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSocket } from "@/hooks/useSocket";
+import { useUIStore } from "@/store/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bot, MessageSquare, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +15,7 @@ interface Message {
 }
 
 export function FloatingChat() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isChatOpen, toggleChat } = useUIStore();
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "BOT",
@@ -31,7 +32,7 @@ export function FloatingChat() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isOpen, isTyping]);
+  }, [messages, isChatOpen, isTyping]);
 
   useEffect(() => {
     if (!socket) return;
@@ -101,15 +102,15 @@ export function FloatingChat() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 font-sans">
+    <div className="fixed bottom-6 right-6 z-[999] flex flex-col items-end gap-3 font-sans">
       <AnimatePresence>
-        {isOpen && (
+        {isChatOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="w-[360px] h-[520px] bg-white/90 backdrop-blur-xl border border-white/50 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden relative"
+            className="max-sm:-mr-5 w-[330px] sm:w-[360px] h-[520px] bg-white/90 backdrop-blur-xl border border-white/50 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden relative"
           >
             {/* Fondo decorativo */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -z-10 translate-x-10 -translate-y-10"></div>
@@ -134,7 +135,7 @@ export function FloatingChat() {
                 size="icon"
                 variant="ghost"
                 className="text-white hover:bg-white/20 rounded-full h-8 w-8 transition-colors"
-                onClick={() => setIsOpen(false)}
+                onClick={toggleChat}
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -232,8 +233,8 @@ export function FloatingChat() {
 
       <Button
         size="lg"
-        className="rounded-full h-14 w-14 shadow-[0_8px_30px_rgba(0,0,0,0.12)] bg-gradient-to-tr from-primary to-purple-600 hover:scale-110 hover:shadow-primary/40 transition-all duration-300 z-50"
-        onClick={() => setIsOpen(!isOpen)}
+        className="rounded-full h-14 w-14 shadow-[0_8px_30px_rgba(0,0,0,0.12)] bg-gradient-to-tr from-primary to-purple-600 hover:scale-110 hover:shadow-primary/40 transition-all duration-300 z-50 sm:flex hidden"
+        onClick={toggleChat}
       >
         <MessageSquare className="w-7 h-7 text-white" />
      
