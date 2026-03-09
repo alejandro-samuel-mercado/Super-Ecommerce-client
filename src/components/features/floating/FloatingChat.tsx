@@ -102,7 +102,7 @@ export function FloatingChat() {
   };
 
   return (
-    <div className="fixed bottom-6 max-sm:bottom-14  right-6 z-[999] flex flex-col items-end gap-3 font-sans">
+    <div className="fixed bottom-6 max-sm:bottom-20  right-6 z-[999] flex flex-col items-end gap-3 font-sans">
       <AnimatePresence>
         {isChatOpen && (
           <motion.div

@@ -48,6 +48,12 @@ export function Hero() {
   });
   const { carousel, featureBadges } = home.hero;
   const { user } = useAuth();
+  const { 
+    toggleCart, 
+    toggleNotifications, 
+    toggleMobileMenu, 
+    isMobileMenuOpen 
+  } = useUIStore();
   const { currency } = useCurrencyStore();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -58,7 +64,6 @@ export function Hero() {
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
   const { getTotalItems } = useCartStore();
-  const { toggleMobileMenu, isMobileMenuOpen, toggleCart } = useUIStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -477,7 +482,7 @@ export function Hero() {
                 )}
               </AnimatePresence>
 
-              <div className="flex items-center sm:hidden">
+              <div className="flex items-center sm:hidden -mr-3">
                 <Button
                   variant="ghost"
                   className="rounded-lg hover:bg-white/30 p-2 h-auto w-auto text-white"
@@ -494,7 +499,7 @@ export function Hero() {
                   <Button
                     variant="ghost"
                     className="relative rounded-lg hover:bg-white/30 p-2 h-auto w-auto text-white"
-                    onClick={() => useUIStore.getState().toggleNotifications()}
+                    onClick={toggleNotifications}
                   >
                     <Bell className="!h-6 !w-6" />
                     {/* Badge for notifications can be added if we had count here, but Widget handles its own badge */}

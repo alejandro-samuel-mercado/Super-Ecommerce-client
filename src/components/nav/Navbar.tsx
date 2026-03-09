@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 
 export function Navbar() {
   const { user } = useAuth();
+  const { toggleCart, toggleMobileMenu, toggleNotifications, isMobileMenuOpen } = useUIStore();
   const { data: config, isLoading } = useQuery({
     queryKey: ["publicConfig"],
     queryFn: configService.getPublicConfig,
@@ -85,7 +86,6 @@ export function Navbar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const debouncedSearch = useDebounce(searchQuery, 150);
 
-  const { toggleCart, toggleMobileMenu, isMobileMenuOpen } = useUIStore();
   const { getTotalItems } = useCartStore();
 
   useEffect(() => {
@@ -290,7 +290,7 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 className={`rounded-lg hover:bg-white/50 p-2 h-auto w-auto sm:hidden ${scrolled ? "text-white" : "text-primary"}`}
-                onClick={useUIStore.getState().toggleNotifications}
+                onClick={toggleNotifications}
               >
                 <Bell className="!h-7 !w-7" />
               </Button>

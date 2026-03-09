@@ -9,9 +9,9 @@ export function FloatingEssentials() {
   return (
     <>
       <FloatingChat />
+      <NotificationWidget />
       <div className="hidden sm:block">
         <FloatingMenu />
-        <NotificationWidget />
         <MusicPlayer />
       </div>
     </>
