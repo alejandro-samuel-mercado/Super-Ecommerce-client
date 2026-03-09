@@ -4,6 +4,7 @@ import { home } from "@/../content/home";
 import { navbar } from "@/../content/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/lib/utils";
 import { configService } from "@/services/config";
 import { productService } from "@/services/products";
@@ -13,6 +14,7 @@ import { useUIStore } from "@/store/ui";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+      Bell,
       ChevronLeft,
       ChevronRight,
       Headphones,
@@ -45,7 +47,7 @@ export function Hero() {
     staleTime: 1000 * 60 * 60,
   });
   const { carousel, featureBadges } = home.hero;
-
+  const { user } = useAuth();
   const { currency } = useCurrencyStore();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -455,7 +457,7 @@ export function Hero() {
                 {isMobileSearchExpanded && (
                   <motion.form
                     initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: "140px", opacity: 1 }}
+                    animate={{ width: "120px", opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }}
                     onSubmit={handleSearchSubmit}
                     className="sm:hidden flex items-center relative"
@@ -475,17 +477,30 @@ export function Hero() {
                 )}
               </AnimatePresence>
 
-              <Button
-                variant="ghost"
-                className="rounded-lg hover:bg-white/30 sm:hidden p-2 h-auto w-auto text-white"
-                onClick={() => setIsMobileSearchExpanded(!isMobileSearchExpanded)}
-              >
-                {isMobileSearchExpanded ? (
-                  <X className="!h-6 !w-6" />
-                ) : (
-                  <Search className="!h-6 !w-6" />
+              <div className="flex items-center sm:hidden">
+                <Button
+                  variant="ghost"
+                  className="rounded-lg hover:bg-white/30 p-2 h-auto w-auto text-white"
+                  onClick={() => setIsMobileSearchExpanded(!isMobileSearchExpanded)}
+                >
+                  {isMobileSearchExpanded ? (
+                    <X className="!h-6 !w-6" />
+                  ) : (
+                    <Search className="!h-6 !w-6" />
+                  )}
+                </Button>
+
+                {user && (
+                  <Button
+                    variant="ghost"
+                    className="relative rounded-lg hover:bg-white/30 p-2 h-auto w-auto text-white"
+                    onClick={() => useUIStore.getState().toggleNotifications()}
+                  >
+                    <Bell className="!h-6 !w-6" />
+                    {/* Badge for notifications can be added if we had count here, but Widget handles its own badge */}
+                  </Button>
                 )}
-              </Button>
+              </div>
 
               <Button
                 variant="ghost"

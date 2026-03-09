@@ -102,7 +102,7 @@ export function FloatingChat() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[999] flex flex-col items-end gap-3 font-sans">
+    <div className="fixed bottom-6 max-sm:bottom-14  right-6 z-[999] flex flex-col items-end gap-3 font-sans">
       <AnimatePresence>
         {isChatOpen && (
           <motion.div
@@ -110,7 +110,7 @@ export function FloatingChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="max-sm:-mr-5 w-[330px] sm:w-[360px] h-[520px] bg-white/90 backdrop-blur-xl border border-white/50 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden relative"
+            className="max-sm:-mr-3 w-[330px] sm:w-[360px] h-[520px] bg-white/90 backdrop-blur-xl border border-white/50 rounded-[2rem] shadow-2xl flex flex-col overflow-hidden relative"
           >
             {/* Fondo decorativo */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -z-10 translate-x-10 -translate-y-10"></div>

@@ -2,6 +2,7 @@
 
 import { navbar } from "@/../content/navbar";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { configService } from "@/services/config";
 import { productService } from "@/services/products";
@@ -10,12 +11,13 @@ import { useUIStore } from "@/store/ui";
 import { Product } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { Heart, Menu, Search, ShoppingCart, User, X } from "lucide-react";
+import { Bell, Heart, Menu, ShoppingCart, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export function Navbar() {
+  const { user } = useAuth();
   const { data: config, isLoading } = useQuery({
     queryKey: ["publicConfig"],
     queryFn: configService.getPublicConfig,
@@ -283,6 +285,16 @@ export function Navbar() {
                 </span>
               )}
             </Button>
+
+            {user && (
+              <Button
+                variant="ghost"
+                className={`rounded-lg hover:bg-white/50 p-2 h-auto w-auto sm:hidden ${scrolled ? "text-white" : "text-primary"}`}
+                onClick={useUIStore.getState().toggleNotifications}
+              >
+                <Bell className="!h-7 !w-7" />
+              </Button>
+            )}
 
             <Button
               variant="ghost"

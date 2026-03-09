@@ -8,6 +8,7 @@ import {
       Notification,
       notificationService,
 } from "@/services/notification.service";
+import { useUIStore } from "@/store/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import {
       AlertTriangle,
@@ -25,7 +26,7 @@ import { useCallback, useEffect, useState } from "react";
 export const NotificationWidget = () => {
   const { user } = useAuth();
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
+  const { isNotificationsOpen, toggleNotifications } = useUIStore();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -82,7 +83,7 @@ export const NotificationWidget = () => {
     }
     if (notification.data?.url) {
       router.push(notification.data.url);
-      setIsOpen(false);
+      toggleNotifications();
     }
   };
 
@@ -107,9 +108,9 @@ export const NotificationWidget = () => {
   if (!user) return null;
 
   return (
-    <div className="fixed bottom-24 right-6 z-[998]">
+    <div className="fixed bottom-24 max-sm:bottom-32 right-6 z-[998]">
       <AnimatePresence>
-        {isOpen && (
+        {isNotificationsOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -193,8 +194,8 @@ export const NotificationWidget = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className="h-14 w-14 rounded-full bg-background/80 backdrop-blur-xl border border-primary/30 shadow-lg flex items-center justify-center relative hover:bg-white/10 transition-colors"
+        onClick={toggleNotifications}
+        className="h-14 w-14 rounded-full bg-background/80 backdrop-blur-xl border border-primary/30 shadow-lg flex items-center justify-center relative hover:bg-white/10 transition-colors sm:flex hidden"
       >
         <Bell className="h-6 w-6" />
         {unreadCount > 0 && (
