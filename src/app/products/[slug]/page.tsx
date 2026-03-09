@@ -4,13 +4,13 @@ import { ProductCard } from "@/components/shared/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-   Dialog,
-   DialogContent,
-   DialogDescription,
-   DialogFooter,
-   DialogHeader,
-   DialogTitle,
-   DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -28,13 +28,13 @@ import { SKU, VariantOption } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-   ChevronRight,
-   Heart,
-   Minus,
-   Plus,
-   ShoppingCart,
-   Star,
-   ZoomIn,
+    ChevronRight,
+    Heart,
+    Minus,
+    Plus,
+    ShoppingCart,
+    Star,
+    ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -208,8 +208,7 @@ export default function ProductDetailPage() {
 
   const handleBuyNow = () => {
     handleAddToCart();
-
-    window.dispatchEvent(new CustomEvent("open-cart"));
+    router.push("/cart");
   };
 
   const isFav = isFavorite(product.id);
@@ -625,10 +624,7 @@ export default function ProductDetailPage() {
                 size="lg"
                 variant="secondary"
                 className="flex-1 rounded-full h-14 max-sm:py-4 max-sm:w-60 max-sm:mx-auto  text-base font-bold border-2 border-primary/10 hover:border-primary/30 bg-secondary/90 hover:bg-secondary/50 shadow-lg shadow-black/5 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-                onClick={() => {
-                  handleBuyNow();
-                  window.location.href = "/cart?reloaded=true";
-                }}
+                onClick={handleBuyNow}
                 disabled={!currentSku || currentStock === 0}
               >
                 Comprar Ahora

@@ -42,7 +42,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
       return;
     }
 
-    const defaultSku = product.skus[0];
+    const defaultSku = product.skus?.find(sku => Number(sku.stock) > 0) || product.skus?.[0];
     const defaultSkuPrice = typeof defaultSku?.price === "number" ? defaultSku.price : parseFloat(defaultSku?.price || "0");
 
     addItem(
@@ -81,10 +81,14 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
     if (product?.id) toggleFavorite(product.id);
   };
 
-  const displaySku = product.skus?.[0];
+  const displaySku = product.skus?.find(sku => Number(sku.stock) > 0) || product.skus?.[0];
   const displayPrice = displaySku 
     ? (typeof displaySku.price === "number" ? displaySku.price : parseFloat(displaySku.price || "0")) || product.price || product.basePrice || 0
     : product.price || product.basePrice || 0;
+
+  const discountVal = Number(product.discountPercentage) || 0;
+  const hasDiscount = discountVal > 0;
+  const finalDiscountedPrice = hasDiscount ? displayPrice * (1 - discountVal / 100) : displayPrice;
 
   return (
     <Link
@@ -121,9 +125,9 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
               Nuevo
             </Badge>
           )}
-          {Number(product.discountPercentage) > 0 && (
+          {hasDiscount && (
             <Badge className="bg-red-500/90 text-white border-none rounded-lg font-bold shadow-sm">
-              -{product.discountPercentage}%
+              -{discountVal}%
             </Badge>
           )}
         </div>
@@ -186,14 +190,13 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
       </div>
 
       <div className="flex items-baseline gap-2 flex-wrap">
-        {Number(product.discountPercentage) > 0 &&
-        (product as any).discountedPrice ? (
+        {hasDiscount ? (
           <>
             <span
               className={`font-bold text-xl ${isOutOfStock ? "text-muted-foreground" : "text-primary"}`}
             >
               {formatPrice(
-                (product as any).discountedPrice,
+                finalDiscountedPrice,
                 product.currencyCode,
               )}
             </span>

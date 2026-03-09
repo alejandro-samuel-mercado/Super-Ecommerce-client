@@ -4,10 +4,13 @@ import { useCurrencyStore } from "@/store/currency";
 import { useEffect } from "react";
 
 export function CurrencyInitializer() {
-  const { setCurrency } = useCurrencyStore();
+  const { currency, setCurrency } = useCurrencyStore();
 
   useEffect(() => {
     const initializeCurrency = async () => {
+      // Si ya hay una moneda seleccionada (ej. en localStorage o guardada de sesión previa), NO sobreescribir
+      if (currency) return;
+
       try {
         const { configService } = await import("@/services/config");
         const publicConfig = await configService.getPublicConfig();
@@ -19,7 +22,7 @@ export function CurrencyInitializer() {
     };
 
     initializeCurrency();
-  }, [setCurrency]);
+  }, [currency, setCurrency]);
 
   return null;
 }
