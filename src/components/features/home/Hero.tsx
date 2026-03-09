@@ -591,7 +591,7 @@ export function Hero() {
                   onClick={prevSlide}
                   onMouseEnter={() => setIsAutoPlaying(false)}
                   onMouseLeave={() => setIsAutoPlaying(true)}
-                  className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all hover:scale-110 shadow-lg group"
+                  className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10  flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110  group"
                   aria-label="Previous slide"
                 >
                   <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800 group-hover:text-primary transition-colors" />
@@ -600,7 +600,7 @@ export function Hero() {
                   onClick={nextSlide}
                   onMouseEnter={() => setIsAutoPlaying(false)}
                   onMouseLeave={() => setIsAutoPlaying(true)}
-                  className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all hover:scale-110 shadow-lg group"
+                  className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10  flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110 group"
                   aria-label="Next slide"
                 >
                   <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800 group-hover:text-primary transition-colors" />
