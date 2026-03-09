@@ -63,7 +63,7 @@ export function CartDrawer() {
 
   return (
     <Sheet open={isCartOpen} onOpenChange={(open) => !open && closeCart()}>
-      <SheetContent className="flex flex-col h-full w-full sm:max-w-md border-l-0 bg-white/95 backdrop-blur-xl p-0">
+      <SheetContent className="flex flex-col h-full w-full sm:max-w-md border-l-0 bg-white/95 backdrop-blur-xl p-0 z-[2000]">
         <SheetHeader className="p-6 border-b bg-white">
           <SheetTitle className="text-2xl font-black bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
             Mi Carrito ({getTotalItems()})

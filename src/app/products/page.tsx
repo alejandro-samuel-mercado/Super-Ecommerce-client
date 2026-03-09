@@ -341,7 +341,7 @@ function ProductsContent() {
           {/* Botón de filtros  */}
           <Sheet open={isMobileFilterOpen} onOpenChange={setIsMobileFilterOpen}>
             <SheetTrigger asChild className="lg:hidden">
-              <Button variant="outline">
+              <Button variant="outline" className="border-2 border-border bg-background">
                 <Filter className="h-4 w-4 mr-2" />
                 Filtros
                 {activeFilterCount > 0 && (

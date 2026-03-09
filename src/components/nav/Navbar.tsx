@@ -146,7 +146,7 @@ export function Navbar() {
       className={`fixed z-50 transition-all duration-300 w-full lg:w-auto ${
         scrolled
           ? "top-2 lg:top-5 bg-secondary/60 backdrop-blur-md py-2 max-sm:py-1 w-[95%] max-sm:w-[90%] max-sm:-ml-[45%] lg:w-[80%] left-1/2 right-1/2 -ml-[47.5%] lg:-ml-[40%] -mr-[47.5%] lg:-mr-[40%] rounded-[1.5rem] lg:rounded-full shadow-2xl shadow-primary/20"
-          : "top-0 left-0 right-0 backdrop-blur-xl shadow-md"
+          : "top-0 left-0 right-0 border-b-transparent "
       }`}
       onKeyDown={handleKeyDown}
     >
@@ -253,42 +253,7 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-1 lg:gap-4" ref={searchRef}>
-            {/* Mobile Expandable Search */}
-            <AnimatePresence>
-              {isMobileSearchExpanded && (
-                <motion.form
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: "160px", opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  onSubmit={handleSearchSubmit}
-                  className="sm:hidden flex items-center relative"
-                >
-                  <input
-                    autoFocus
-                    type="text"
-                    placeholder="Buscar..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-9 px-3 pr-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-xs text-white placeholder:text-white/70 focus:outline-none focus:ring-1 focus:ring-white/50"
-                  />
-                  <button type="submit" className="absolute right-2 text-white">
-                    <Search className="h-4 w-4" />
-                  </button>
-                </motion.form>
-              )}
-            </AnimatePresence>
-
-            <Button
-              variant="ghost"
-              className={`rounded-lg hover:bg-white/50 p-2 h-auto w-auto sm:hidden ${scrolled ? "text-white" : "text-primary"}`}
-              onClick={() => setIsMobileSearchExpanded(!isMobileSearchExpanded)}
-            >
-              {isMobileSearchExpanded ? (
-                <X className="!h-7 !w-7" />
-              ) : (
-                <Search className="!h-7 !w-7" />
-              )}
-            </Button>
+            
 
             <Button
               variant="ghost"
@@ -338,16 +303,25 @@ export function Navbar() {
       {/* Wave effect for mobile (only when at top) */}
       {!scrolled && (
         <div className="sm:hidden absolute top-full left-0 w-full h-8 pointer-events-none -translate-y-1">
-          <svg
-            viewBox="0 0 500 150"
-            preserveAspectRatio="none"
-            className="h-full w-full rotate-180"
-          >
-            <path
-              d="M0.00,49.98 C150.00,150.00 349.20,-49.98 500.00,49.98 L500.00,150.00 L0.00,150.00 Z"
-              fill="rgba(255, 255, 255, 0.95)"
-            ></path>
-          </svg>
+       <svg
+  viewBox="0 0 500 150"
+  preserveAspectRatio="none"
+  className="h-full w-full rotate-180"
+>
+ 
+  <path
+    d="M0,50 C150,150 350,-50 500,50 L500,150 L0,150 Z"
+    fill="rgba(255,255,255,0.99)"
+  />
+
+  
+  <path
+    d="M0,50 C150,150 350,-50 500,50"
+    fill="none"
+    stroke="hsl(var(--primary) / 0.3)"
+    strokeWidth="8"
+  />
+</svg>
         </div>
       )}
     </motion.header>
