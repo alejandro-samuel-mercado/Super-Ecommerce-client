@@ -75,7 +75,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <MobileMenu />
       <CartDrawer />
       <CookieBanner />
-      <Toaster expand={true} richColors />
+      <Toaster expand={true} richColors closeButton />
       <FloatingEssentials />
     </>
   );
