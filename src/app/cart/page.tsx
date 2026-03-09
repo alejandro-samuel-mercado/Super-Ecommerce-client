@@ -218,11 +218,11 @@ function CartContent() {
     branchService
       .getAll()
       .then((data) => {
-        console.log("Branches loaded:", data);
+      
         setBranches(data.filter((b) => b.active || (b as any).isActive));
       })
       .catch((err) => {
-        console.error("Error loading branches:", err);
+       
       });
   }, []);
 
