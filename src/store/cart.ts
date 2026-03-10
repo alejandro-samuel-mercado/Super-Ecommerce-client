@@ -85,7 +85,6 @@ export const useCartStore = create<CartState>()(
         try {
           let remoteCart;
 
-          // Merge local anonymous items ONLY if mergeLocal is true
           if (mergeLocal) {
             const localItems = get().items.map((i) => ({
               skuId: Number(i.skuId),
@@ -93,7 +92,7 @@ export const useCartStore = create<CartState>()(
             }));
             remoteCart = await cartService.mergeCart(localItems, currencyCode);
           } else {
-            // Otherwise, we just fetch the true cart from the backend DB directly
+           
             remoteCart = await cartService.getCart(currencyCode);
           }
 

@@ -164,7 +164,7 @@ export function MusicPlayer() {
           )}
         </AnimatePresence>
 
-        {/* Barras del visualizador (simuladas) */}
+        {/* Barras del visualizador */}
         {isPlaying && !isExpanded && (
           <div className="flex gap-0.5 items-end h-4 ml-2 mr-2">
             <motion.div

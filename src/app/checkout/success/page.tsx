@@ -86,7 +86,6 @@ function CheckoutSuccessContent() {
       try {
         if (saleId) {
           const data = await orderService.getById(saleId);
-          // Mapeo preventivo para compatibilidad con el Backend
           const mappedData = {
             ...data,
             tax: data.taxAmount || 0,

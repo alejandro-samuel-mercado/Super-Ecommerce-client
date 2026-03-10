@@ -279,7 +279,7 @@ export default function ProductDetailPage() {
         <div
           className={`grid grid-cols-1 lg:grid-cols-2 gap-5 mb-16 items-start max-md:rounded-none    border-4 border-zinc-300 dark:border-zinc-600 shadow-[0_0_20px_rgba(0,0,0,0.2)] hover:shadow-[0_0_30px_rgba(0,0,0,0.2)] ${isOutOfStock ? "" : "hover:border-secondary"} hover:ring-4 hover:ring-zinc-500/10 transition-all duration-300 rounded-[2rem] overflow-hidden bg-gray-300/20 ${isOutOfStock ? "grayscale-[0.3] opacity-90" : ""}`}
         >
-          {/* Gallery */}
+          {/* Galería */}
           <div className="space-y-6 ">
             <div className="relative aspect-square rounded-[2rem] overflow-hidden  border-4 border-white/50 shadow-2xl shadow-primary/10 group m-5 max-lg:m-20 max-sm:m-8">
               {product?.images?.[selectedImage] && (

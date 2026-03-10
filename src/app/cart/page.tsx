@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,9 +22,9 @@ import { formatPrice } from "@/lib/utils";
 import { Branch, branchService } from "@/services/branch";
 import { PublicConfig, configService } from "@/services/config";
 import {
-  OrderPreviewRequest,
-  OrderPreviewResponse,
-  orderService,
+    OrderPreviewRequest,
+    OrderPreviewResponse,
+    orderService,
 } from "@/services/orders";
 import { PaymentGatewayOption, paymentService } from "@/services/payment";
 import { ShippingZone, shippingService } from "@/services/shipping";
@@ -32,18 +32,18 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-  AlertCircle,
-  Award,
-  Check,
-  Loader2,
-  MapPin,
-  Minus,
-  Plus,
-  ShieldCheck,
-  Tag,
-  Trash2,
-  Truck,
-  User,
+    AlertCircle,
+    Award,
+    Check,
+    Loader2,
+    MapPin,
+    Minus,
+    Plus,
+    ShieldCheck,
+    Tag,
+    Trash2,
+    Truck,
+    User,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -2053,7 +2053,7 @@ function CartContent() {
 
           <div className="lg:col-span-1">
             <Card className="p-6 md:p-8 rounded-[2rem] border-2 border-primary/70 bg-white/60 backdrop-blur-xl shadow-xl sticky top-0 overflow-hidden relative">
-              {/* Loader Localizado de la Tarjeta de Precios - Diseño Premium de Referencia */}
+              {/* Loader Localizado de la Tarjeta de Precios  */}
               {isUpdating && (
                 <div className="absolute inset-0 z-20 bg-white/80 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
                   <div className="relative mb-4">
@@ -2265,7 +2265,8 @@ function CartContent() {
                       isUpdating ||
                       !selectedGateway ||
                       isRedirecting ||
-                      preview === null
+                      preview === null ||
+                      (preview?.total !== undefined && preview.total <= 0)
                     }
                   >
                     {createOrderMutation.isPending || isRedirecting ? (
@@ -2321,7 +2322,6 @@ function CartContent() {
 
               <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <div className="flex gap-2 opacity-50">
-                  {/* Iconos de pago */}
                   <div className="w-8 h-5 bg-gray-400 rounded"></div>
                   <div className="w-8 h-5 bg-gray-400 rounded"></div>
                   <div className="w-8 h-5 bg-gray-400 rounded"></div>

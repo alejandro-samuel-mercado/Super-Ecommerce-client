@@ -152,7 +152,7 @@ export const orderService = {
       },
     );
 
-    // Si llegamos aquí, la API respondió 200 (éxito). Los errores se lanzan via http adapter.
+    //
     const data = response.data;
     return {
       valid: !!(data && data.id),

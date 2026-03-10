@@ -71,7 +71,6 @@ export const NotificationWidget = () => {
     try {
       await notificationService.delete(id);
       setNotifications((prev) => prev.filter((n) => n.id !== id));
-      // Recalcular no leídas en caso de eliminar una no leída
       const isUnread = notifications.find((n) => n.id === id)?.read === false;
       if (isUnread) setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {}

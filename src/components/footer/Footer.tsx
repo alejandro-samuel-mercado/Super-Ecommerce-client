@@ -227,7 +227,7 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Secciones de enlaces (estáticas por ahora como se solicita) */}
+          {/* Secciones de enlaces*/}
           {footer.sections.map((section, idx) => (
             <div key={idx}>
               <h3 className="text-xl font-bold mb-6 border-b-2 border-secondary/30 pb-2 inline-block">

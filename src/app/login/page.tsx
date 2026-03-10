@@ -198,9 +198,8 @@ if(redirectUrl?.includes("cart")){
         </div>
       </div>
 
-      {/* Form side */}
+      {/* Formulario de inicio de sesión */}
       <div className="flex items-center justify-center  p-8 py-40 max-md:py-20  bg-background max-md:bg-background/80   relative ">
-        {/* Decoración de fondo para móviles */}
         <div className="absolute inset-0 lg:hidden -z-10 ">
           <div className="absolute top-[-20%] right-[-20%] w-[80%] h-[80%] bg-primary/5 rounded-full blur-3xl" />
           <div className="absolute bottom-[-20%] left-[-20%] w-[80%] h-[80%] bg-secondary/10 rounded-full blur-3xl" />

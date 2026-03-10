@@ -118,7 +118,7 @@ export function Testimonials() {
           </div>
         )}
 
-        {/* Formulario de comentario - Siempre visible */}
+        {/* Formulario de comentario  */}
         <div className="max-w-3xl mx-auto mt-16">
           <div className="bg-gradient-to-br from-primary/5 to-primary/10 border-2 border-primary/20 rounded-2xl p-8 shadow-lg">
             <div className="flex items-center gap-3 mb-6">

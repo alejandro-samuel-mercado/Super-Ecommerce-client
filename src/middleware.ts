@@ -9,7 +9,6 @@ export function middleware(request: NextRequest) {
   
   if (country) {
     // Guardar en una cookie para que el cliente pueda leerla y enviarla a la API
-    // Usamos una cookie con Max-Age largo (1 año) para persistencia
     response.cookies.set('vercel-country', country, {
       path: '/',
       maxAge: 60 * 60 * 24 * 365,

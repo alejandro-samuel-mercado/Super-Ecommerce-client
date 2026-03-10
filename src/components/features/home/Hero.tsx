@@ -191,10 +191,10 @@ export function Hero() {
       <section className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-[25vh] pt-6 max-md:pt-0 pb-12">
         <div className="px-40 mx-auto px-4 ">
           <div className="bg-zinc-50 borde">
-            {/* Search Bar Skeleton */}
+            {/* Barra de búsqueda Skeleton */}
             <div className="absolute top-10 left-1/2 -translate-x-1/2 w-full max-w-xl h-14 bg-white/50 rounded-full animate-pulse" />
 
-            {/* Content Skeleton */}
+            {/* Contenido Skeleton */}
             <div className="absolute left-20 top-1/2 -translate-y-1/2 space-y-6">
               <div className="h-4 w-32 bg-zinc-200 rounded animate-pulse" />
               <div className="h-16 w-[500px] bg-zinc-200 rounded-2xl animate-pulse" />
@@ -264,7 +264,7 @@ export function Hero() {
 
   return (
     <section className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-[25vh] max-lg:mb-[15vh] max-md:mb-[25vh] pt-6 max-md:pt-0 pb-12 max-sm:pb-28">
-      {/* Fixed Navbar */}
+      {/* Navbar */}
       <div
         className={`fixed lg:top-5 z-50 transition-all duration-300 max-sm:w-full   left-0 right-0 ${
           scrolled
@@ -502,7 +502,7 @@ export function Hero() {
                     onClick={toggleNotifications}
                   >
                     <Bell className="!h-6 !w-6" />
-                    {/* Badge for notifications can be added if we had count here, but Widget handles its own badge */}
+                 
                   </Button>
                 )}
               </div>

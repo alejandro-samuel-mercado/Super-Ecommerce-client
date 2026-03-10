@@ -353,7 +353,7 @@ export default function ContactPage() {
             </Card>
           </div>
 
-          {/*  Contact Form */}
+          {/* Formulario de Contacto */}
           <div className=" lg:col-span-6  lg:ml-20 xl:ml-60 xl:-mr-60">
             <Card className="p-8 max-md:px-4 md:p-12 rounded-[2.5rem] border-[3px] border-primary/60 bg-white shadow-[0_20px_60px_-15px_rgba(99,102,241,0.4)] h-full relative overflow-hidden">
               <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50/50 rounded-bl-[150px] -z-10 -mr-20 -mt-20"></div>

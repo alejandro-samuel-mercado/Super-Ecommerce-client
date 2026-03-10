@@ -151,7 +151,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         useFavoritesStore.getState().syncFavorites();
         await useCartStore.getState().syncWithBackend(undefined, true);
     } else {
-        // El usuario está en PENDING_VERIFICATION, no guardamos tokens
         setUser(userData);
     }
     return res;

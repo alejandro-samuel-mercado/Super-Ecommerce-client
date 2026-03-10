@@ -113,7 +113,6 @@ export default function CategoriesPage() {
                       className="object-cover transition-transform group-hover:scale-105"
                     />
 
-                    {/* Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
                     {/* Información de la categoría */}

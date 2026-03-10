@@ -103,7 +103,7 @@ function ProductsContent() {
     setSearchInput(urlFilters.search || "");
   }, [searchParams]);
 
-  // Efecto de búsqueda con debounce - actualiza los filtros cuando cambia searchInput
+  // Efecto de búsqueda con debounce 
   useEffect(() => {
     if (searchInput === (filters.search || "")) return;
 

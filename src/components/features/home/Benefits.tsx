@@ -43,7 +43,7 @@ export function Benefits() {
                   transition-all duration-300 ease-out"
               >
                 <div className="flex flex-col items-center text-center gap-4">
-                  {/* Icon */}
+                  {/* Icono */}
                   <div
                     className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center
                     group-hover:bg-primary/20 group-hover:scale-110 group-hover:-rotate-3

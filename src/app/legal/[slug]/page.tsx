@@ -48,7 +48,7 @@ export default function LegalPage() {
           </nav>
         </Card>
 
-        {/* Content Sections */}
+        {/* Secciones de contenido */}
         <div className="prose prose-slate max-w-none">
           {page.sections.map((section, idx) => (
             <section

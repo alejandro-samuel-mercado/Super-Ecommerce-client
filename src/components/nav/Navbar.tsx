@@ -312,7 +312,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Wave effect for mobile (only when at top) */}
+      {/* Efecto de onda para móvil (solo cuando está arriba) */}
       {!scrolled && (
         <div className="sm:hidden absolute top-full left-0 w-full h-8 pointer-events-none -translate-y-1">
        <svg
