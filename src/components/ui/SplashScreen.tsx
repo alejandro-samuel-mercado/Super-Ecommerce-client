@@ -34,7 +34,7 @@ export function SplashScreen({
           }}
           className="fixed inset-0  w-screen overflow-hidden h-screen  z-[9999] flex flex-col items-center justify-center bg-white"
         >
-          <div className="bg-gradient-to-r from-primary/20 to-secondary/20 w-full h-full flex items-center justify-center">
+          <div className="sm:bg-gradient-to-r sm:from-primary/20 sm:to-secondary/20 max-sm:bg-background/40 w-full h-full flex items-center justify-center">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

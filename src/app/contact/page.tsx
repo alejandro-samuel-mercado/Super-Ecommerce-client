@@ -223,7 +223,7 @@ export default function ContactPage() {
   return (
     <main className="min-h-screen bg-white pb-40 pt-20 max-md:pt-0">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-48 flex items-center justify-center overflow-hidden bg-gradient-to-r from-secondary/60 to-primary/60 ">
+      <section className="relative pt-32 max-sm:pt-20 pb-48 max-sm:pb-20 flex items-center justify-center overflow-hidden bg-gradient-to-r from-secondary/60 to-primary/60 ">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-1/4 w-[500px] h-[500px]  rounded-full blur-[100px] -translate-y-1/2"></div>
@@ -241,7 +241,7 @@ export default function ContactPage() {
       </section>
 
       {/* Separador  */}
-      <div className="relative -top-[1px] left-0 w-full overflow-hidden leading-[0] z-20 ">
+      <div className="relative  left-0 w-full overflow-hidden leading-[0] z-20 ">
         <svg
           data-name="Layer 1"
           xmlns="http://www.w3.org/2000/svg"
@@ -255,10 +255,15 @@ export default function ContactPage() {
               <stop offset="100%" stopColor="#b34d8e" stopOpacity="0.6" />
             </linearGradient>
           </defs>
-          <path
+          <path className="max-sm:hidden"
             d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
             fill="url(#waveGradient)"
           ></path>
+ <path
+  className="sm:hidden"
+  d="M0,0 L0,60 Q600,90 1200,60 L1200,0 Z"
+  fill="url(#waveGradient)"
+/>
         </svg>
       </div>
 
@@ -377,7 +382,7 @@ export default function ContactPage() {
                         id="name"
                         {...register("name")}
                         placeholder="Tu nombre"
-                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.name ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
+                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400/70 focus:bg-white transition-all ${errors.name ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
                       />
                       {errors.name && (
                         <p className="text-red-600 font-bold text-sm ml-2">
@@ -398,7 +403,7 @@ export default function ContactPage() {
                         type="email"
                         {...register("email")}
                         placeholder="tucorreo@ejemplo.com"
-                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.email ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
+                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400/70 focus:bg-white transition-all ${errors.email ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
                       />
                       {errors.email && (
                         <p className="text-red-600 font-bold text-sm ml-2">
@@ -420,7 +425,7 @@ export default function ContactPage() {
                         id="phone"
                         {...register("phone")}
                         placeholder="+54 ..."
-                        className="h-12 rounded-[1.2rem] border-2 border-gray-400 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400 focus:border-secondary focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all"
+                        className="h-12 rounded-[1.2rem] border-2 border-gray-400 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400/70 focus:border-secondary focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all"
                       />
                     </div>
                     <div className="space-y-3">
@@ -434,7 +439,7 @@ export default function ContactPage() {
                         id="subject"
                         {...register("subject")}
                         placeholder="Motivo de consulta"
-                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400 focus:bg-white transition-all ${errors.subject ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
+                        className={`h-12 rounded-[1.2rem] border-2 bg-gray-50/50 text-lg px-6 font-medium placeholder:text-gray-400/70  focus:bg-white transition-all ${errors.subject ? "border-red-500 focus:ring-red-200" : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"}`}
                       />
                       {errors.subject && (
                         <p className="text-red-600 font-bold text-sm ml-2">
@@ -455,7 +460,7 @@ export default function ContactPage() {
                       id="message"
                       {...register("message")}
                       rows={6}
-                      className={`w-full rounded-[1.5rem] border-2 bg-gray-50/50 p-6 text-lg font-medium outline-none transition-all placeholder:text-gray-400 focus:bg-white ${
+                      className={`w-full rounded-[1.5rem] border-2 bg-gray-50/50 p-6 text-lg font-medium outline-none transition-all placeholder:text-gray-400/70 focus:bg-white ${
                         errors.message
                           ? "border-red-500 focus:ring-red-200"
                           : "border-gray-400 focus:border-secondary focus:ring-4 focus:ring-purple-100"

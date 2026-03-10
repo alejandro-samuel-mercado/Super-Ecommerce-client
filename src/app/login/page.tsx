@@ -264,7 +264,7 @@ if(redirectUrl?.includes("cart")){
                   type="email"
                   {...register("email")}
                   placeholder={auth.login.emailPlaceholder}
-                  className={`rounded-xl h-14 border-2 bg-muted/20 focus:bg-background transition-all ${errors.email ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
+                  className={`rounded-xl h-14 border-2 placeholder:text-gray-400/70 focus:bg-background transition-all ${errors.email ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                 />
                 {errors.email && (
                   <p className="text-sm text-destructive ml-1">
@@ -290,7 +290,7 @@ if(redirectUrl?.includes("cart")){
                   type="password"
                   {...register("password")}
                   placeholder={auth.login.passwordPlaceholder}
-                  className={`rounded-xl h-14 border-2 bg-muted/20 focus:bg-background transition-all ${errors.password ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
+                  className={`rounded-xl h-14 border-2 placeholder:text-gray-400/70  focus:bg-background transition-all ${errors.password ? "border-destructive" : "border-border hover:border-primary/40 focus:border-primary"}`}
                 />
                 {errors.password && (
                   <p className="text-sm text-destructive ml-1">

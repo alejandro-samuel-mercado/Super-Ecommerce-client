@@ -231,7 +231,9 @@ export function CartDrawer() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute top-2 right-2 h-7 w-7 rounded-full text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 opacity-100  transition-all"
+                      className="absolute top-2 right-2 h-10 w-10 rounded-full p-2 
+                      max-md:bg-primary/70
+                      text-muted-foreground hover:text-destructive hover:bg-primary/70 opacity-100  transition-all"
                       onClick={() => removeItem(item.skuId, user !== null)}
                     >
                       <X className="h-4 w-4" />

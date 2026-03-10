@@ -14,19 +14,17 @@ import { useUIStore } from "@/store/ui";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-      Bell,
-      ChevronLeft,
-      ChevronRight,
-      Headphones,
-      Heart,
-      Menu,
-      Package,
-      Search,
-      ShieldCheck,
-      ShoppingCart,
-      Truck,
-      User,
-      X
+    Bell,
+    Headphones,
+    Heart,
+    Menu,
+    Package,
+    Search,
+    ShieldCheck,
+    ShoppingCart,
+    Truck,
+    User,
+    X
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -673,28 +671,22 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Flechas de Navegación */}
-            <div className="absolute inset-0 z-30 pointer-events-none">
-              <div className="container mx-auto h-full flex items-center justify-between px-4">
+            {/* Indicadores del Carousel */}
+            <div className="absolute bottom-10 left-0 right-0 z-30 flex justify-center gap-3">
+              {bannerSlides.map((_, index) => (
                 <button
-                  onClick={prevSlide}
+                  key={index}
+                  onClick={() => goToSlide(index)}
                   onMouseEnter={() => setIsAutoPlaying(false)}
                   onMouseLeave={() => setIsAutoPlaying(true)}
-                  className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10  flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110  group"
-                  aria-label="Previous slide"
-                >
-                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800 group-hover:text-primary transition-colors" />
-                </button>
-                <button
-                  onClick={nextSlide}
-                  onMouseEnter={() => setIsAutoPlaying(false)}
-                  onMouseLeave={() => setIsAutoPlaying(true)}
-                  className="pointer-events-auto w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10  flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110 group"
-                  aria-label="Next slide"
-                >
-                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800 group-hover:text-primary transition-colors" />
-                </button>
-              </div>
+                  className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 hover:cursor-pointer ${
+                    currentSlide === index 
+                      ? "bg-white w-8 shadow-[0_0_10px_rgba(255,255,255,0.8)]" 
+                      : "bg-white/40 hover:bg-white/60"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </motion.div>
@@ -702,7 +694,7 @@ export function Hero() {
 
       {/* Badges de Características - Sobresaliendo del fondo */}
       <div className=" absolute lg:-bottom-16 max-sm:-bottom-[80%]  z-40 w-full max-md:-bottom-10  max-md:h-full ">
-        <div className="md:container flex mx-auto  w-full justify-center  h-52  max-sm:h-46 max-md:h-48 max-lg:h-46 ">
+        <div className="md:container flex mx-auto  w-full justify-center    max-sm:h-46 max-md:h-48 lg:h-46 ">
           <div className="flex gap-60 max-lg:gap-36 justify-center max-md:justify-between w-[40vw] md:w-[65vw] max-md:gap-28 max-sm:gap-4 max-md:w-[100%] max-sm:mx-6 max-sm:w-[100%]  max-md:mx-10    h-full">
             {featureBadges.map((badge, index) => {
               const Icon = iconMap[badge.icon];
@@ -713,7 +705,7 @@ export function Hero() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 * index }}
                   whileHover={{ y: -8, scale: 1.02 }}
-                  className="border-2 border-gray-400 bg-primary/80 max-sm:bg-primary/40 backdrop-blur-sm shadow-sm rounded-2xl p-6 w-50 "
+                  className="border-2 border-gray-400 bg-background/20 backdrop-blur-xl shadow-sm rounded-2xl p-6 w-50 "
                 >
                   <div className="flex flex-col items-center text-center gap-3">
                     <div
@@ -726,10 +718,10 @@ export function Hero() {
                       {Icon && <Icon className="w-7 h-7 [color:inherit]" />}
                     </div>
                     <div>
-                      <h3 className="font-bold text-white text-sm md:text-base mb-1">
+                      <h3 className="font-bold text-gray-600  text-sm md:text-base mb-1">
                         {badge.title}
                       </h3>
-                      <p className="text-xs text-white font-semibold">
+                      <p className="text-xs text-gray-400  font-semibold">
                         {badge.subtitle}
                       </p>
                     </div>

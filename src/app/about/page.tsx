@@ -30,7 +30,7 @@ const iconMap: Record<string, any> = {
 export default function AboutPage() {
   return (
     <main className="min-h-screen pb-40  relative overflow-hidden">
-      <section className="relative pt-40 pb-48 flex items-center justify-center overflow-hidden bg-gradient-to-r from-secondary/60 to-primary/60">
+      <section className="relative pt-40 max-sm:pt-20 pb-48 max-sm:pb-20  flex items-center justify-center overflow-hidden bg-gradient-to-r from-secondary/60 to-primary/60">
         <div className="absolute inset-0 overflow-hidden pointer-events-none ">
           <div className="absolute top-0 left-1/4 w-[500px] h-[500px]  rounded-full blur-[100px] -translate-y-1/2"></div>
           <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px]  rounded-full blur-[100px] translate-y-1/2"></div>
@@ -61,10 +61,15 @@ export default function AboutPage() {
               <stop offset="100%" stopColor="#b34d8e" stopOpacity="0.6" />
             </linearGradient>
           </defs>
-          <path
+          <path className="max-sm:hidden"
             d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
             fill="url(#waveGradient)"
           ></path>
+          <path
+  className="sm:hidden"
+  d="M0,0 L0,60 Q600,90 1200,60 L1200,0 Z"
+  fill="url(#waveGradient)"
+/>
         </svg>
       </div>
 

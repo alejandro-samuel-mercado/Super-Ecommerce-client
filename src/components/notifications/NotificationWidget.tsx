@@ -5,9 +5,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import {
-      Notification,
-      notificationService,
+      Notification
 } from "@/services/notification.service";
+import { useNotificationStore } from "@/store/notifications";
 import { useUIStore } from "@/store/ui";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -21,64 +21,45 @@ import {
       XCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const NotificationWidget = () => {
   const { user } = useAuth();
   const router = useRouter();
   const { isNotificationsOpen, toggleNotifications } = useUIStore();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  const fetchNotifications = useCallback(async () => {
-    if (!user) return;
-    try {
-      const data = await notificationService.getAll();
-      setNotifications(data);
-      setUnreadCount(data.filter((n) => !n.read).length);
-    } catch (error) {}
-  }, [user]);
+  const {
+    notifications,
+    unreadCount,
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+  } = useNotificationStore();
 
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      // Consultar cada 60 segundos
       const interval = setInterval(fetchNotifications, 60000);
       return () => clearInterval(interval);
     }
   }, [user, fetchNotifications]);
 
   const handleMarkRead = async (id: number) => {
-    try {
-      await notificationService.markAsRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {}
+    await markAsRead(id);
   };
 
   const handleMarkAllRead = async () => {
-    try {
-      await notificationService.markAsRead("all");
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-      setUnreadCount(0);
-    } catch (error) {}
+    await markAllAsRead();
   };
 
   const handleDelete = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await notificationService.delete(id);
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-      const isUnread = notifications.find((n) => n.id === id)?.read === false;
-      if (isUnread) setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {}
+    await deleteNotification(id);
   };
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.read) {
-      handleMarkRead(notification.id);
+      await markAsRead(notification.id);
     }
     if (notification.data?.url) {
       router.push(notification.data.url);
@@ -107,14 +88,14 @@ export const NotificationWidget = () => {
   if (!user) return null;
 
   return (
-    <div className="fixed bottom-24 max-sm:bottom-32 right-6 z-[998]">
+    <div className="fixed sm:bottom-24 max-sm:top-16  right-6 z-[998] ">
       <AnimatePresence>
         {isNotificationsOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="absolute bottom-16 right-0 w-80 md:w-96 bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-12rem)] max-sm:max-h-[calc(100vh-20rem)]"
+            className="absolute sm:bottom-16 right-0 w-80 md:w-96 bg-background/80 backdrop-blur-xl border border-primary/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[calc(100vh-12rem)] max-sm:h-[400px]"
           >
             <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
               <h3 className="font-bold text-lg">Notificaciones</h3>

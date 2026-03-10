@@ -1362,7 +1362,7 @@ function CartContent() {
                               name: e.target.value,
                             }))
                           }
-                          className="h-12 rounded-xl border-2 border-primary/40 focus:border-primary bg-white/50"
+                          className="h-12 placeholder:text-gray-400/70  rounded-xl border-2 border-primary/40 focus:border-primary bg-white/50"
                         />
                       </div>
                       <div>
@@ -1382,7 +1382,7 @@ function CartContent() {
                               phone: e.target.value,
                             }))
                           }
-                          className="h-12 rounded-xl border-2 border-primary/40 focus:border-primary bg-white/50"
+                          className="h-12 placeholder:text-gray-400/70  rounded-xl border-2 border-primary/40 focus:border-primary bg-white/50"
                         />
                       </div>
                     </div>
@@ -1401,7 +1401,7 @@ function CartContent() {
                             dni: e.target.value,
                           }))
                         }
-                        className="h-12 rounded-xl border-2 text-gray-900  border-primary/40 focus:border-primary bg-white/50 placeholder:text-gray-400"
+                        className="h-12 rounded-xl border-2 text-gray-900 placeholder:text-gray-400/70 border-primary/40 focus:border-primary bg-white/50 placeholder:text-gray-400/70"
                       />
                     </div>
 
@@ -1555,7 +1555,7 @@ function CartContent() {
                                 address: e.target.value,
                               }))
                             }
-                            className="h-12 rounded-xl border-2 border-primary/40 text-gray-900 focus:border-primary bg-white/50 placeholder:text-gray-400"
+                            className="h-12 rounded-xl border-2 border-primary/40 text-gray-900 focus:border-primary bg-white/50 placeholder:text-gray-400/70 "
                           />
                         </div>
                         <div>
@@ -1572,7 +1572,7 @@ function CartContent() {
                                 zipCode: e.target.value,
                               }))
                             }
-                            className="h-12 rounded-xl border-2 border-primary/40 focus:border-primary bg-white/50 placeholder:text-gray-400"
+                            className="h-12 rounded-xl border-2 border-primary/40 focus:border-primary bg-white/50 placeholder:text-gray-400/70"
                           />
                         </div>
                       </div>

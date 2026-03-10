@@ -55,7 +55,7 @@ export default function CategoriesPage() {
   }
 
   return (
-    <main className="min-h-screen py-12 bg-white pt-32 max-md:pt-20 max-lg:px-10 max-md:px-2">
+    <main className="min-h-screen py-12 pt-32 max-md:pt-20 max-lg:px-10 max-md:px-2 pb-24">
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="mb-8">
@@ -87,7 +87,7 @@ export default function CategoriesPage() {
         )}
 
         {/* Grid de categorías */}
-        <div className="grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-1 gap-4">
+        <div className="grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 gap-4">
           {currentLevelCats.map((category, idx) => {
             const hasChildren =
               category.children && category.children.length > 0;
@@ -104,7 +104,7 @@ export default function CategoriesPage() {
                   onClick={() => handleCategoryClick(category)}
                   className="w-full text-left group"
                 >
-                  <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-3 bg-muted">
+                  <div className="relative aspect-[4/3] max-md:aspect-[1] rounded-lg overflow-hidden mb-3 bg-muted">
                     {/* Imagen de la categoría */}
                     <Image
                       src={category.slug}

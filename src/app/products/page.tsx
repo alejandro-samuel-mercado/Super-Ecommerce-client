@@ -374,7 +374,7 @@ function ProductsContent() {
                   placeholder="Buscar productos..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-16 pr-16 h-12 text-lg rounded-full border-2 border-primary/30 bg-transparent focus:ring-0 focus:outline-none placeholder:text-gray-400"
+                  className="pl-16 pr-16 h-12 text-lg rounded-full border-2 border-primary/30 bg-transparent focus:ring-0 focus:outline-none placeholder:text-gray-400/70"
                 />
                 {searchInput && (
                   <button

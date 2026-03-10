@@ -1,16 +1,17 @@
 "use client";
 
+import { ProductGalleryModal } from "@/components/features/products/ProductGalleryModal";
 import { ProductCard } from "@/components/shared/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+      Dialog,
+      DialogContent,
+      DialogDescription,
+      DialogFooter,
+      DialogHeader,
+      DialogTitle,
+      DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -28,13 +29,13 @@ import { SKU, VariantOption } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    ChevronRight,
-    Heart,
-    Minus,
-    Plus,
-    ShoppingCart,
-    Star,
-    ZoomIn,
+      ChevronRight,
+      Heart,
+      Minus,
+      Plus,
+      ShoppingCart,
+      Star,
+      ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,6 +53,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState<number>(1);
   const [quantityInput, setQuantityInput] = useState<string>("1");
   const [showStickyCTA, setShowStickyCTA] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [rating, setRating] = useState(5);
@@ -217,13 +219,13 @@ export default function ProductDetailPage() {
   const averageRating = product?.averageRating || 0;
 
   return (
-    <main className="min-h-screen py-8 pb-40 relative overflow-hidden max-sm:px-0 sm:px-20 pt-28 max-md:pt-20 max-sm:pt-8">
+    <main className="min-h-screen py-8 pb-40 relative overflow-hidden max-sm:px-0 sm:px-20 pt-28 max-md:pt-20 max-sm:pt-12">
       {/* Blobs decorativos */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>
 
       <div className="container mx-auto px-0 relative z-10">
-        <nav className="flex items-center gap-2 text-sm mb-8 text-muted-foreground/80 font-medium px-4">
+        <nav className="flex items-center flex-wrap gap-2 text-sm mb-8 text-muted-foreground/80 font-medium px-4">
           <Link href="/" className="hover:text-primary transition-colors">
             Inicio
           </Link>
@@ -236,17 +238,22 @@ export default function ProductDetailPage() {
           </Link>
           {product?.category && (
             <>
-              <ChevronRight className="h-4 w-4" />
-              <Link
-                href={`/products?categoria=${product.category.slug}`}
-                className="hover:text-primary transition-colors"
-              >
-                {product.category.name}
-              </Link>
+              {/* Categorías relacionadas (padres e hijas) */}
+              {[...(product.category.parents || []), product.category].map((cat: any) => (
+                <div key={cat.id} className="flex items-center gap-2">
+                  <ChevronRight className="h-4 w-4" />
+                  <Link
+                    href={`/products?categoria=${cat.slug}`}
+                    className="hover:text-primary transition-colors"
+                  >
+                    {cat.name}
+                  </Link>
+                </div>
+              ))}
             </>
           )}
           <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground">{product?.name}</span>
+          <span className="text-foreground line-clamp-1">{product?.name}</span>
         </nav>
 
         {isOutOfStock && (
@@ -281,7 +288,15 @@ export default function ProductDetailPage() {
         >
           {/* Galería */}
           <div className="space-y-6 ">
-            <div className="relative aspect-square rounded-[2rem] overflow-hidden  border-4 border-white/50 shadow-2xl shadow-primary/10 group m-5 max-lg:m-20 max-sm:m-8">
+            <div 
+              className="relative aspect-square rounded-[2rem] overflow-hidden  border-4 border-white/50 shadow-2xl shadow-primary/10 group m-5 max-lg:m-20 max-sm:m-8 cursor-pointer"
+              onClick={() => {
+                // Solo abrir modal en pantallas md e inferiores no (usando simple check de window width o clase helper)
+                if (window.innerWidth >= 768) {
+                  setIsGalleryOpen(true);
+                }
+              }}
+            >
               {product?.images?.[selectedImage] && (
                 <Image
                   src={product.images[selectedImage]}
@@ -291,7 +306,7 @@ export default function ProductDetailPage() {
                 />
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center pointer-events-none">
-                <div className="bg-white/80 backdrop-blur-md p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all transform translate-y-4 group-hover:translate-y-0 shadow-lg">
+                <div className="bg-white/80 backdrop-blur-md p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all transform translate-y-4 group-hover:translate-y-0 shadow-lg max-md:hidden">
                   <ZoomIn className="h-6 w-6 text-primary" />
                 </div>
               </div>
@@ -429,25 +444,28 @@ export default function ProductDetailPage() {
                 )}
             </div>
 
-            {/* Estado del stock */}
-            <div className="mb-8">
+            <div className="mb-8 font-bold">
               {currentStock === 0 ? (
                 <Badge
                   variant="destructive"
-                  className="rounded-full px-4 py-1 text-sm bg-gray-300"
+                  className="rounded-full px-4 py-1 text-sm bg-destructive text-white shadow-lg"
                 >
                   Agotado
                 </Badge>
-              ) : currentSku && currentStock < 10 ? (
-                <Badge
-                  variant="secondary"
-                  className="rounded-full px-4 py-1 text-sm  bg-gray-300 text-amber-800  border-gray-300 hover:bg-amber-200"
-                >
-                  ¡Últimas {currentStock} unidades!
+              ) : currentStock >= 50 ? (
+                <Badge className="rounded-full px-4 py-1 text-sm bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-emerald-300 shadow-sm">
+                  +50 disponibles
+                </Badge>
+              ) : currentStock >= 10 ? (
+                <Badge className="rounded-full px-4 py-1 text-sm bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-300 shadow-sm">
+                  +10 disponibles
                 </Badge>
               ) : (
-                <Badge className="rounded-full px-4 py-1 text-sm bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-emerald-300">
-                  Disponible
+                <Badge
+                  variant="secondary"
+                  className="rounded-full px-4 py-1 text-sm bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200 shadow-sm animate-pulse"
+                >
+                  Últimos {currentStock} disponibles
                 </Badge>
               )}
             </div>
@@ -711,10 +729,30 @@ export default function ProductDetailPage() {
                       </tr>
                       <tr className="border-b border-black/30">
                         <td className="py-4 font-semibold text-foreground/70">
-                          Categoría
+                          Categorías
                         </td>
                         <td className="py-4 text-foreground">
-                          {product.category?.name || "-"}
+                          {product.category ? (
+                            <div className="flex flex-wrap gap-2">
+                              {[...(product.category.parents || []), product.category].map((cat: any, i: number) => (
+                                <span key={cat.id}>
+                                  {cat.name}
+                                  {i < (product.category.parents?.length || 0) + 1 - 1 && " > "}
+                                </span>
+                              ))}
+                            </div>
+                          ) : "-"}
+                        </td>
+                      </tr>
+                      <tr className="border-b border-black/30">
+                        <td className="py-4 font-semibold text-foreground/70">
+                          Disponibilidad
+                        </td>
+                        <td className="py-4 text-foreground font-bold">
+                          {currentStock === 0 ? "Sin stock" : 
+                           currentStock >= 50 ? "+50 unidades" :
+                           currentStock >= 10 ? "+10 unidades" :
+                           `${currentStock} unidades`}
                         </td>
                       </tr>
                       {currentSku?.variantOptions &&
@@ -1018,6 +1056,14 @@ export default function ProductDetailPage() {
         </section>
       </div>
 
+      <ProductGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        images={product.images}
+        initialIndex={selectedImage}
+        productName={product.name}
+      />
+
       {/* CTA Flotante */}
       <AnimatePresence>
         {showStickyCTA && (
@@ -1033,13 +1079,13 @@ export default function ProductDetailPage() {
                   {product.name}
                 </h3>
                 <p className="text-lg font-black text-primary">
-                  {formatPrice(currentPrice, product.currencyCode || currency)}
+                  {formatPrice(discountedPrice, product.currencyCode || currency)}
                 </p>
               </div>
               <div className="flex gap-3 w-full sm:w-auto">
                 <Button
                   onClick={handleAddToCart}
-                  disabled={!currentSku || currentSku.stock === 0}
+                  disabled={!currentSku || currentStock === 0}
                   className="flex-1 sm:flex-none rounded-full shadow-lg hover:shadow-primary/25 font-bold"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
@@ -1049,9 +1095,8 @@ export default function ProductDetailPage() {
                   variant="secondary"
                   onClick={() => {
                     handleBuyNow();
-                    window.location.href = "/cart?reloaded=true";
                   }}
-                  disabled={!currentSku || currentSku.stock === 0}
+                  disabled={!currentSku || currentStock === 0}
                   className="flex-1 sm:flex-none rounded-full border border-primary/10 shadow-md font-bold"
                 >
                   Comprar

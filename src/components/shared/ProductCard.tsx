@@ -132,7 +132,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
           )}
         </div>
 
-        <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
+        <div className="absolute top-2 right-2 flex flex-col gap-2 md:opacity-0 max-md:opacity-100 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
           <Button
             size="icon"
             variant={isFav ? "default" : "secondary"}
@@ -145,7 +145,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
           </Button>
         </div>
 
-        <div className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+        <div className="absolute bottom-2 left-2 right-2 md:opacity-0 max-md:opacity-100  group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
           <Button
             size="sm"
             className="w-full rounded-lg bg-primary hover:bg-secondary text-white shadow-lg"

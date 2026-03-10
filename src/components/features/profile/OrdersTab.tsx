@@ -565,7 +565,7 @@ function OrderCard({
             })}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex max-sm:flex-col items-center gap-2">
           <Badge
             variant={getStatusDetails(order).color}
             className={`rounded-full px-4 py-1 font-black text-[10px] tracking-widest uppercase ${getStatusDetails(order).className || ''}`}
@@ -587,7 +587,7 @@ function OrderCard({
 
       <OrderTracker order={order} />
 
-      <div className="flex items-center justify-between">
+      <div className="flex max-sm:flex-col items-center justify-between max-sm:gap-4">
         <div>
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">
             {order.items?.length || 0}{" "}

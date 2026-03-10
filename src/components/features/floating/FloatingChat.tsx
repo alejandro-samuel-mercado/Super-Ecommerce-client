@@ -212,7 +212,7 @@ export function FloatingChat() {
                 }}
               >
                 <Input
-                  className=" bg-gray-200 border-2 border-secondary  focus-visible:ring-0 p-0 text-sm placeholder:text-muted-foreground/70 pl-2"
+                  className=" bg-gray-200 border-2 border-secondary  focus-visible:ring-0 p-0 text-sm placeholder:text-gray-400/70 pl-2"
                   placeholder="Escribe tu consulta..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}

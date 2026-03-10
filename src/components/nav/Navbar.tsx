@@ -7,6 +7,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { configService } from "@/services/config";
 import { productService } from "@/services/products";
 import { useCartStore } from "@/store/cart";
+import { useNotificationStore } from "@/store/notifications";
 import { useUIStore } from "@/store/ui";
 import { Product } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +20,7 @@ import { useEffect, useRef, useState } from "react";
 export function Navbar() {
   const { user } = useAuth();
   const { toggleCart, toggleMobileMenu, toggleNotifications, isMobileMenuOpen } = useUIStore();
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
   const { data: config, isLoading } = useQuery({
     queryKey: ["publicConfig"],
     queryFn: configService.getPublicConfig,
@@ -289,10 +291,13 @@ export function Navbar() {
             {user && (
               <Button
                 variant="ghost"
-                className={`rounded-lg hover:bg-white/50 p-2 h-auto w-auto sm:hidden ${scrolled ? "text-white" : "text-primary"}`}
+                className={`relative rounded-lg hover:bg-white/50 p-2 h-auto w-auto sm:hidden ${scrolled ? "text-white" : "text-primary"}`}
                 onClick={toggleNotifications}
               >
                 <Bell className="!h-7 !w-7" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-2 right-2 h-3 w-3 rounded-full bg-red-500 border-2 border-background animate-pulse" />
+                )}
               </Button>
             )}
 

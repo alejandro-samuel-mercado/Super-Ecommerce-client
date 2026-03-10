@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <main className="min-h-screen md:h-auto flex items-center justify-center py-16 px-4">
+    <main className="min-h-screen md:h-auto flex md:items-center justify-center py-16 px-4 ">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">
@@ -126,7 +126,7 @@ export default function ResetPasswordPage() {
                   {...resetForm.register("code")}
                   placeholder={auth.resetPassword.codePlaceholder}
                   maxLength={6}
-                  autoComplete="one-time-code"
+                  autoComplete="off"
                   inputMode="numeric"
                   className={
                     resetForm.formState.errors.code

@@ -65,7 +65,7 @@ export default function BlogPage() {
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-zinc-400 group-focus-within:text-primary transition-colors" />
               <Input
                 placeholder={blogContent.listing.filters.search}
-                className="pl-16 h-16 rounded-[2rem] border-2 border-zinc-400 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/50 focus-visible:ring-primary/20 transition-all text-lg font-black placeholder:text-zinc-400"
+                className="pl-16 h-16 rounded-[2rem] border-2 border-zinc-400 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/50 focus-visible:ring-primary/20 transition-all text-lg font-black placeholder:text-gray-400/70"
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);

@@ -19,7 +19,7 @@ export function ScrollBackground() {
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
       {/* Gradiente de Fondo */}
       <motion.div
-        className="absolute inset-0 sm:bg-gradient-to-bl sm:from-primary/20 sm:via-white sm:to-secondary/30 max-sm:bg-secondary/20"
+        className="absolute inset-0 sm:bg-gradient-to-bl sm:from-primary/20 sm:via-white sm:to-secondary/30 max-sm:bg-background/80"
         style={{ opacity }}
       />
 

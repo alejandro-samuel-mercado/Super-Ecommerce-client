@@ -38,7 +38,7 @@ export function Benefits() {
             return (
               <div
                 key={idx}
-                className="group relative bg-card rounded-3xl p-6 soft-shadow border-2 border-gray-300 dark:border-zinc-700 cursor-pointer overflow-hidden
+                className="group relative bg-card/40 backdrop-blur-xl rounded-3xl p-6 soft-shadow border-2 border-gray-300 dark:border-zinc-700 cursor-pointer overflow-hidden
                   hover:scale-[1.03] hover:-translate-y-1.5 hover:shadow-xl hover:border-primary/50
                   transition-all duration-300 ease-out"
               >

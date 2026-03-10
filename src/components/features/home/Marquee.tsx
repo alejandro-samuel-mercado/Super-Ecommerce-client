@@ -36,13 +36,15 @@ export function Marquee() {
   };
 
   const marqueeItems = getMarqueeItems();
-  const items = marqueeItems.map((item) =>
+  const baseItems = marqueeItems.map((item) =>
     item.replace(
       "{0}",
       formatPrice(config?.freeShippingThreshold || 0, currency),
     ),
   );
 
+  
+  const items = [...baseItems];
   const repeatedItems = [...items, ...items, ...items, ...items];
 
   return (
@@ -54,24 +56,24 @@ export function Marquee() {
       {/* Marquee */}
       <div className="relative py-10 pointer-events-auto">
         <motion.div
-          className="flex whitespace-nowrap items-center"
-          animate={{ x: ["0%", "-50%"] }}
+          className="flex whitespace-nowrap items-center w-max"
+          animate={{ x: ["0%", "-25%"] }}
           transition={{
-            duration: home.marquee.speed ,
+            duration: items.length * 3,
             repeat: Infinity,
             ease: "linear",
           }}
         >
           {repeatedItems.map((item, idx) => (
-            <span
+            <div
               key={idx}
-              className="inline-flex items-center mx-12 text-lg sm:text-xl font-bold text-white tracking-widest uppercase"
+              className="flex items-center px-8 text-lg sm:text-xl font-bold text-white tracking-widest uppercase"
             >
-              {item}
-              <span className="ml-12 text-white/25 text-2xl select-none">
+              <span>{item}</span>
+              <span className="ml-16 text-white/25 text-2xl select-none">
                 ★
               </span>
-            </span>
+            </div>
           ))}
         </motion.div>
       </div>

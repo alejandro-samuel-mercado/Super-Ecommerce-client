@@ -167,7 +167,7 @@ function ProfileContent() {
           className="w-full "
         >
           <div className="border-b border-secondary/40 mb-8 overflow-x-auto scrollbar-hide">
-            <TabsList className="bg-transparent h-auto p-0 pb-2 flex justify-start gap-8">
+            <TabsList className="max-md:grid max-ms:grid-cols-3 max-sm:grid-cols-2 bg-transparent h-auto p-0 pb-2 flex justify-start gap-8">
               <TabsTrigger
                 value="profile"
                 className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary"
@@ -195,7 +195,7 @@ function ProfileContent() {
               {storeConfig?.enablePoints && (
                 <TabsTrigger
                   value="points"
-                  className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary"
+                  className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary max-sm:mx-auto max-sm:px-6"
                 >
                   <Gift className="w-4 h-4" /> Recompensas
                 </TabsTrigger>

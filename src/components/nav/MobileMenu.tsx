@@ -100,7 +100,7 @@ const {user}= useAuth()
                       {categories.map((cat) => (
                         <Link
                           key={cat.id}
-                          href={`/products?categoria=${cat.slug}`}
+                          href={`/products?category=${cat.slug}`}
                           onClick={closeMobileMenu}
                           className="text-xl font-medium text-gray-600 hover:text-primary hover:translate-x-2 transition-all"
                         >

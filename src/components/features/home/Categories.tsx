@@ -11,7 +11,7 @@ export function Categories() {
 
   useEffect(() => {
     productService.getCategoriesTree().then((data) => {
-      // Filtrar categorías sin productos y ordenar por cantidad de productos (mayor a menor)
+     
       const filteredAndSorted = data
         .filter((cat: any) => cat._count?.products > 0)
         .sort(
@@ -24,12 +24,7 @@ export function Categories() {
   }, []);
 
   return (
-    <section className="py-20 relative sm:bg-muted/20 ">
-      {/* Fondo decorativo sutil */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
-      </div>
+    <section className="py-20 relative sm:bg-background/20 ">
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
@@ -38,7 +33,7 @@ export function Categories() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid max-md:grid-cols-2  max-lg:grid-cols-3 lg:grid-cols-4 gap-8 mb-12">
           {categories.map((category, idx) => (
             <motion.div
               key={category.id}
@@ -49,7 +44,7 @@ export function Categories() {
             >
               <Link
                 href={`/products?categoria=${category.slug}`}
-                className="group block relative aspect-[3/4] rounded-2xl overflow-hidden soft-shadow hover:shadow-lg transition-all duration-300"
+                className="group block relative aspect-[3/4] max-md:aspect-[1] rounded-2xl overflow-hidden soft-shadow hover:shadow-lg transition-all duration-300"
               >
                 {/* Superposición de gradiente */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/60 via-secondary/40 to-accent/60 z-10 group-hover:opacity-90 transition-opacity" />
@@ -62,7 +57,7 @@ export function Categories() {
                 />
 
                 <div className="absolute inset-0 p-6 z-20 text-white flex flex-col justify-end">
-                  <h3 className="text-3xl font-bold mb-2 drop-shadow-lg">
+                  <h3 className="text-3xl max-md:text-xl font-bold mb-2 drop-shadow-lg break-words">
                     {category.name}
                   </h3>
                   <p className="text-sm drop-shadow font-medium opacity-90">

@@ -86,7 +86,7 @@ export function ProfileEditTab({ user }: ProfileEditTabProps) {
   if (!isEditing) {
     return (
       <div className="space-y-12">
-        <div className="flex justify-between items-start">
+        <div className="flex max-sm:flex-col max-sm:gap-4 justify-between items-start">
           <div>
             <h2 className="text-3xl font-black mb-2 tracking-tight">
               Detalles de Cuenta
@@ -224,7 +224,7 @@ export function ProfileEditTab({ user }: ProfileEditTabProps) {
             id="email"
             value={user.email}
             disabled
-            className="bg-muted border-2 border-primary  placeholder:text-gray-400/70"
+            className="bg-background border-2 border-primary  placeholder:text-gray-400/70"
           />
         </div>
 
