@@ -2,7 +2,7 @@ export const home = {
   hero: {
     carousel: {
       autoPlayInterval: 5000, // 5 seconds
-      transitionDuration: 800, // milliseconds
+      transitionDuration: 800,
       slides: [
         {
           id: 1,
