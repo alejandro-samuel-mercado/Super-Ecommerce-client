@@ -18,14 +18,26 @@ interface ProductCardProps {
 }
 
 import { useAuth } from "@/contexts/AuthContext";
+import { configService } from "@/services/config";
+import { useQuery } from "@tanstack/react-query";
 
 export const ProductCard = memo(function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const isFav = isFavorite(product.id);
-  const totalStock =
+  
+  const { data: config } = useQuery({
+    queryKey: ["publicConfig"],
+    queryFn: configService.getPublicConfig,
+    staleTime: 1000 * 60 * 60,
+  });
+  
+  const safetyStock = config?.webSafetyStock || 0;
+
+  const rawTotalStock =
     product.skus?.reduce((acc, sku) => acc + Number(sku.stock || 0), 0) || 0;
+  const totalStock = Math.max(0, rawTotalStock - safetyStock);
   const isOutOfStock = totalStock <= 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {

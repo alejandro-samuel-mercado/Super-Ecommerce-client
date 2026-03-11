@@ -61,6 +61,9 @@ export interface Product {
   discountPercentage?: number;
   currencyCode?: string;
   currencySymbol?: string;
+  model?: string;
+  characteristics?: { key: string; value: string }[];
+  specifications?: { key: string; value: string }[];
 }
 
 export interface Comment {

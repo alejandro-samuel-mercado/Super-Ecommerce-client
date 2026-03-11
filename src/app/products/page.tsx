@@ -458,7 +458,7 @@ function ProductsContent() {
           </aside>
 
           {/* Grid de productos */}
-          <div className="flex-1 ">
+          <div className="flex-1 min-h-[1000px]">
             {isLoading || isFetching ? (
               <div className="grid  md:grid-cols-3 grid-cols-4 max-md:grid-cols-1 gap-6">
                 {Array.from({ length: 8 }).map((_, i) => (
@@ -495,7 +495,10 @@ function ProductsContent() {
                       variant="outline"
                       size="icon"
                       disabled={page === 1}
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      onClick={() => {
+                        setPage((p) => Math.max(1, p - 1));
+                        window.scrollTo({ top: 0, behavior: 'instant' });
+                      }}
                       className="rounded-full w-10 h-10 border-border-foreground/20"
                     >
                       ←
@@ -518,7 +521,10 @@ function ProductsContent() {
                               key={pageNum}
                               variant={page === pageNum ? "default" : "ghost"}
                               size="sm"
-                              onClick={() => setPage(pageNum)}
+                              onClick={() => {
+                                setPage(pageNum);
+                                window.scrollTo({ top: 0, behavior: 'instant' });
+                              }}
                               className={`rounded-full w-9 h-9 p-0 font-medium ${page === pageNum ? "shadow-md shadow-primary/20" : "text-muted-foreground hover:text-foreground"}`}
                             >
                               {pageNum}
@@ -532,9 +538,10 @@ function ProductsContent() {
                       variant="outline"
                       size="icon"
                       disabled={page === data.totalPages}
-                      onClick={() =>
-                        setPage((p) => Math.min(data.totalPages, p + 1))
-                      }
+                      onClick={() => {
+                        setPage((p) => Math.min(data.totalPages, p + 1));
+                        window.scrollTo({ top: 0, behavior: 'instant' });
+                      }}
                       className="rounded-full w-10 h-10 border-border-foreground/20"
                     >
                       →

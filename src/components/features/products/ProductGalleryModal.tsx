@@ -48,12 +48,12 @@ export function ProductGalleryModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="lg:max-w-[80vw] sm:max-w-[85vw] h-[90vh] p-0 bg-background/10 backdrop-blur-sm border-white/20 shadow-2xl rounded-[2rem] flex flex-col overflow-hidden ring-1 ring-white/20">
+      <DialogContent className="lg:max-w-[80vw] sm:max-w-[85vw] h-[90vh] p-2 bg-background/10 backdrop-blur-sm border-white/20 shadow-2xl rounded-[2rem] flex flex-col overflow-hidden ring-1 ring-white/20">
         <VisuallyHidden>
           <DialogTitle>Galería de {productName}</DialogTitle>
         </VisuallyHidden>
 
-        <div className="absolute top-6 right-6 sm:right-16 z-50 flex items-center gap-2">
+        <div className="absolute top-2 right-6 sm:right-16  flex items-center gap-2 z-50">
           <div className="flex items-center gap-1 bg-white/10  rounded-full p-1 border border-white/20 shadow-2xl">
             <button
               onClick={handleZoomOut}
@@ -83,7 +83,7 @@ export function ProductGalleryModal({
           </div>
         </div>
 
-        <div className="flex-1 relative flex items-center justify-center overflow-hidden">
+        <div className="flex-1 relative flex items-center justify-center overflow-hidden ">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -100,7 +100,7 @@ export function ProductGalleryModal({
                 transition={{ type: "spring", damping: 25, stiffness: 200, mass: 1 }}
                 className="relative w-full h-full p-12 cursor-grab active:cursor-grabbing flex items-center justify-center"
               >
-                <div className="relative w-full h-full max-w-5xl max-h-5xl">
+                <div className="relative w-full h-full max-w-5xl max-h-5xl  ">
                   <Image
                     src={images[currentIndex]}
                     alt={`${productName} - Imagen ${currentIndex + 1}`}
