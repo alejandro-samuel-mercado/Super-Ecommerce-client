@@ -28,6 +28,7 @@ export interface PublicConfig {
   detectedCurrency?: string;
   taxRate: number;
   baseCurrency: string;
+  webSafetyStock: number;
 }
 
 export const configService = {

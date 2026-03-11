@@ -54,7 +54,7 @@ featureBadges: [
     icon: "shield-check",
     title: "Gran Variedad",
     subtitle: "Encuentra todo en un solo lugar",
-    color: "#4ECDC4",
+    color: "#d464b8ff",
   },
 
 
@@ -63,7 +63,7 @@ featureBadges: [
     icon: "truck",
     title: "Envíos Rápidos",
     subtitle: "Recibe tu pedido sin demoras",
-    color: "#A78BFA",
+    color: "#8d74daff",
   },
 ],
   },

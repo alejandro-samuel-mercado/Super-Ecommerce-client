@@ -247,11 +247,11 @@ export function CartDrawer() {
 
         {items.length > 0 && (
           <div className="space-y-4 p-6 mt-auto border-t bg-white">
-            <div className="flex justify-between items-end mb-2">
-              <span className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+            <div className="flex justify-between items-end mb-2 gap-4">
+              <span className="text-sm text-muted-foreground font-medium uppercase tracking-wider shrink-0">
                 Subtotal Estimado
               </span>
-              <span className="text-2xl font-black text-foreground">
+              <span className="text-xl sm:text-2xl font-black text-foreground text-right break-all">
                 {formatPrice(getSubtotal(), currency)}
               </span>
             </div>

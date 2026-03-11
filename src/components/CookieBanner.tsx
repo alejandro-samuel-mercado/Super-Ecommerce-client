@@ -60,7 +60,7 @@ export function CookieBanner() {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-4"
+          className="fixed bottom-0 max-sm:bottom-20  left-0 right-0 z-50 p-4"
         >
           <Card className="container mx-auto max-w-4xl p-6 shadow-2xl border-2">
             <div className="flex items-start gap-4">

@@ -355,7 +355,7 @@ function CartContent() {
   ]);
 
   const isAddressValid = useMemo(() => {
-    if (shippingZones.length === 0) return true;
+    if (!shippingZones || !Array.isArray(shippingZones) || shippingZones.length === 0) return true;
     if (!customerData.city) return true;
 
     return shippingZones.some(
@@ -2052,7 +2052,7 @@ function CartContent() {
           </div>
 
           <div className="lg:col-span-1">
-            <Card className="p-6 md:p-8 rounded-[2rem] border-2 border-primary/70 bg-white/60 backdrop-blur-xl shadow-xl sticky top-0 overflow-hidden relative">
+            <Card className="p-6 md:p-8 md:px-5 rounded-[2rem] border-2 border-primary/70 bg-white/60 backdrop-blur-xl shadow-xl sticky top-0 overflow-hidden relative">
               {/* Loader Localizado de la Tarjeta de Precios  */}
               {isUpdating && (
                 <div className="absolute inset-0 z-20 bg-white/80 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
@@ -2117,7 +2117,7 @@ function CartContent() {
                         </div>
                       )}
 
-                    {/* Copones */}
+                    {/* Cupones */}
                     {storeConfig?.enableCoupons !== false &&
                       preview?.discountDetails && (
                         <div className="space-y-2">
@@ -2226,12 +2226,14 @@ function CartContent() {
 
                 <Separator className="my-6 bg-primary/20" />
 
-                <div className="flex justify-between items-end mb-8 relative">
-                  <span className="text-lg font-bold text-muted-foreground">
+                <div className="flex  items-end mb-8 relative gap-1">
+                  <span className="text-lg font-bold text-muted-foreground shrink-0">
                     {cartContent.step1.summary.total}
                   </span>
-                  <div className="flex flex-col items-end">
-                    <span className="text-3xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+                  <div className="flex flex-col  flex-1 min-w-0">
+                    <span 
+                      className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent text-right break-all"
+                    >
                       {formatPrice(
                         isUpdating
                           ? clientSubtotal +

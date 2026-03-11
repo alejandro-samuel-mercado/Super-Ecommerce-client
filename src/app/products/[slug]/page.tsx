@@ -5,13 +5,13 @@ import { ProductCard } from "@/components/shared/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-      Dialog,
-      DialogContent,
-      DialogDescription,
-      DialogFooter,
-      DialogHeader,
-      DialogTitle,
-      DialogTrigger,
+   Dialog,
+   DialogContent,
+   DialogDescription,
+   DialogFooter,
+   DialogHeader,
+   DialogTitle,
+   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -29,13 +29,13 @@ import { SKU, VariantOption } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-      ChevronRight,
-      Heart,
-      Minus,
-      Plus,
-      ShoppingCart,
-      Star,
-      ZoomIn,
+   ChevronRight,
+   Heart,
+   Minus,
+   Plus,
+   ShoppingCart,
+   Star,
+   ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -161,10 +161,15 @@ export default function ProductDetailPage() {
     : currentPrice;
   const savings = hasDiscount ? currentPrice - discountedPrice : 0;
 
-  const totalStock =
+  const safetyStock = config?.webSafetyStock || 0;
+  
+  const rawTotalStock =
     product?.skus?.reduce((acc: number, sku: SKU) => acc + Number(sku.stock || 0), 0) || 0;
-  const isOutOfStock = totalStock === 0;
-  const currentStock = currentSku ? Number(currentSku.stock || 0) : 0;
+  const totalStock = Math.max(0, rawTotalStock - safetyStock);
+  const isOutOfStock = totalStock <= 0;
+  
+  const rawCurrentStock = currentSku ? Number(currentSku.stock || 0) : 0;
+  const currentStock = Math.max(0, rawCurrentStock - safetyStock);
 
   const handleAddToCart = () => {
     if (isOutOfStock) {
@@ -291,7 +296,7 @@ export default function ProductDetailPage() {
             <div 
               className="relative aspect-square rounded-[2rem] overflow-hidden  border-4 border-white/50 shadow-2xl shadow-primary/10 group m-5 max-lg:m-20 max-sm:m-8 cursor-pointer"
               onClick={() => {
-                // Solo abrir modal en pantallas md e inferiores no (usando simple check de window width o clase helper)
+               
                 if (window.innerWidth >= 768) {
                   setIsGalleryOpen(true);
                 }
@@ -340,10 +345,17 @@ export default function ProductDetailPage() {
           <div className="bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-xl  border border-white/40 rounded-[2rem] p-8  max-md:p-16 max-sm:p-10 lg:p-10 shadow-xl shadow-primary/5 relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-bl-[100px] rounded-tr-[2rem] -z-10"></div>
 
-            <div className="flex items-start justify-between mb-6">
+            <div className="flex items-start justify-between  mb-6">
+               <div className=" max-w-[80%]">
               <h1 className="text-3xl lg:text-4xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight">
                 {product?.name}
               </h1>
+              {(product?.brand && product.brand !== "-" || product?.model && product.model !== "-") && (
+                <p className="text-lg text-muted-foreground mt-2 font-medium">
+                  {[product.brand && product.brand !== "-" ? product.brand : "", product.model && product.model !== "-" ? product.model : ""].filter(Boolean).join(" · ")}
+                </p>
+              )}
+              </div>
               <Button
                 variant="outline"
                 size="icon"
@@ -682,7 +694,6 @@ export default function ProductDetailPage() {
                   "description",
                   "specifications",
                   "shipping",
-                  "faqs",
                   "reviews",
                 ].map((tab) => (
                   <TabsTrigger
@@ -708,7 +719,7 @@ export default function ProductDetailPage() {
               <TabsContent value="description" className="mt-0">
                 <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground">
                   <h3 className="text-2xl mb-4">Sobre este producto</h3>
-                  <p>
+                  <p className="whitespace-pre-line">
                     {product.description ||
                       "Sin descripción disponible por el momento."}
                   </p>
@@ -716,58 +727,95 @@ export default function ProductDetailPage() {
               </TabsContent>
 
               <TabsContent value="specifications" className="mt-0">
-                <div className="grid grid-cols-1 gap-8  px-40">
-                  <table className="w-full border-collapse mx-auto">
-                    <tbody className="">
-                      <tr className="border-b border-black/30">
-                        <td className="py-4 font-semibold text-foreground/70 w-1/3">
-                          SKU
-                        </td>
-                        <td className="py-4 text-foreground">
-                          {currentSku?.code || "-"}
-                        </td>
-                      </tr>
-                      <tr className="border-b border-black/30">
-                        <td className="py-4 font-semibold text-foreground/70">
-                          Categorías
-                        </td>
-                        <td className="py-4 text-foreground">
-                          {product.category ? (
-                            <div className="flex flex-wrap gap-2">
-                              {[...(product.category.parents || []), product.category].map((cat: any, i: number) => (
-                                <span key={cat.id}>
-                                  {cat.name}
-                                  {i < (product.category.parents?.length || 0) + 1 - 1 && " > "}
-                                </span>
-                              ))}
-                            </div>
-                          ) : "-"}
-                        </td>
-                      </tr>
-                      <tr className="border-b border-black/30">
-                        <td className="py-4 font-semibold text-foreground/70">
-                          Disponibilidad
-                        </td>
-                        <td className="py-4 text-foreground font-bold">
-                          {currentStock === 0 ? "Sin stock" : 
-                           currentStock >= 50 ? "+50 unidades" :
-                           currentStock >= 10 ? "+10 unidades" :
-                           `${currentStock} unidades`}
-                        </td>
-                      </tr>
-                      {currentSku?.variantOptions &&
-                        currentSku.variantOptions.map((variant: VariantOption, idx: number) => (
-                          <tr key={idx} className="border-b border-black/30">
-                            <td className="py-4 font-semibold text-foreground/70 capitalize">
-                              {variant.name}
-                            </td>
-                            <td className="py-4 text-foreground">
-                              {variant.value}
+                <div className="max-w-4xl mx-auto">
+                  <div className="bg-white/40 backdrop-blur-md rounded-2xl border border-primary/10 overflow-hidden shadow-sm">
+                    <table className="w-full border-collapse text-left">
+                      <tbody className="divide-y divide-primary/10 text-sm sm:text-base">
+                        {product?.brand && product.brand !== "-" && (
+                          <tr className="group hover:bg-white/60 transition-colors">
+                            <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-primary/5 group-hover:bg-primary/10 transition-colors">
+                              Marca
+                            </th>
+                            <td className="py-4 px-6 text-foreground/90 font-medium">
+                              {product.brand}
                             </td>
                           </tr>
-                        ))}
-                    </tbody>
-                  </table>
+                        )}
+                        {product?.model && product.model !== "-" && (
+                          <tr className="group hover:bg-white/60 transition-colors">
+                            <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-primary/5 group-hover:bg-primary/10 transition-colors">
+                              Modelo
+                            </th>
+                            <td className="py-4 px-6 text-foreground/90 font-medium">
+                              {product.model}
+                            </td>
+                          </tr>
+                        )}
+                        
+                        <tr className="group hover:bg-white/60 transition-colors">
+                          <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-primary/5 group-hover:bg-primary/10 transition-colors">
+                            Categorías
+                          </th>
+                          <td className="py-4 px-6 text-foreground/90">
+                            {product.category ? (
+                              <div className="flex flex-wrap gap-2 font-medium">
+                                {[...(product.category.parents || []), product.category].map((cat: any, i: number) => (
+                                  <span key={cat.id}>
+                                    {cat.name}
+                                    {i < (product.category.parents?.length || 0) + 1 - 1 && " > "}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : "-"}
+                          </td>
+                        </tr>
+                        <tr className="group hover:bg-white/60 transition-colors">
+                          <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-primary/5 group-hover:bg-primary/10 transition-colors">
+                            Disponibilidad
+                          </th>
+                          <td className="py-4 px-6 text-foreground/90 font-bold">
+                            {currentStock === 0 ? "Sin stock" : 
+                             currentStock >= 50 ? "+50 unidades" :
+                             currentStock >= 10 ? "+10 unidades" :
+                             `${currentStock} unidades`}
+                          </td>
+                        </tr>
+                        {currentSku?.variantOptions &&
+                          currentSku.variantOptions.map((variant: VariantOption, idx: number) => (
+                            <tr key={`var-${idx}`} className="group hover:bg-white/60 transition-colors">
+                              <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-primary/5 group-hover:bg-primary/10 transition-colors capitalize">
+                                {variant.name}
+                              </th>
+                              <td className="py-4 px-6 text-foreground/90 font-medium capitalize">
+                                {variant.value}
+                              </td>
+                            </tr>
+                          ))}
+                        {product?.characteristics && product.characteristics.length > 0 &&
+                          product.characteristics.map((item: any, idx: number) => (
+                            <tr key={`char-${idx}`} className="group hover:bg-white/60 transition-colors">
+                              <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-primary/5 group-hover:bg-primary/10 transition-colors capitalize">
+                                {item.key}
+                              </th>
+                              <td className="py-4 px-6 text-foreground/90 font-medium">
+                                {item.value}
+                              </td>
+                            </tr>
+                          ))}
+                        {product?.specifications && product.specifications.length > 0 &&
+                          product.specifications.map((item: any, idx: number) => (
+                            <tr key={`spec-${idx}`} className="group hover:bg-white/60 transition-colors">
+                              <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-primary/5 group-hover:bg-primary/10 transition-colors capitalize">
+                                {item.key}
+                              </th>
+                              <td className="py-4 px-6 text-foreground/90 font-medium">
+                                {item.value}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </TabsContent>
 
@@ -797,32 +845,7 @@ export default function ProductDetailPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="faqs" className="mt-0">
-                <div className="space-y-4 max-w-3xl mx-auto">
-                  {[
-                    {
-                      q: "¿Cómo realizo el seguimiento de mi pedido?",
-                      a: "Una vez despachado, recibirás un correo electrónico con el número de seguimiento de Correo Argentino.",
-                    },
-                    {
-                      q: "¿Los productos tienen garantía?",
-                      a: "Sí, todos nuestros productos cuentan con garantía oficial de 12 meses por fallas de fabricación.",
-                    },
-                    {
-                      q: "¿Hacen factura A?",
-                      a: "Sí, realizamos factura A y B. Podés cargar tus datos fiscales en el checkout.",
-                    },
-                  ].map((faq, i) => (
-                    <div
-                      key={i}
-                      className="bg-white/50 p-6 rounded-2xl border border-white/50"
-                    >
-                      <h4 className="font-bold text-lg mb-2">{faq.q}</h4>
-                      <p className="text-muted-foreground">{faq.a}</p>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
+              
 
               <TabsContent value="reviews" className="mt-0">
                 <div className="space-y-6">

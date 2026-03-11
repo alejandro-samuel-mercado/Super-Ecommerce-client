@@ -711,7 +711,7 @@ export function Hero() {
                     <div
                       className="w-14 h-14 rounded-full flex items-center justify-center"
                       style={{
-                        backgroundColor: `${badge.color}50`,
+                        backgroundColor: `${badge.color}`,
                         color: "white",
                       }}
                     >
