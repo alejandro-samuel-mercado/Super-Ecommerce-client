@@ -5,13 +5,13 @@ import { ProductCard } from "@/components/shared/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-   Dialog,
-   DialogContent,
-   DialogDescription,
-   DialogFooter,
-   DialogHeader,
-   DialogTitle,
-   DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -29,13 +29,13 @@ import { SKU, VariantOption } from "@/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-   ChevronRight,
-   Heart,
-   Minus,
-   Plus,
-   ShoppingCart,
-   Star,
-   ZoomIn,
+    ChevronRight,
+    Heart,
+    Minus,
+    Plus,
+    ShoppingCart,
+    Star,
+    ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -113,7 +113,8 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (product?.skus && product.skus.length > 0 && !selectedSku) {
-      setSelectedSku(product.skus[0].id);
+      const firstAvailable = product.skus.find((s: SKU) => Number(s.stock) > 0) || product.skus[0];
+      setSelectedSku(firstAvailable.id);
     }
   }, [product, selectedSku]);
 
