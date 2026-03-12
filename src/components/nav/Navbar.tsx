@@ -150,7 +150,7 @@ export function Navbar() {
       className={`fixed z-50 transition-all duration-300 w-full lg:w-auto ${
         scrolled
           ? "top-2 lg:top-5 bg-secondary/60 backdrop-blur-md py-2 max-sm:py-1 w-[95%] max-sm:w-[90%] max-sm:-ml-[45%] lg:w-[80%] left-1/2 right-1/2 -ml-[47.5%] lg:-ml-[40%] -mr-[47.5%] lg:-mr-[40%] rounded-[1.5rem] lg:rounded-full shadow-2xl shadow-primary/20"
-          : "top-0 left-0 right-0 border-b-transparent border-2 border-b-primary/20"
+          : "top-0 left-0 right-0  border-2 border-b-primary/20"
       }`}
       onKeyDown={handleKeyDown}
     >
