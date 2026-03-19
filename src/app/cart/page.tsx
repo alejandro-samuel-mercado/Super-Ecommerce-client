@@ -280,11 +280,25 @@ function CartContent() {
       setIsPaymentLoading(true);
       try {
         const options = await paymentService.getPaymentOptions(currency);
-        setPaymentOptions(options);
+        
+        // Inyectar métodos de pago manuales desde configuración
+        const manualMethods: PaymentGatewayOption[] = [];
+        if (storeConfig?.enabledPaymentMethods?.includes('QR')) {
+          manualMethods.push({
+            id: 9999,
+            name: 'Pago por QR',
+            slug: 'QR',
+            type: 'FALLBACK',
+            isFallback: true,
+          });
+        }
+        
+        const allOptions = [...options, ...manualMethods];
+        setPaymentOptions(allOptions);
 
-        if (options.length > 0) {
+        if (allOptions.length > 0) {
           const primary =
-            options.find((o) => o.type === "PRIMARY") || options[0];
+            allOptions.find((o) => o.type === "PRIMARY") || allOptions[0];
           setSelectedGateway(primary.slug);
         }
       } catch (error) {
@@ -297,7 +311,7 @@ function CartContent() {
     };
 
     fetchPaymentOptions();
-  }, [currency]);
+  }, [currency, storeConfig]);
 
   const shippingMutation = useMutation({
     mutationFn: async (address: {

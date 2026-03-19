@@ -152,7 +152,7 @@ export function FloatingChat() {
                   className={`flex ${msg.sender === "USER" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[85%] p-3.5 px-4 text-sm leading-relaxed shadow-sm ${
+                    className={`max-w-[85%] p-3.5 px-4 text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
                       msg.sender === "USER"
                         ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-sm"
                         : msg.sender === "ADMIN"

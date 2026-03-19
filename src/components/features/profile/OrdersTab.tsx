@@ -6,14 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-   Dialog,
-   DialogContent,
-   DialogHeader,
-   DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { formatPrice } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, Clock, Download, Eye, History, Package, ReceiptText, Upload, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, Download, Eye, History, Package, QrCode, ReceiptText, Upload, XCircle } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -71,13 +71,13 @@ export function OrdersTab() {
       case "PAID":
         return { color: "default" as const, label: "Pagado" };
       case "PENDING":
-        if (paymentType !== 'CASH' && paymentType !== 'TRANSFER') {
+        if (paymentType !== 'CASH' && paymentType !== 'TRANSFER' && paymentType !== 'QR') {
           if (mpPaymentId) {
             return { color: "secondary" as const, label: "Pago en Proceso", className: "bg-blue-100 text-blue-800 border-blue-200" };
           }
           return { color: "outline" as const, label: "Incompleto / Abandonado", className: "text-muted-foreground italic" };
         }
-        return { color: "outline" as const, label: "Pendiente de Pago" };
+        return { color: "outline" as const, label: paymentType === 'QR' ? "Esperando Pago QR" : "Pendiente de Pago" };
       case "CANCELLED":
       case "REJECTED":
         return { color: "destructive" as const, label: status === "CANCELLED" ? "Cancelado" : "Rechazado" };
@@ -332,10 +332,31 @@ export function OrdersTab() {
                     MÉTODO PAGO
                   </p>
                   <p className="text-xs font-black uppercase text-foreground bg-primary/5 w-max px-3 py-1 rounded-full">
-                    {selectedOrder.paymentType?.replace("_", " ")}
+                    {selectedOrder.paymentType === 'QR' ? 'PAGO QR' : selectedOrder.paymentType?.replace("_", " ")}
                   </p>
                 </div>
               </div>
+
+              {/* QR de Pago */}
+              {selectedOrder.paymentType === 'QR' && selectedOrder.qrPaymentUrl && (
+                <div className="border-4 border-purple-500/20 bg-purple-50/30 dark:bg-purple-900/10 p-6 rounded-[2rem] space-y-4">
+                  <p className="text-[10px] text-purple-700/60 font-black tracking-[0.4em] flex items-center gap-2">
+                    <QrCode size={14} /> CÓDIGO QR DE PAGO
+                  </p>
+                  <div className="flex justify-center">
+                    <div className="bg-white p-4 rounded-2xl border-2 border-purple-200 shadow-sm inline-block">
+                      <img 
+                        src={selectedOrder.qrPaymentUrl} 
+                        alt="QR de Pago" 
+                        className="w-[200px] h-[200px] object-contain rounded-lg"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-purple-600 font-bold text-center">
+                    Escanea este QR con tu app bancaria para pagar
+                  </p>
+                </div>
+              )}
 
               <div>
                 <p className="text-[10px] text-primary/60 font-black tracking-[0.4em] mb-6 border-b border-primary/5 pb-2">

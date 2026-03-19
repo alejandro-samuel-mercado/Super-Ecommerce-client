@@ -153,12 +153,13 @@ export interface Order {
   shipping: number;
   tax: number;
   status: "PENDING" | "PAID" | "CANCELLED" | "REJECTED";
-  paymentType: "CASH" | "CARD" | "POINTS" | "DEBIT" | "MERCADO_PAGO";
+  paymentType: "CASH" | "CARD" | "POINTS" | "DEBIT" | "MERCADO_PAGO" | "QR";
   deliveryType: "PICKUP" | "DELIVERY";
   deliveryStatus: "PENDING_DELIVERY" | "SHIPPED" | "DELIVERED";
   currencyCode: string;
   exchangeRateAtPurchase: number;
   totalInBaseCurrency: number;
+  qrPaymentUrl?: string | null;
   createdAt: string;
 }
 
