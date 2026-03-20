@@ -4,6 +4,7 @@ import { NotificationWidget } from "@/components/notifications/NotificationWidge
 import { FloatingChat } from "./FloatingChat";
 import { FloatingMenu } from "./FloatingMenu";
 import { MusicPlayer } from "./MusicPlayer";
+import { FloatingWhastappButton } from "./WhatsAppButton";
 
 export function FloatingEssentials() {
   return (
@@ -11,7 +12,8 @@ export function FloatingEssentials() {
       <FloatingChat />
       <NotificationWidget />
       <div className="hidden sm:block">
-        <FloatingMenu />
+        {/*<FloatingMenu />*/}
+        <FloatingWhastappButton />
         <MusicPlayer />
       </div>
     </>

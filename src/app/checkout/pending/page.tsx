@@ -61,9 +61,13 @@ function CheckoutPendingContent() {
     }
   }, [clearCart, searchParams, router, fetchSaleData]);
 
-  // Polling para detectar cuando el admin sube el QR
   useEffect(() => {
     if (!saleData || saleData.paymentType !== 'QR' || qrUrl) return;
+
+    if (config?.enablePersistentQr && config?.persistentQrUrl) {
+      setQrUrl(config.persistentQrUrl);
+      return;
+    }
     
     const interval = setInterval(async () => {
       try {
@@ -79,7 +83,7 @@ function CheckoutPendingContent() {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [saleData, qrUrl, saleId]);
+  }, [saleData, qrUrl, saleId, config]);
 
   if (isValidating) {
     return (

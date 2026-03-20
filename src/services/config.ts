@@ -29,6 +29,10 @@ export interface PublicConfig {
   taxRate: number;
   baseCurrency: string;
   webSafetyStock: number;
+  enablePersistentQr?: boolean;
+  persistentQrUrl?: string;
+  country: string;
+  defaultCurrency: string;
 }
 
 export const configService = {

@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+      Select,
+      SelectContent,
+      SelectItem,
+      SelectTrigger,
+      SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,9 +22,9 @@ import { formatPrice } from "@/lib/utils";
 import { Branch, branchService } from "@/services/branch";
 import { PublicConfig, configService } from "@/services/config";
 import {
-    OrderPreviewRequest,
-    OrderPreviewResponse,
-    orderService,
+      OrderPreviewRequest,
+      OrderPreviewResponse,
+      orderService,
 } from "@/services/orders";
 import { PaymentGatewayOption, paymentService } from "@/services/payment";
 import { ShippingZone, shippingService } from "@/services/shipping";
@@ -32,18 +32,18 @@ import { useCartStore } from "@/store/cart";
 import { useCurrencyStore } from "@/store/currency";
 import { useMutation } from "@tanstack/react-query";
 import {
-    AlertCircle,
-    Award,
-    Check,
-    Loader2,
-    MapPin,
-    Minus,
-    Plus,
-    ShieldCheck,
-    Tag,
-    Trash2,
-    Truck,
-    User,
+      AlertCircle,
+      Award,
+      Check,
+      Loader2,
+      MapPin,
+      Minus,
+      Plus,
+      ShieldCheck,
+      Tag,
+      Trash2,
+      Truck,
+      User,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -227,6 +227,15 @@ function CartContent() {
   }, []);
 
   useEffect(() => {
+    if (storeConfig?.country && !customerData.country) {
+      setCustomerData((prev) => ({
+        ...prev,
+        country: storeConfig.country,
+      }));
+    }
+  }, [storeConfig?.country, customerData.country]);
+
+  useEffect(() => {
     if (user && items.length === 0 && currentStep === "cart") {
       orderService
         .getMySales({ includePending: true })
@@ -281,7 +290,7 @@ function CartContent() {
       try {
         const options = await paymentService.getPaymentOptions(currency);
         
-        // Inyectar métodos de pago manuales desde configuración
+      
         const manualMethods: PaymentGatewayOption[] = [];
         if (storeConfig?.enabledPaymentMethods?.includes('QR')) {
           manualMethods.push({
@@ -292,6 +301,7 @@ function CartContent() {
             isFallback: true,
           });
         }
+
         
         const allOptions = [...options, ...manualMethods];
         setPaymentOptions(allOptions);
@@ -374,7 +384,7 @@ function CartContent() {
 
     return shippingZones.some(
       (z) =>
-        (z.country || "Argentina") === customerData.country &&
+        (z.country || storeConfig?.country || "") === customerData.country &&
         z.province === customerData.state &&
         z.city === customerData.city,
     );
@@ -383,6 +393,7 @@ function CartContent() {
     customerData.country,
     customerData.state,
     customerData.city,
+    storeConfig?.country,
   ]);
 
   const debouncedItems = useDebounce(items, 150);
@@ -1455,7 +1466,7 @@ function CartContent() {
                             {Array.from(
                               new Set(
                                 shippingZones
-                                  .map((z) => z.country || "Argentina")
+                                  .map((z) => z.country || storeConfig?.country || "")
                                   .filter(Boolean),
                               ),
                             ).map((c) => (
@@ -1493,7 +1504,7 @@ function CartContent() {
                                   shippingZones
                                     .filter(
                                       (z) =>
-                                        (z.country || "Argentina") ===
+                                        (z.country || storeConfig?.country || "") ===
                                         customerData.country,
                                     )
                                     .map((z) => z.province)
@@ -1535,7 +1546,7 @@ function CartContent() {
                                   shippingZones
                                     .filter(
                                       (z) =>
-                                        (z.country || "Argentina") ===
+                                        (z.country || storeConfig?.country || "") ===
                                           customerData.country &&
                                         z.province === customerData.state,
                                     )
