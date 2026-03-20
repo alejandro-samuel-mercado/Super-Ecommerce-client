@@ -14,13 +14,13 @@ import {
 import { formatPrice } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Clock, Download, Eye, History, Package, QrCode, ReceiptText, Upload, XCircle } from "lucide-react";
-import { useRouter } from "next/router";
-
+// @ts-ignore
+import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";
 
 export function OrdersTab() {
-    const router = useRouter;
+    const router = useRouter();
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [isDownloading, setIsDownloading] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -739,8 +739,8 @@ function OrderTracker({ order }: { order: any }) {
                         <div key={step.id} className="relative flex flex-col items-center group">
                             <div
                                 className={`h-11 w-11 rounded-2xl flex items-center justify-center transition-all duration-300 z-10 border-4 ${isCompleted
-                                        ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110'
-                                        : 'bg-card text-muted-foreground border-primary/10'
+                                    ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-110'
+                                    : 'bg-card text-muted-foreground border-primary/10'
                                     } ${isCurrent ? 'ring-4 ring-primary/20' : ''}`}
                             >
                                 <Icon size={18} />
