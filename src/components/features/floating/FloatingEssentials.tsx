@@ -7,15 +7,15 @@ import { MusicPlayer } from "./MusicPlayer";
 import { FloatingWhastappButton } from "./WhatsAppButton";
 
 export function FloatingEssentials() {
-  return (
-    <>
-      <FloatingChat />
-      <NotificationWidget />
-      <div className="hidden sm:block">
-        {/*<FloatingMenu />*/}
-        <FloatingWhastappButton />
-        <MusicPlayer />
-      </div>
-    </>
-  );
+    return (
+        <>
+            <FloatingChat />
+            <NotificationWidget />
+            <div className="hidden sm:block">
+                {/*<FloatingMenu />*/}
+
+                <MusicPlayer />
+            </div>
+        </>
+    );
 }

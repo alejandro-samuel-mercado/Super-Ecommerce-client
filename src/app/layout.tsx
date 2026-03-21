@@ -20,65 +20,67 @@ import { Providers } from "@/components/providers/Providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  return (
-    <html lang="es">
-      <body className={inter.className}>
-        <Providers>
-          <LayoutContent>
-            <ScrollBackground />
-            {children}
-          </LayoutContent>
-        </Providers>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="es">
+            <body className={inter.className}>
+                <Providers>
+                    <LayoutContent>
+                        <ScrollBackground />
+                        {children}
+                    </LayoutContent>
+                </Providers>
+            </body>
+        </html>
+    );
 }
 
 import { SplashScreen } from "@/components/ui/SplashScreen";
 import { configService } from "@/services/config";
 import { useQuery } from "@tanstack/react-query";
 import { MobileBottomNav } from "@/components/nav/MobileBottomNav";
+import { FloatingWhastappButton } from "@/components/features/floating/WhatsAppButton";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isHomePage = pathname === "/";
-  const { isMaintenanceMode, loading: maintenanceLoading } = useMaintenance();
+    const pathname = usePathname();
+    const isHomePage = pathname === "/";
+    const { isMaintenanceMode, loading: maintenanceLoading } = useMaintenance();
 
-  const { data: config, isLoading: configLoading } = useQuery({
-    queryKey: ["publicConfig"],
-    queryFn: configService.getPublicConfig,
-    staleTime: 1000 * 60 * 60,
-  });
+    const { data: config, isLoading: configLoading } = useQuery({
+        queryKey: ["publicConfig"],
+        queryFn: configService.getPublicConfig,
+        staleTime: 1000 * 60 * 60,
+    });
 
-  const isLoading = maintenanceLoading || (isHomePage && configLoading);
+    const isLoading = maintenanceLoading || (isHomePage && configLoading);
 
-  if (isMaintenanceMode && !maintenanceLoading) {
-    return <MaintenancePage />;
-  }
+    if (isMaintenanceMode && !maintenanceLoading) {
+        return <MaintenancePage />;
+    }
 
-  return (
-    <>
-      <SplashScreen
-        isLoading={isLoading}
-        logo={config?.logoUrl}
-        storeName={config?.storeName}
-      />
+    return (
+        <>
+            <SplashScreen
+                isLoading={isLoading}
+                logo={config?.logoUrl}
+                storeName={config?.storeName}
+            />
 
-      {!isHomePage && <Navbar />}
-      <div className={!isHomePage ? "pt-16  md:pt-2  " : "max-sm:px-2 max-md:px-6 max-xl:px-10 overflow-x-hidden"}>
-        {children}
-      </div>
-      <Footer />
-      <MobileMenu />
-      <CartDrawer />
-      <CookieBanner />
-      <Toaster expand={true} richColors closeButton />
-      <FloatingEssentials />
-      <MobileBottomNav />
-    </>
-  );
+            {!isHomePage && <Navbar />}
+            <div className={!isHomePage ? "pt-16  md:pt-2  " : "max-sm:px-2 max-md:px-6 max-xl:px-10 overflow-x-hidden"}>
+                {children}
+            </div>
+            <Footer />
+            <MobileMenu />
+            <CartDrawer />
+            <CookieBanner />
+            <Toaster expand={true} richColors closeButton />
+            <FloatingEssentials />
+            <FloatingWhastappButton />
+            <MobileBottomNav />
+        </>
+    );
 }
