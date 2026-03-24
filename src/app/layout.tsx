@@ -52,7 +52,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     const { data: config, isLoading: configLoading } = useQuery({
         queryKey: ["publicConfig"],
         queryFn: configService.getPublicConfig,
-        staleTime: 1000 * 60 * 60,
+        staleTime: 1000 * 60 * 5,
     });
 
     const isLoading = maintenanceLoading || (isHomePage && configLoading);

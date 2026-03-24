@@ -43,9 +43,9 @@ export const footer = {
   ],
   
   legal: [
-    { label: "Política de Privacidad", href: "/legal/privacy" },
-    { label: "Términos de Servicio", href: "/legal/terms" },
-    { label: "Política de Devoluciones", href: "/legal/returns" },
+    { label: "Política de Privacidad", href: "/legal/detail?slug=privacy" },
+    { label: "Términos de Servicio", href: "/legal/detail?slug=terms" },
+    { label: "Política de Devoluciones", href: "/legal/detail?slug=returns" },
   ],
   
   promo: {

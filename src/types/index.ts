@@ -34,6 +34,7 @@ export interface Category {
 
 export interface Product {
   id: number;
+  slug: string;
   name: string;
   brand: string;
   qr: string | null;

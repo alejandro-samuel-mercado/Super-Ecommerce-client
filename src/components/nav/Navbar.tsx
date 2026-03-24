@@ -24,7 +24,7 @@ export function Navbar() {
   const { data: config, isLoading } = useQuery({
     queryKey: ["publicConfig"],
     queryFn: configService.getPublicConfig,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -242,6 +242,15 @@ export function Navbar() {
             >
               Tendencias
             </Link>
+            
+            {config?.navItemName && (
+              <Link
+                href="/custom"
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${scrolled ? "text-white hover:bg-white hover:text-gray-700" : "text-foreground hover:bg-secondary/60 hover:text-white"}`}
+              >
+                {config.navItemName}
+              </Link>
+            )}
             <Link
               href="/products?isNew=true"
               className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all  ${scrolled ? "text-white hover:bg-white hover:text-gray-700" : "text-foreground hover:bg-secondary/60 hover:text-white"}`}

@@ -33,6 +33,20 @@ export interface PublicConfig {
   persistentQrUrl?: string;
   country: string;
   defaultCurrency: string;
+  institutionalVideo?: string;
+  institutionalVideoTitle?: string;
+  whatsappProductMessage?: string;
+  navItemName?: string;
+  customPageTitle?: string;
+  customPageDescription?: string;
+  customPageImage?: string;
+  customPageVideo?: string;
+  customPageImages?: string[];
+  customPageVideos?: string[];
+  customPageTexts?: string[];
+  customPageTextsSubtitle?: string;
+  customPageImagesSubtitle?: string;
+  customPageVideosSubtitle?: string;
 }
 
 export const configService = {

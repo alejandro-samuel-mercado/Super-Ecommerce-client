@@ -75,7 +75,7 @@ export function CookieBanner() {
                   hacer clic en &quot;Aceptar Todo&quot;, aceptas nuestro uso de
                   cookies.{" "}
                   <Link
-                    href="/legal/privacy"
+                    href="/legal/detail?slug=privacy"
                     className="text-primary hover:underline"
                   >
                     Aprender más

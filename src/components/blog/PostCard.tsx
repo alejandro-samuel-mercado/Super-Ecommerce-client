@@ -52,7 +52,7 @@ export function PostCard({ post }: PostCardProps) {
       {/* Imagen Destacada */}
       {post.coverImage && (
         <Link
-          href={`/blog/${post.slug}`}
+          href={`/blog/detail?slug=${post.slug}`}
           className="relative aspect-[16/10] w-full overflow-hidden block bg-zinc-100 dark:bg-zinc-900 border-y-2 border-zinc-100 dark:border-zinc-800/50"
         >
           <Image
@@ -71,7 +71,7 @@ export function PostCard({ post }: PostCardProps) {
 
       {/* Content Section */}
       <div className="p-8 flex-1 flex flex-col">
-        <Link href={`/blog/${post.slug}`}>
+        <Link href={`/blog/detail?slug=${post.slug}`}>
           <h3 className="text-2xl font-black mb-4 group-hover:text-primary transition-colors leading-[1.1] tracking-tighter text-zinc-900 dark:text-zinc-50 line-clamp-2">
             {post.title}
           </h3>
@@ -95,7 +95,7 @@ export function PostCard({ post }: PostCardProps) {
             ))}
           </div>
 
-          <Link href={`/blog/${post.slug}`} className="w-full">
+          <Link href={`/blog/detail?slug=${post.slug}`} className="w-full">
             <Button className="w-full rounded-2xl font-black text-xs h-14 bg-zinc-900 dark:bg-zinc-50 text-zinc-50 dark:text-zinc-900 hover:bg-primary dark:hover:bg-primary hover:text-white transition-all shadow-2xl shadow-zinc-300 dark:shadow-none uppercase tracking-widest gap-2">
               Seguir Leyendo{" "}
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />

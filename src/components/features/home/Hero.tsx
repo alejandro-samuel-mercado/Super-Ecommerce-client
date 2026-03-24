@@ -446,6 +446,16 @@ export function Hero() {
               >
                 Tendencias
               </Link>
+
+              {config?.navItemName && (
+                  <Link
+                    href="/custom"
+                    className="text-sm font-semibold text-white hover:bg-white px-2 py-2 rounded-full hover:text-gray-900 transition-all"
+                  >
+                    {config.navItemName}
+                  </Link>
+              )}
+
               <Link
                 href="/contact"
                 className="text-sm font-semibold text-white hover:bg-white px-2 py-2 rounded-full hover:text-gray-900 transition-all"

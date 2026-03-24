@@ -122,6 +122,17 @@ const {user}= useAuth()
               <ChevronRight className="w-6 h-6 text-gray-400" />
             </Link>
 
+            {config?.navItemName && (
+              <Link
+                href="/custom"
+                onClick={closeMobileMenu}
+                className="flex justify-between items-center text-3xl max-sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-all py-2"
+              >
+                {config.navItemName}
+                <ChevronRight className="w-6 h-6 text-gray-400" />
+              </Link>
+            )}
+
             <Link
               href="/products?isNew=true"
               onClick={closeMobileMenu}

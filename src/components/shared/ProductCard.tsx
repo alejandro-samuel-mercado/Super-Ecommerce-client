@@ -104,7 +104,7 @@ export const ProductCard = memo(function ProductCard({ product }: ProductCardPro
 
   return (
     <Link
-      href={isOutOfStock ? "#" : `/products/${product.id}`}
+      href={isOutOfStock ? "#" : `/products/detail?slug=${product.slug || product.id}`}
       className={`group block bg-card/30 max-sm:bg-card/80 sm:border-none shadow-2xl rounded-2xl p-2 max-sm:p-6 border-b border-primary pb-6 ${isOutOfStock ? "opacity-75 cursor-not-allowed" : ""}`}
       onClick={handleCardClick}
     >

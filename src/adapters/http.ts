@@ -133,7 +133,7 @@ export async function http<T>(
         referenceId: errorBody.reference_id,
       };
 
-      if (response.status >= 500) {
+      if (response.status >= 500 && typeof window !== "undefined") {
         triggerGlobalError({
           title: "Error del Servidor",
           message: error.message,
@@ -199,11 +199,13 @@ export async function http<T>(
       title: "Problema de Conexión",
     };
 
-    triggerGlobalError({
-      title: netError.title,
-      message: netError.message,
-      code: netError.code,
-    });
+    if (typeof window !== "undefined") {
+      triggerGlobalError({
+        title: netError.title,
+        message: netError.message,
+        code: netError.code,
+      });
+    }
 
     throw {
       status: 500,
