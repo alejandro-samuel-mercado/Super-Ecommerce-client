@@ -12,10 +12,11 @@ import { useUIStore } from "@/store/ui";
 import { Product } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, Heart, Menu, ShoppingCart, User, X } from "lucide-react";
+import { Bell, Heart, Menu, Package, ShoppingCart, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { guestOrderPersistence } from "@/lib/guest-persistence";
 
 export function Navbar() {
   const { user } = useAuth();
@@ -34,10 +35,17 @@ export function Navbar() {
   const [categoriesTree, setCategoriesTree] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
+  const [hasGuestOrders, setHasGuestOrders] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     productService.getCategoriesTree().then(setCategoriesTree);
+    
+    // Verificar si hay pedidos de invitado
+    if (typeof window !== "undefined") {
+      const orders = guestOrderPersistence.getOrders();
+      setHasGuestOrders(orders.length > 0);
+    }
   }, []);
 
   const CategoryColumn = ({ category }: { category: any }) => {
@@ -268,10 +276,21 @@ export function Navbar() {
           <div className="flex items-center gap-1 lg:gap-4" ref={searchRef}>
             
 
+            {mounted && (
+              <Button
+                variant="ghost"
+                title="Mis Pedidos"
+                className={`rounded-lg hover:bg-white/50 p-2 h-auto w-auto hidden sm:flex ${scrolled ? "text-white" : "hover:bg-secondary/60 hover:text-white"}`}
+                onClick={() => router.push("/profile?tab=orders")}
+              >
+                <Package className="!h-7 !w-7" />
+              </Button>
+            )}
+
             <Button
               variant="ghost"
               className={`rounded-lg hover:bg-white/50 p-2 h-auto w-auto hidden sm:flex ${scrolled ? "text-white" : "hover:bg-secondary/60 hover:text-white"}`}
-              onClick={() => router.push("/profile")}
+              onClick={() => router.push(user ? "/profile" : "/login")}
             >
               <User className="!h-7 !w-7" />
             </Button>

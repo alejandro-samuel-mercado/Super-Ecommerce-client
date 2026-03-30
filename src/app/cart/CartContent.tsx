@@ -964,24 +964,7 @@ export default function CartContent() {
                     </div>
                   )}
 
-                  {!user && (
-                    <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-xl flex items-center justify-between shadow-sm">
-                      <p className="text-sm font-medium text-primary">
-                        Inicia sesión para poder procesar tu compra.
-                      </p>
-                      <Button
-                        variant="default"
-                        className="rounded-full bg-primary hover:bg-primary/90 text-white"
-                        onClick={() =>
-                          router.push(
-                            `/login?redirect=${encodeURIComponent("/cart?reloaded=true")}`,
-                          )
-                        }
-                      >
-                        Iniciar Sesión
-                      </Button>
-                    </div>
-                  )}
+
 
                   <div
                     className={`space-y-4 transition-opacity duration-300 ${isUpdating ? "opacity-60 pointer-events-none" : ""}`}
@@ -1355,20 +1338,7 @@ export default function CartContent() {
                     {cartContent.step2.subtitle}
                   </p>
 
-                  {!user && (
-                    <div className="mb-8 p-6 bg-purple-50/50 border border-purple-100 rounded-2xl flex items-center justify-between">
-                      <p className="text-sm font-medium text-purple-900">
-                        {cartContent.step2.loginPrompt}
-                      </p>
-                      <Button
-                        variant="default"
-                        className="rounded-full bg-purple-600 hover:bg-purple-700 "
-                        onClick={() => router.push("/login?redirect=/cart")}
-                      >
-                        {cartContent.step2.loginLink}
-                      </Button>
-                    </div>
-                  )}
+
 
                   <div className="space-y-4">
                     <div>

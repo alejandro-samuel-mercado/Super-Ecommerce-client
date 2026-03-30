@@ -22,6 +22,7 @@ interface RequestOptions extends RequestInit {
   token?: string;
   skipRetry?: boolean;
   responseType?: "json" | "blob";
+  params?: Record<string, string | number | boolean | undefined>;
 }
 
 let refreshHandler: (() => Promise<string | null>) | null = null;
@@ -39,7 +40,21 @@ export async function http<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const url = `${BASE_URL}${path}`;
+  let url = `${BASE_URL}${path}`;
+
+  if (options.params) {
+    const searchParams = new URLSearchParams();
+    Object.entries(options.params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, String(value));
+      }
+    });
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += (url.includes("?") ? "&" : "?") + queryString;
+    }
+  }
+
   const headers = new Headers(options.headers);
 
   if (options.token) {
@@ -141,11 +156,32 @@ export async function http<T>(
           referenceId: error.referenceId,
         });
       } else if (response.status !== 401 && typeof window !== "undefined") {
-        throttledToastError(
-          error.message ||
-            "Ocurrió un error inesperado al conectar con el servidor.",
-          "Revise los datos ingresados e intente nuevamente.",
-        );
+        // Skip toast if x-silence-toast header is present
+        if (!options.headers || !(options.headers as any)["x-silence-toast"]) {
+            const sanitizeErrorMessage = (msg: string) => {
+              if (!msg) return "Ocurrió un error inesperado.";
+              
+              // Specific translations
+              if (msg.includes("CURRENCY_NOT_SUPPORTED")) return "PayPal no soporta esta moneda. Pruebe con otro método de pago.";
+              if (msg.includes("INSTRUMENT_DECLINED")) return "El medio de pago fue rechazado. Intente con otro.";
+              
+              // AGGRESSIVE: Detect JSON, technical terms, or very long strings
+              if (msg.includes("{") || msg.includes("Error:") || msg.length > 150 || msg.includes(" at ")) {
+                 if (msg.includes("Venta creada")) {
+                    const match = msg.match(/Venta creada \(#.*?\)/);
+                    if (match) return `${match[0]} pero hubo un problema con el pago. Revise su email.`;
+                 }
+                 return "Ocurrió un problema al procesar su solicitud. Por favor intente nuevamente.";
+              }
+              return msg;
+            };
+
+            throttledToastError(
+              sanitizeErrorMessage(error.message) ||
+                "Ocurrió un error inesperado al conectar con el servidor.",
+              "Revise los datos ingresados e intente nuevamente.",
+            );
+        }
       }
 
       throw error;

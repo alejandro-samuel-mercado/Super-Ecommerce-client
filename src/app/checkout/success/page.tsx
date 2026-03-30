@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { guestOrderPersistence } from "@/lib/guest-persistence";
 
 export default function CheckoutSuccessPage() {
   return (
@@ -31,16 +32,22 @@ function CheckoutSuccessContent() {
 
   const handleDownloadInvoice = useCallback(async (id?: string) => {
     const saleId = id || sale?.id || sale?.uuid;
+    const saleUuid = sale?.uuid || saleId;
     if (!saleId) return;
 
     setIsDownloading(true);
     try {
       const baseUrl =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${baseUrl}/api/sales/${saleId}/invoice`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
+      const token = localStorage.getItem("accessToken");
+      
+      const endpoint = token ? `/api/sales/${saleId}/invoice` : `/api/sales/guest/${saleUuid}/invoice`;
+      
+      const headers: any = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      const response = await fetch(`${baseUrl}${endpoint}`, {
+        headers,
       });
 
       if (!response.ok) throw new Error("Failed to download invoice");
@@ -85,7 +92,15 @@ function CheckoutSuccessContent() {
     const fetchOrderDetails = async () => {
       try {
         if (saleId) {
-          const data = await orderService.getById(saleId);
+          const token = localStorage.getItem("accessToken");
+          const data = token 
+            ? await orderService.getById(saleId)
+            : await orderService.getGuestOrder(saleId);
+            
+          if (!token && data?.uuid) {
+            guestOrderPersistence.saveOrder(data.uuid);
+          }
+          
           const mappedData = {
             ...data,
             tax: data.taxAmount || 0,

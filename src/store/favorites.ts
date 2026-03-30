@@ -23,6 +23,10 @@ export const useFavoritesStore = create<FavoritesState>()(
         set((state) => ({
           favorites: [...new Set([...state.favorites, productId])],
         }));
+        
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
         try {
           await http(`/api/users/favorites/${productId}`, { method: "POST" });
         } catch (e) {
@@ -34,6 +38,10 @@ export const useFavoritesStore = create<FavoritesState>()(
         set((state) => ({
           favorites: state.favorites.filter((id) => id !== productId),
         }));
+        
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
         try {
           await http(`/api/users/favorites/${productId}`, { method: "DELETE" });
         } catch (e) {
@@ -55,6 +63,9 @@ export const useFavoritesStore = create<FavoritesState>()(
       },
 
       syncFavorites: async () => {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
         try {
           const res = await http<{ success: boolean; data: { id: number }[] }>(
             "/api/users/favorites",

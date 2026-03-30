@@ -169,6 +169,13 @@ export const orderService = {
     return response.data;
   },
 
+  getGuestOrder: async (uuid: string): Promise<any> => {
+    const response = await http<{ success: boolean; data: any }>(
+      `/api/sales/guest/${uuid}`,
+    );
+    return response.data;
+  },
+
   getMySales: async (params?: { includePending?: boolean }): Promise<any[]> => {
     const query = new URLSearchParams();
     if (params?.includePending !== undefined) {

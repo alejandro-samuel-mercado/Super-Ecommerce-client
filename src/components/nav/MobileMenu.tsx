@@ -158,6 +158,15 @@ const {user}= useAuth()
              Mis Favoritos
               <ChevronRight className="w-6 h-6 text-gray-400" />
             </Link>
+              <Link
+                href="/profile?tab=orders"
+                onClick={closeMobileMenu}
+                className="flex justify-between items-center text-3xl max-sm:text-2xl font-semibold text-gray-800 hover:text-primary transition-all py-2"
+              >
+                Mis Pedidos
+                <ChevronRight className="w-6 h-6 text-gray-400" />
+              </Link>
+            
                <Link
               href={user ? "/profile" : "/login"}
               onClick={closeMobileMenu}

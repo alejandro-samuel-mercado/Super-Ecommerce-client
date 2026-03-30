@@ -14,10 +14,10 @@ import {
 import { formatPrice } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Clock, Download, Eye, History, Package, QrCode, ReceiptText, Upload, XCircle } from "lucide-react";
-// @ts-ignore
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";
+import { guestOrderPersistence } from "@/lib/guest-persistence";
 
 export function OrdersTab() {
     const router = useRouter();
@@ -32,14 +32,36 @@ export function OrdersTab() {
     const { data: orders, isLoading } = useQuery({
         queryKey: ["orders"],
         queryFn: async () => {
-            const response = await http<{ success: boolean; data: any[] }>(
-                "/api/sales/my-purchases?includePending=true",
-            );
-
-            if (!response.data) return [];
-
-            // Mapeo preventivo para compatibilidad con el modelo del Backend
-            return response.data.map((order) => ({
+            const token = localStorage.getItem("accessToken");
+            
+            if (token) {
+                const response = await http<{ success: boolean; data: any[] }>(
+                    "/api/sales/my-purchases?includePending=true",
+                );
+                if (!response.data) return [];
+                return response.data;
+            } else {
+                // Modo Invitado: Cargar desde localStorage
+                const guestOrders = guestOrderPersistence.getOrders();
+                if (guestOrders.length === 0) return [];
+                
+                // Obtener detalles de cada pedido de invitado
+                const detailedOrders = await Promise.all(
+                    guestOrders.map(async (go) => {
+                        try {
+                            const res = await http<any>(`/api/sales/guest/${go.id}`);
+                            return res.data || res;
+                        } catch (err) {
+                            return null;
+                        }
+                    })
+                );
+                
+                return detailedOrders.filter(Boolean);
+            }
+        },
+        select: (data: any[]) => {
+            return data.map((order) => ({
                 ...order,
                 status: order.paymentStatus,
                 shipping: order.shippingCost || 0,
@@ -49,7 +71,7 @@ export function OrdersTab() {
                     price: item.unitPrice,
                 })),
             }));
-        },
+        }
     });
 
     if (isLoading) {
@@ -104,10 +126,15 @@ export function OrdersTab() {
         }
     };
 
-    const handleDownload = async (orderId: string) => {
+    const handleDownload = async (orderId: string, uuid?: string) => {
         setIsDownloading(orderId);
         try {
-            const blob = await http<Blob>(`/api/sales/${orderId}/invoice`, {
+            const token = localStorage.getItem("accessToken");
+            const endpoint = token 
+                ? `/api/sales/${orderId}/invoice` 
+                : `/api/sales/guest/${uuid || orderId}/invoice`;
+
+            const blob = await http<Blob>(endpoint, {
                 method: "GET",
                 responseType: 'blob',
             });
@@ -452,7 +479,7 @@ export function OrdersTab() {
                             <div className="flex gap-4 pt-4 pb-4">
                                 <Button
                                     className="flex-1 h-14 rounded-2xl font-black bg-primary text-white hover:bg-secondary transition-all gap-2 disabled:opacity-50"
-                                    onClick={() => handleDownload(selectedOrder.id.toString())}
+                                    onClick={() => handleDownload(selectedOrder.id.toString(), selectedOrder.uuid)}
                                     disabled={isDownloading === selectedOrder.id.toString() || selectedOrder.paymentStatus !== 'PAID'}
                                 >
                                     {isDownloading === selectedOrder.id.toString() ? (
@@ -690,7 +717,7 @@ function OrderCard({
                     <Button
                         variant="outline"
                         className="h-12 w-12 rounded-2xl border-2 border-primary/40 hover:bg-primary/10 hover:border-primary transition-all p-0 disabled:opacity-50"
-                        onClick={() => onDownload(order.id.toString())}
+                        onClick={() => onDownload(order.id.toString(), order.uuid)}
                         disabled={isDownloading === order.id.toString() || order.paymentStatus !== 'PAID'}
                         title={order.paymentStatus !== 'PAID' ? "Disponible solo al confirmar pago" : profile.orders.downloadButton}
                     >

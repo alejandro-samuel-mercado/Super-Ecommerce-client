@@ -3,12 +3,15 @@
 import { useCartStore } from "@/store/cart";
 import { useUIStore } from "@/store/ui";
 import { motion } from "framer-motion";
-import { LayoutGrid, MessageCircle, ShoppingBag, User } from "lucide-react";
+import { LayoutGrid, MessageCircle, Package, ShoppingBag, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { user } = useAuth();
   const { toggleCart, toggleChat, isCartOpen, isChatOpen, closeAll } = useUIStore();
   const { getTotalItems } = useCartStore();
 
@@ -29,6 +32,12 @@ export function MobileBottomNav() {
       badge: getTotalItems(),
     },
     {
+      label: "Pedidos",
+      icon: Package,
+      href: "/profile?tab=orders",
+      active: pathname === "/profile" && !isAnyOverlayOpen && searchParams.get("tab") === "orders",
+    },
+    {
       label: "Chat",
       icon: MessageCircle,
       onClick: toggleChat,
@@ -37,7 +46,7 @@ export function MobileBottomNav() {
     {
       label: "Perfil",
       icon: User,
-      href: "/profile",
+      href: user ? "/profile" : "/login",
       active: pathname === "/profile" && !isAnyOverlayOpen,
     },
   ];

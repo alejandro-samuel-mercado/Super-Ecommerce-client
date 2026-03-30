@@ -518,7 +518,16 @@ export function Hero() {
               <Button
                 variant="ghost"
                 className="rounded-lg hover:bg-white/30 hidden sm:flex p-2 h-auto w-auto"
-                onClick={() => router.push("/profile")}
+                onClick={() => router.push("/profile?tab=orders")}
+                title="Mis Pedidos"
+              >
+                <Package className="!h-6 !w-6 max-lg:!h-10 max-lg:!w-10 text-white font-bold" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="rounded-lg hover:bg-white/30 hidden sm:flex p-2 h-auto w-auto"
+                onClick={() => router.push(user ? "/profile" : "/login")}
               >
                 <User className="!h-6 !w-6 max-lg:!h-10 max-lg:!w-10  text-white font-bold" />
               </Button>
@@ -675,6 +684,27 @@ export function Hero() {
                       >
                         {currentSlideData.subtitle}
                       </motion.p>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="flex gap-4"
+                      >
+                        <Button
+                          onClick={() => router.push("/products")}
+                          className="bg-white text-primary hover:bg-white/90 font-bold rounded-full px-8 h-12"
+                        >
+                          Ver Productos
+                        </Button>
+                        <Button
+                          onClick={() => router.push("/profile?tab=orders")}
+                          variant="outline"
+                          className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold rounded-full px-8 h-12 gap-2"
+                        >
+                          <Package size={18} />
+                          Rastrear Pedido
+                        </Button>
+                      </motion.div>
                     </div>
                   </motion.div>
                 </AnimatePresence>

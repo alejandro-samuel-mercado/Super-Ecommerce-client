@@ -23,6 +23,8 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
+import { guestOrderPersistence } from "@/lib/guest-persistence";
+
 export default function ProfilePage() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><div className="h-12 w-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>}>
@@ -32,9 +34,12 @@ export default function ProfilePage() {
 }
 
 function ProfileContent() {
-  const { user, isLoading, logout } = useAuth();
+  const { user: authUser, isLoading, logout } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  
+  const [user, setUser] = useState<any>(null);
+  const [isGuest, setIsGuest] = useState(false);
   const [activeTab, setActiveTab] = useState(
     searchParams.get("tab") || "profile",
   );
@@ -45,12 +50,32 @@ function ProfileContent() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/login");
-    }
-  }, [user, isLoading, router]);
+    if (authUser) {
+      setUser(authUser);
+      setIsGuest(false);
+    } else if (!isLoading) {
+      const gOrders = guestOrderPersistence.getOrders();
+      const isOrdersTab = searchParams.get("tab") === "orders" || activeTab === "orders";
 
-  if (isLoading) {
+      if (gOrders.length > 0 || isOrdersTab) {
+        setIsGuest(true);
+        setUser({
+          name: "Invitado",
+          email: "Compra sin cuenta",
+          role: { name: "CUSTOMER" },
+          points: 0,
+        });
+        // Si es invitado y no hay tab especificada, ir a orders
+        if (!searchParams.get("tab")) {
+          setActiveTab("orders");
+        }
+      } else {
+        router.push("/login");
+      }
+    }
+  }, [authUser, isLoading, router, searchParams]);
+
+  if (isLoading || (!user && !isGuest)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <motion.div
@@ -61,8 +86,6 @@ function ProfileContent() {
       </div>
     );
   }
-
-  if (!user) return null;
 
   return (
     <div className="min-h-screen  text-foreground pb-40 selection:bg-primary/30 pt-20 max-lg:pt-10 max-md:pt-0">
@@ -78,18 +101,20 @@ function ProfileContent() {
         </div>
 
         {/* Botón de cerrar sesión */}
-        <div className="absolute top-6 right-6 max-md:top-10 max-md:right-3 z-20">
-          <Button
-            variant="ghost"
-            onClick={logout}
-            className="bg-white/20 hover:bg-destructive/20 hover:text-destructive-foreground backdrop-blur-md border border-white/20 rounded-2xl gap-2 transition-all group font-bold"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="text-xs uppercase tracking-wider">
-              Cerrar Sesión
-            </span>
-          </Button>
-        </div>
+        {user && !isGuest && (
+          <div className="absolute top-6 right-6 max-md:top-10 max-md:right-3 z-20">
+            <Button
+              variant="ghost"
+              onClick={logout}
+              className="bg-white/20 hover:bg-destructive/20 hover:text-destructive-foreground backdrop-blur-md border border-white/20 rounded-2xl gap-2 transition-all group font-bold"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-xs uppercase tracking-wider">
+                Cerrar Sesión
+              </span>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* 2. Información del usuario */}
@@ -168,12 +193,14 @@ function ProfileContent() {
         >
           <div className="border-b border-secondary/40 mb-8 overflow-x-auto scrollbar-hide">
             <TabsList className="max-md:grid max-ms:grid-cols-3 max-sm:grid-cols-2 bg-transparent h-auto p-0 pb-2 flex justify-start gap-8">
-              <TabsTrigger
-                value="profile"
-                className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary"
-              >
-                <UserIcon className="w-4 h-4" /> Principal
-              </TabsTrigger>
+              {!isGuest && (
+                <TabsTrigger
+                  value="profile"
+                  className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary"
+                >
+                  <UserIcon className="w-4 h-4" /> Principal
+                </TabsTrigger>
+              )}
               <TabsTrigger
                 value="orders"
                 className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary"
@@ -186,13 +213,15 @@ function ProfileContent() {
               >
                 <Heart className="w-4 h-4" /> Favoritos
               </TabsTrigger>
-              <TabsTrigger
-                value="comments"
-                className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary"
-              >
-                <MessageSquare className="w-4 h-4" /> Reseñas
-              </TabsTrigger>
-              {storeConfig?.enablePoints && (
+              {!isGuest && (
+                <TabsTrigger
+                  value="comments"
+                  className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary"
+                >
+                  <MessageSquare className="w-4 h-4" /> Reseñas
+                </TabsTrigger>
+              )}
+              {!isGuest && storeConfig?.enablePoints && (
                 <TabsTrigger
                   value="points"
                   className="social-tab-trigger data-[state=active]:bg-primary data-[state=active]:text-white hover:bg-secondary/40 hover:text-primary max-sm:mx-auto max-sm:px-6"

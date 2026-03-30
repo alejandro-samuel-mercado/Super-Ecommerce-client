@@ -9,6 +9,7 @@ import { Clock, Eye, Home, Loader2, QrCode } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
+import { guestOrderPersistence } from "@/lib/guest-persistence";
 
 export default function CheckoutPendingPage() {
     return (
@@ -33,9 +34,16 @@ function CheckoutPendingContent() {
     const fetchSaleData = useCallback(async () => {
         if (!saleId) return;
         try {
-            const data = await http<any>(`/api/sales/${saleId}`, { method: "GET" });
+            const token = localStorage.getItem("accessToken");
+            const endpoint = token ? `/api/sales/${saleId}` : `/api/sales/guest/${saleId}`;
+            const data = await http<any>(endpoint, { method: "GET" });
             const sale = data?.data || data;
             setSaleData(sale);
+            
+            if (!token && sale?.uuid) {
+                guestOrderPersistence.saveOrder(sale.uuid);
+            }
+            
             if (sale?.qrPaymentUrl) {
                 setQrUrl(sale.qrPaymentUrl);
             }
@@ -71,7 +79,9 @@ function CheckoutPendingContent() {
 
         const interval = setInterval(async () => {
             try {
-                const data = await http<any>(`/api/sales/${saleId}`, { method: "GET" });
+                const token = localStorage.getItem("accessToken");
+                const endpoint = token ? `/api/sales/${saleId}` : `/api/sales/guest/${saleId}`;
+                const data = await http<any>(endpoint, { method: "GET" });
                 const sale = data?.data || data;
                 if (sale?.qrPaymentUrl) {
                     setQrUrl(sale.qrPaymentUrl);
