@@ -79,6 +79,7 @@ export interface CreateOrderRequest {
   couponCode?: string;
   pointsToUse?: number;
   createAccount?: boolean;
+  currencyCode?: string;
 }
 
 export interface CreateOrderResponse {

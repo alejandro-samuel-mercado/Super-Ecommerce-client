@@ -612,6 +612,7 @@ function CartContent() {
                     pointsToUse: appliedPoints,
                     createAccount,
                     paymentType: (selectedGateway as any) || "MERCADO_PAGO",
+                    currencyCode: currency || undefined,
                 },
                 idempotencyKey,
                 { headers: { "x-silence-toast": "true" } },
