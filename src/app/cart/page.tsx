@@ -624,8 +624,6 @@ function CartContent() {
             toast.error(errorMessage);
         },
         onSuccess: async (data: any) => {
-            clearCart();
-
             try {
                 setIsRedirecting(true);
 
@@ -635,8 +633,10 @@ function CartContent() {
                 if (checkoutUrl) {
                     window.location.href = checkoutUrl;
                 } else if (saleId) {
+                    clearCart();
                     router.push(`/profile`);
                 } else {
+                    clearCart();
                     router.push("/profile");
                     setIsRedirecting(false);
                 }
