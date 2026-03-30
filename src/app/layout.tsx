@@ -13,6 +13,7 @@ import { MaintenancePage } from "@/components/maintenance/MaintenancePage";
 import { useMaintenance } from "@/hooks/useMaintenance";
 import { Inter } from "next/font/google";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import "./globals.css";
 
 import { Providers } from "@/components/providers/Providers";
@@ -80,7 +81,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
             <Toaster expand={true} richColors closeButton />
             <FloatingEssentials />
             <FloatingWhastappButton />
-            <MobileBottomNav />
+            <Suspense fallback={null}>
+                <MobileBottomNav />
+            </Suspense>
         </>
     );
 }
