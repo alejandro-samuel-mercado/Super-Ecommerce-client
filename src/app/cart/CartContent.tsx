@@ -47,7 +47,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Step = "cart" | "data" | "delivery" | "payment";
@@ -92,23 +92,15 @@ interface DeliveryData {
   };
 }
 
-export default function CartPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        </div>
-      }
-    >
-      <CartContent />
-    </Suspense>
-  );
-}
-
-function CartContent() {
+export default function CartContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    console.log("[CartContent] Mounted");
+  }, []);
 
   useEffect(() => {
     if (
@@ -198,6 +190,8 @@ function CartContent() {
   const [recentPendingOrder, setRecentPendingOrder] = useState<any>(null);
 
   const [nearestBranch, setNearestBranch] = useState<number | null>(null);
+  const [showBypass, setShowBypass] = useState(false);
+  const [bypassLoading, setBypassLoading] = useState(false);
 
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [storeConfig, setStoreConfig] = useState<PublicConfig | null>(null);
@@ -218,12 +212,13 @@ function CartContent() {
     branchService
       .getAll()
       .then((data) => {
-      
-        setBranches(data.filter((b) => b.active || (b as any).isActive));
+        if (Array.isArray(data)) {
+          setBranches(data.filter((b) => b.active || (b as any).isActive));
+        } else {
+          setBranches([]);
+        }
       })
-      .catch((err) => {
-       
-      });
+      .catch(() => setBranches([]));
   }, []);
 
   useEffect(() => {
@@ -489,13 +484,13 @@ function CartContent() {
     },
   });
 
-  // Sincronizar precios del carrito cuando cambie la moneda
+  // Sincronizar precios del carrito cuando cambie la moneda (Solo si hay usuario logueado)
   const syncWithBackend = useCartStore((state) => state.syncWithBackend);
   useEffect(() => {
-    if (currency) {
+    if (currency && user) {
       syncWithBackend(currency);
     }
-  }, [currency, syncWithBackend]);
+  }, [currency, syncWithBackend, user]);
 
   const dependencyString = useMemo(() => {
     return JSON.stringify({
@@ -515,6 +510,7 @@ function CartContent() {
               city: customerData.city?.trim() || "",
               state: customerData.state?.trim() || "",
               zip: customerData.zipCode?.trim() || "",
+              country: customerData.country?.trim() || "",
             }
           : null,
       userId: user?.id,
@@ -530,6 +526,7 @@ function CartContent() {
     customerData.city,
     customerData.state,
     customerData.zipCode,
+    customerData.country,
     user?.id,
   ]);
 
@@ -537,7 +534,6 @@ function CartContent() {
 
   useEffect(() => {
     if (
-      user &&
       items.length > 0 &&
       dependencyString !== prevDepsRef.current &&
       !previewMutation.isPending
@@ -641,8 +637,9 @@ function CartContent() {
 
         if (checkoutUrl) {
           window.location.href = checkoutUrl;
-        } else if (saleId) {
-          router.push(`/profile`);
+        } else if (saleId || data.uuid) {
+          router.push(`/checkout/success?saleId=${data.uuid || saleId}`);
+          setIsRedirecting(false);
         } else {
           router.push("/profile");
           setIsRedirecting(false);
@@ -758,12 +755,6 @@ function CartContent() {
     const steps: Step[] = ["cart", "data", "delivery", "payment"];
     const currentIndex = steps.indexOf(currentStep);
 
-    if (currentStep === "cart" && !user) {
-      router.push(
-        `/login?redirect=${encodeURIComponent("/cart?reloaded=true")}`,
-      );
-      return;
-    }
 
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
@@ -780,13 +771,40 @@ function CartContent() {
     }
   };
 
-  const isDebouncing = items !== debouncedItems;
+  const isDebouncing = useMemo(() => {
+    return JSON.stringify(items) !== JSON.stringify(debouncedItems);
+  }, [items, debouncedItems]);
+
   const isUpdating =
-    isDebouncing ||
     previewMutation.isPending ||
     shippingMutation.isPending ||
     couponMutation.isPending ||
     createOrderMutation.isPending;
+
+  useEffect(() => {
+    let timer: any;
+    if (isUpdating) {
+      timer = setTimeout(() => setShowBypass(true), 6000);
+      console.log("[CartContent] isUpdating active:", {
+        preview: previewMutation.isPending,
+        shipping: shippingMutation.isPending,
+        coupon: couponMutation.isPending,
+        createOrder: createOrderMutation.isPending
+      });
+    } else {
+      setShowBypass(false);
+      setBypassLoading(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isUpdating, previewMutation.isPending, shippingMutation.isPending, couponMutation.isPending, createOrderMutation.isPending]);
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (isAuthLoading) {
     return (
@@ -2079,19 +2097,35 @@ function CartContent() {
           <div className="lg:col-span-1">
             <Card className="p-6 md:p-8 md:px-5 rounded-[2rem] border-2 border-primary/70 bg-white/60 backdrop-blur-xl shadow-xl sticky top-0 overflow-hidden relative">
               {/* Loader Localizado de la Tarjeta de Precios  */}
-              {isUpdating && (
-                <div className="absolute inset-0 z-20 bg-white/80 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
-                  <div className="relative mb-4">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary/30" />
-                    <ShieldCheck className="h-6 w-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+              {isUpdating && !bypassLoading && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/80 backdrop-blur-md rounded-3xl animate-in fade-in duration-500">
+                  <div className="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-sm mx-4 animate-in zoom-in duration-300">
+                    <div className="relative w-24 h-24 mx-auto mb-6">
+                      <div className="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+                      <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      <ShieldCheck className="absolute inset-0 m-auto h-12 w-12 text-primary animate-pulse" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Cálculo Seguro en Progreso
+                    </h3>
+                    <p className="text-gray-500 text-sm leading-relaxed mb-4">
+                      Validando precios, impuestos y descuentos con precisión
+                      total para su seguridad.
+                    </p>
+                    {showBypass && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-xs text-amber-600 border-amber-200 hover:bg-amber-50"
+                        onClick={() => {
+                          setBypassLoading(true);
+                          toast.warning("Continuando con precios estimados...");
+                        }}
+                      >
+                        ¿Tarda demasiado? Continuar de todas formas
+                      </Button>
+                    )}
                   </div>
-                  <p className="font-bold text-primary mb-1">
-                    Cálculo Seguro en Progreso
-                  </p>
-                  <p className="text-xs text-muted-foreground max-w-[200px]">
-                    Validando precios, impuestos y descuentos con precisión
-                    total para su seguridad.
-                  </p>
                 </div>
               )}
 
@@ -2312,7 +2346,6 @@ function CartContent() {
                     className="w-full h-14 text-lg font-bold rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleNext}
                     disabled={
-                      (!user && currentStep === "cart") ||
                       !canProceed() ||
                       isUpdating ||
                       preview === null

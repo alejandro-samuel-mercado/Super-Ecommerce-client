@@ -6,12 +6,12 @@ import { branchService } from "@/services/branch";
 import { configService } from "@/services/config";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Clock,
-  Facebook,
-  Instagram,
-  MapPin,
-  Phone,
-  Twitter,
+    Clock,
+    Facebook,
+    Instagram,
+    MapPin,
+    Phone,
+    Twitter,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -49,7 +49,7 @@ export function Footer() {
         typeof h === "string" ? h : `${h.days}: ${h.hours}`,
       );
 
-    if (typeof config.openingHours === "object") {
+    if (typeof config.openingHours === "object" && config.openingHours !== null) {
       const dayMap: Record<string, string> = {
         monday: "Lunes",
         tuesday: "Martes",

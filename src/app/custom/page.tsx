@@ -123,7 +123,7 @@ export default function CustomPage() {
                     )}
 
                     {/* Textos Extra (Masonry) */}
-                    {config.customPageTexts && config.customPageTexts.length > 0 && (
+                    {Array.isArray(config.customPageTexts) && config.customPageTexts.length > 0 && (
                         <div className="space-y-8 pt-8 border-t border-border/50">
                             <h2 className="text-3xl font-bold tracking-tight">
                                 {config.customPageTextsSubtitle || "Más Información"}
@@ -148,7 +148,7 @@ export default function CustomPage() {
                     )}
 
                     {/* Galería de Imágenes (Masonry Orgánico) */}
-                    {config.customPageImages && config.customPageImages.length > 0 && (
+                    {Array.isArray(config.customPageImages) && config.customPageImages.length > 0 && (
                         <div className="space-y-8 pt-8 border-t border-border/50">
                             <h2 className="text-3xl font-bold tracking-tight">
                                 {config.customPageImagesSubtitle || "Galería de Imágenes"}
@@ -176,7 +176,7 @@ export default function CustomPage() {
                     )}
 
                     {/* Galería de Videos (Masonry Grid) */}
-                    {config.customPageVideos && config.customPageVideos.length > 0 && (
+                    {Array.isArray(config.customPageVideos) && config.customPageVideos.length > 0 && (
                         <div className="space-y-8 pt-8 border-t border-border/50">
                             <h2 className="text-3xl font-bold tracking-tight">
                                 {config.customPageVideosSubtitle || "Videos Destacados"}
