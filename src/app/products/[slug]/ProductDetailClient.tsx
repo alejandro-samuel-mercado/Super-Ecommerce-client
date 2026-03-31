@@ -236,6 +236,9 @@ export function ProductDetailClient({
     const totalReviews = product?.ratingCount || 0;
     const averageRating = product?.averageRating || 0;
 
+    const isFoodCategory = product?.category?.name?.toLowerCase().includes("alimento") || 
+                           (product?.category?.parents || []).some((p: any) => p.name?.toLowerCase().includes("alimento"));
+
     return (
         <main className="min-h-screen py-8 pb-40 relative overflow-hidden max-sm:px-0 sm:px-20 pt-28 max-md:pt-20 max-sm:pt-12">
             {/* Blobs decorativos */}
@@ -747,7 +750,7 @@ export function ProductDetailClient({
                                 {[
                                     "description",
                                     "specifications",
-                                    "nutritional",
+                                    ...(isFoodCategory ? ["nutritional"] : []),
                                     "shipping",
                                     "reviews",
                                 ].map((tab) => (
@@ -875,30 +878,32 @@ export function ProductDetailClient({
                                 </div>
                             </TabsContent>
 
-                            <TabsContent value="nutritional" className="mt-0">
-                                <div className="max-w-4xl mx-auto">
-                                    <div className="bg-white/40 backdrop-blur-md rounded-2xl border border-green-500/20 overflow-hidden shadow-sm">
-                                        {product?.nutritionalInfo && Array.isArray(product.nutritionalInfo) && product.nutritionalInfo.length > 0 ? (
-                                            <table className="w-full border-collapse text-left">
-                                                <tbody className="divide-y divide-green-500/10 text-sm sm:text-base">
-                                                    {product.nutritionalInfo.map((item: any, idx: number) => (
-                                                        <tr key={`nutri-${idx}`} className="group hover:bg-white/60 transition-colors">
-                                                            <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-green-500/5 group-hover:bg-green-500/10 transition-colors capitalize">
-                                                                {item.key}
-                                                            </th>
-                                                            <td className="py-4 px-6 text-foreground/90 font-medium">
-                                                                {item.value}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        ) : (
-                                            <div className="p-8 text-center text-muted-foreground">No hay información nutricional disponible para este producto.</div>
-                                        )}
+                            {isFoodCategory && (
+                                <TabsContent value="nutritional" className="mt-0">
+                                    <div className="max-w-4xl mx-auto">
+                                        <div className="bg-white/40 backdrop-blur-md rounded-2xl border border-green-500/20 overflow-hidden shadow-sm">
+                                            {product?.nutritionalInfo && Array.isArray(product.nutritionalInfo) && product.nutritionalInfo.length > 0 ? (
+                                                <table className="w-full border-collapse text-left">
+                                                    <tbody className="divide-y divide-green-500/10 text-sm sm:text-base">
+                                                        {product.nutritionalInfo.map((item: any, idx: number) => (
+                                                            <tr key={`nutri-${idx}`} className="group hover:bg-white/60 transition-colors">
+                                                                <th scope="row" className="py-4 px-6 font-semibold text-foreground/80 w-1/3 bg-green-500/5 group-hover:bg-green-500/10 transition-colors capitalize">
+                                                                    {item.key}
+                                                                </th>
+                                                                <td className="py-4 px-6 text-foreground/90 font-medium">
+                                                                    {item.value}
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            ) : (
+                                                <div className="p-8 text-center text-muted-foreground">No hay información nutricional disponible para este producto.</div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </TabsContent>
+                                </TabsContent>
+                            )}
 
                             <TabsContent value="shipping" className="mt-0">
                                 <div className="grid md:grid-cols-2 gap-8">
