@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { guestOrderPersistence } from "@/lib/guest-persistence";
 import { formatPrice } from "@/lib/utils";
 import { orderService } from "@/services/orders";
 import { useCartStore } from "@/store/cart";
@@ -8,9 +9,9 @@ import { motion } from "framer-motion";
 import { Check, Download, Home, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { guestOrderPersistence } from "@/lib/guest-persistence";
 
 export default function CheckoutSuccessPage() {
   return (
@@ -310,6 +311,24 @@ function CheckoutSuccessContent() {
                       {formatPrice(sale?.total, sale?.currencyCode)}
                     </span>
                   </div>
+                </div>
+
+                <div className="flex flex-col items-center justify-center p-6 bg-white border-4 border-primary/20 rounded-3xl shadow-inner gap-3">
+                  <QRCodeSVG 
+                    value={JSON.stringify({
+                      t: sale?.receipt?.ticketNumber || `SALE-${sale?.id}`,
+                      s: "Super Ecommerce", 
+                      d: sale?.createdAt ? new Date(sale.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                      v: sale?.total
+                    })}
+                    size={120}
+                    level="M"
+                    includeMargin={false}
+                    className="drop-shadow-sm"
+                  />
+                  <p className="text-[10px] font-black text-primary/40 uppercase tracking-widest text-center">
+                    Comprobante Digital <br/> #{sale?.id}
+                  </p>
                 </div>
 
                 <div className="pt-10 flex flex-col gap-4">
