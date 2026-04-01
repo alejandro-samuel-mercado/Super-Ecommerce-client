@@ -29,6 +29,7 @@ function CheckoutSuccessContent() {
   const [sale, setSale] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadAttempted, setDownloadAttempted] = useState(false);
 
 
   const handleDownloadInvoice = useCallback(async (id?: string) => {
@@ -109,7 +110,8 @@ function CheckoutSuccessContent() {
           };
           setSale(mappedData);
           clearCart();
-          if (data.paymentStatus === 'PAID') {
+          if (data.paymentStatus === 'PAID' && !downloadAttempted) {
+            setDownloadAttempted(true);
             setTimeout(() => handleDownloadInvoice(data.id), 2000);
           }
         }
@@ -121,7 +123,8 @@ function CheckoutSuccessContent() {
     };
 
     fetchOrderDetails();
-  }, [searchParams, clearCart, router, handleDownloadInvoice]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, clearCart, router]);
 
 
   if (isLoading) {
