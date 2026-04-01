@@ -7,7 +7,7 @@ export interface OrderPreviewRequest {
   }>;
   couponCode?: string;
   shippingAddressId?: string;
-  paymentType: "MERCADO_PAGO" | "CASH" | "CARD" | "DEBIT" | "POINTS";
+  paymentType: string;
   deliveryMethod?: "pickup" | "shipping";
   branchId?: string;
   pointsToUse?: number;
@@ -68,7 +68,7 @@ export interface CreateOrderRequest {
   };
   deliveryMethod: "pickup" | "shipping";
   pickupBranchId?: string;
-  paymentType: "MERCADO_PAGO" | "CASH" | "CARD" | "DEBIT" | "POINTS";
+  paymentType: string;
   deliveryAddress?: string;
   address?: {
     city?: string;
@@ -80,6 +80,7 @@ export interface CreateOrderRequest {
   pointsToUse?: number;
   createAccount?: boolean;
   currencyCode?: string;
+  customPaymentData?: any;
 }
 
 export interface CreateOrderResponse {

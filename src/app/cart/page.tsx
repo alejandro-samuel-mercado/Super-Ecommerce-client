@@ -49,6 +49,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import MercadoPagoBrick from "@/components/features/checkout/MercadoPagoBrick";
 
 type Step = "cart" | "data" | "delivery" | "payment";
 
@@ -101,9 +102,22 @@ export default function CartPage() {
                 </div>
             }
         >
-            <CartContent />
+            <CartContentWithMount />
         </Suspense>
     );
+}
+
+function CartContentWithMount() {
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => setIsMounted(true), []);
+
+    if (!isMounted) return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+    );
+
+    return <CartContent />;
 }
 
 function CartContent() {
@@ -137,6 +151,11 @@ function CartContent() {
     );
 
     const { currency } = useCurrencyStore();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const [currentStep, setCurrentStep] = useState<Step>("cart");
     const [couponCode, setCouponCode] = useState("");
@@ -285,11 +304,10 @@ function CartContent() {
 
     useEffect(() => {
         const fetchPaymentOptions = async () => {
-            if (!currency) return;
+            if (!currency || !storeConfig) return;
             setIsPaymentLoading(true);
             try {
                 const options = await paymentService.getPaymentOptions(currency);
-
 
                 const manualMethods: PaymentGatewayOption[] = [];
                 if (storeConfig?.enabledPaymentMethods?.includes('QR')) {
@@ -302,19 +320,31 @@ function CartContent() {
                     });
                 }
 
+                const hasCustom = options.some(o => o.slug === 'mercadopago_custom');
+                const allOptions = hasCustom ? [...options, ...manualMethods] : [
+                    ...options,
+                    {
+                        id: 999,
+                        name: 'Tarjeta de Crédito o Débito (Directo)',
+                        slug: 'mercadopago_custom',
+                        type: 'PRIMARY' as any,
+                        isFallback: false,
+                    },
+                    ...manualMethods
+                ];
 
-                const allOptions = [...options, ...manualMethods];
-                setPaymentOptions(allOptions);
+                setPaymentOptions(prev => {
+                    if (JSON.stringify(prev) === JSON.stringify(allOptions)) return prev;
+                    return allOptions;
+                });
 
-                if (allOptions.length > 0) {
-                    const primary =
-                        allOptions.find((o) => o.type === "PRIMARY") || allOptions[0];
-                    setSelectedGateway(primary.slug);
-                }
+                setSelectedGateway((current) => {
+                    if (current && allOptions.some(o => o.slug === current)) return current;
+                    const primary = allOptions.find((o) => o.type === "PRIMARY") || allOptions[0];
+                    return primary?.slug || null;
+                });
             } catch (error) {
-                if (paymentOptions.length > 0) {
-                    toast.error("Error al actualizar opciones de pago");
-                }
+                console.error("Error fetching payment options:", error);
             } finally {
                 setIsPaymentLoading(false);
             }
@@ -534,7 +564,7 @@ function CartContent() {
     ]);
 
     useEffect(() => {
-        if (items.length > 0) {
+        if (items.length > 0 && debouncedItems.length > 0) {
             previewMutation.mutate();
         }
     }, [dependencyString]);
@@ -583,8 +613,11 @@ function CartContent() {
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     const createOrderMutation = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (customPaymentData?: any) => {
             const idempotencyKey = getIdempotencyKey();
+
+            // Si se cliqueó el botón regular, puede venir el React Event. Lo ignoramos.
+            const validPaymentData = (customPaymentData && !customPaymentData.nativeEvent) ? customPaymentData : undefined;
 
             return orderService.create(
                 {
@@ -611,8 +644,9 @@ function CartContent() {
                     couponCode: appliedCoupon || undefined,
                     pointsToUse: appliedPoints,
                     createAccount,
-                    paymentType: (selectedGateway as any) || "MERCADO_PAGO",
+                    paymentType: (selectedGateway as string) || "MERCADO_PAGO",
                     currencyCode: currency || undefined,
+                    customPaymentData: validPaymentData,
                 },
                 idempotencyKey,
                 { headers: { "x-silence-toast": "true" } },
@@ -795,7 +829,16 @@ function CartContent() {
     }
 
     const handlePlaceOrder = () => {
-        createOrderMutation.mutate();
+        createOrderMutation.mutate(undefined);
+    };
+
+    const handleBrickSubmit = async (formData: any) => {
+        return new Promise<void>((resolve, reject) => {
+            createOrderMutation.mutate(formData, {
+                onSuccess: () => resolve(),
+                onError: (err) => reject(err),
+            });
+        });
     };
 
     if (items.length === 0 && currentStep === "cart") {
@@ -874,18 +917,18 @@ function CartContent() {
                                 <div key={step.id} className="flex flex-col items-center z-10">
                                     <div
                                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-md transition-all duration-300 ${isCompleted
-                                                ? "bg-gradient-to-r from-primary to-secondary text-white scale-110"
-                                                : isActive
-                                                    ? "bg-gradient-to-r from-primary to-secondary text-white scale-125 ring-4 ring-primary/20"
-                                                    : "bg-white text-muted-foreground border-2 border-border"
+                                            ? "bg-gradient-to-r from-primary to-secondary text-white scale-110"
+                                            : isActive
+                                                ? "bg-gradient-to-r from-primary to-secondary text-white scale-125 ring-4 ring-primary/20"
+                                                : "bg-white text-muted-foreground border-2 border-border"
                                             }`}
                                     >
                                         {isCompleted ? <Check className="h-5 w-5" /> : step.id}
                                     </div>
                                     <span
                                         className={`text-xs md:text-sm mt-3 font-medium transition-colors duration-300 ${isActive
-                                                ? "text-primary font-bold"
-                                                : "text-muted-foreground"
+                                            ? "text-primary font-bold"
+                                            : "text-muted-foreground"
                                             }`}
                                     >
                                         {step.label}
@@ -945,7 +988,7 @@ function CartContent() {
 
 
                                     <div
-                                        className={`space-y-4 transition-opacity duration-300 ${isUpdating ? "opacity-60 pointer-events-none" : ""}`}
+                                        className={`space-y-4 transition-opacity duration-300 ${isUpdating ? "opacity-60" : ""}`}
                                     >
                                         {items.map((item) => {
                                             const stockIssue = stockIssues.find(
@@ -960,8 +1003,8 @@ function CartContent() {
                                                 <div
                                                     key={item.skuId}
                                                     className={`flex max-md:flex-col max-md:items-center gap-6 p-4 mb-4 rounded-xl border transition-all ${stockIssue
-                                                            ? "bg-destructive/5 border-destructive/40 shadow-inner"
-                                                            : "bg-secondary/20 border-white/60 shadow-sm hover:shadow-md"
+                                                        ? "bg-destructive/5 border-destructive/40 shadow-inner"
+                                                        : "bg-secondary/20 border-white/60 shadow-sm hover:shadow-md"
                                                         }`}
                                                 >
                                                     <div className="relative w-28 h-28 rounded-xl overflow-hidden shadow-inner flex-shrink-0">
@@ -1323,6 +1366,7 @@ function CartContent() {
                                             <Input
                                                 type="email"
                                                 inputMode="email"
+                                                autoComplete="off"
                                                 placeholder={cartContent.step2.fields.email.placeholder}
                                                 value={customerData.email}
                                                 onChange={(e) =>
@@ -1342,6 +1386,7 @@ function CartContent() {
                                                     {cartContent.step2.fields.firstName.label} *
                                                 </Label>
                                                 <Input
+                                                    autoComplete="off"
                                                     placeholder={
                                                         cartContent.step2.fields.firstName.placeholder
                                                     }
@@ -1362,6 +1407,7 @@ function CartContent() {
                                                 <Input
                                                     type="tel"
                                                     inputMode="tel"
+                                                    autoComplete="off"
                                                     placeholder={
                                                         cartContent.step2.fields.phone.placeholder
                                                     }
@@ -1384,6 +1430,7 @@ function CartContent() {
                                             <Input
                                                 placeholder="12345678"
                                                 inputMode="numeric"
+                                                autoComplete="off"
                                                 value={customerData.dni}
                                                 onChange={(e) =>
                                                     setCustomerData((prev) => ({
@@ -1538,6 +1585,7 @@ function CartContent() {
                                                     </Label>
                                                     <Input
                                                         placeholder="Calle 123"
+                                                        autoComplete="off"
                                                         value={customerData.address}
                                                         onChange={(e) =>
                                                             setCustomerData((prev) => ({
@@ -1555,6 +1603,7 @@ function CartContent() {
                                                     <Input
                                                         placeholder="1900"
                                                         inputMode="numeric"
+                                                        autoComplete="off"
                                                         value={customerData.zipCode}
                                                         onChange={(e) =>
                                                             setCustomerData((prev) => ({
@@ -1610,8 +1659,8 @@ function CartContent() {
                                             <Label
                                                 htmlFor="pickup"
                                                 className={`flex items-start space-x-3 p-6 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-lg ${deliveryData.method === "pickup"
-                                                        ? "border-primary bg-primary/5 shadow-primary/10"
-                                                        : "border-border bg-white/50 hover:border-primary/40"
+                                                    ? "border-primary bg-primary/5 shadow-primary/10"
+                                                    : "border-border bg-white/50 hover:border-primary/40"
                                                     }`}
                                             >
                                                 <RadioGroupItem
@@ -1636,8 +1685,8 @@ function CartContent() {
                                                 <Label
                                                     htmlFor="shipping"
                                                     className={`flex items-start space-x-3 p-6 border-2 rounded-2xl cursor-pointer transition-all hover:shadow-lg ${deliveryData.method === "shipping"
-                                                            ? "border-primary bg-primary/5 shadow-primary/10"
-                                                            : "border-border bg-white/50 hover:border-primary/40"
+                                                        ? "border-primary bg-primary/5 shadow-primary/10"
+                                                        : "border-border bg-white/50 hover:border-primary/40"
                                                         }`}
                                                 >
                                                     <RadioGroupItem
@@ -1693,10 +1742,10 @@ function CartContent() {
                                                             disabled={!isBranchAvailable}
                                                             variant={isSelected ? "secondary" : "outline"}
                                                             className={`w-full justify-start h-auto py-4 px-6 rounded-xl border-2 transition-all ${!isBranchAvailable
-                                                                    ? "opacity-60 bg-gray-50 border-gray-200 cursor-not-allowed"
-                                                                    : isSelected
-                                                                        ? "border-primary bg-primary/5 hover:bg-primary/10"
-                                                                        : "border-transparent bg-white/50 hover:border-primary/30"
+                                                                ? "opacity-60 bg-gray-50 border-gray-200 cursor-not-allowed"
+                                                                : isSelected
+                                                                    ? "border-primary bg-primary/5 hover:bg-primary/10"
+                                                                    : "border-transparent bg-white/50 hover:border-primary/30"
                                                                 }`}
                                                             onClick={() => {
                                                                 if (isBranchAvailable) {
@@ -1709,18 +1758,18 @@ function CartContent() {
                                                         >
                                                             <MapPin
                                                                 className={`h-5 w-5 mr-3 shrink-0 ${!isBranchAvailable
-                                                                        ? "text-gray-400"
-                                                                        : isSelected
-                                                                            ? "text-primary"
-                                                                            : "text-muted-foreground"
+                                                                    ? "text-gray-400"
+                                                                    : isSelected
+                                                                        ? "text-primary"
+                                                                        : "text-muted-foreground"
                                                                     }`}
                                                             />
                                                             <div className="text-left w-full">
                                                                 <div className="flex justify-between items-center w-full">
                                                                     <span
                                                                         className={`font-bold block ${!isBranchAvailable
-                                                                                ? "text-gray-500 line-through"
-                                                                                : "text-gray-700"
+                                                                            ? "text-gray-500 line-through"
+                                                                            : "text-gray-700"
                                                                             }`}
                                                                     >
                                                                         {branch.name}
@@ -1733,8 +1782,8 @@ function CartContent() {
                                                                 </div>
                                                                 <span
                                                                     className={`text-sm font-normal ${!isBranchAvailable
-                                                                            ? "text-gray-400"
-                                                                            : "text-muted-foreground"
+                                                                        ? "text-gray-400"
+                                                                        : "text-muted-foreground"
                                                                         }`}
                                                                 >
                                                                     {branch.address}{" "}
@@ -1853,31 +1902,43 @@ function CartContent() {
                                                 >
                                                     <div className="grid grid-cols-1 gap-3">
                                                         {paymentOptions.map((option) => (
-                                                            <Label
-                                                                key={option.slug}
-                                                                htmlFor={`gateway-${option.slug}`}
-                                                                className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${selectedGateway === option.slug
+                                                            <div key={option.slug} className="space-y-3">
+                                                                <Label
+                                                                    htmlFor={`gateway-${option.slug}`}
+                                                                    className={`flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${selectedGateway === option.slug
                                                                         ? "border-primary bg-primary/5 shadow-primary/10"
                                                                         : "border-border bg-white/50 hover:border-primary/30"
-                                                                    }`}
-                                                            >
-                                                                <div className="flex items-center gap-3">
-                                                                    <RadioGroupItem
-                                                                        value={option.slug}
-                                                                        id={`gateway-${option.slug}`}
-                                                                    />
-                                                                    <div className="flex flex-col">
-                                                                        <span className="font-bold text-base md:text-lg">
-                                                                            {option.name}
-                                                                        </span>
-                                                                        {option.type === "PRIMARY" && (
-                                                                            <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full w-fit">
-                                                                                Recomendado
+                                                                        }`}
+                                                                >
+                                                                    <div className="flex items-center gap-3">
+                                                                        <RadioGroupItem
+                                                                            value={option.slug}
+                                                                            id={`gateway-${option.slug}`}
+                                                                        />
+                                                                        <div className="flex flex-col">
+                                                                            <span className="font-bold text-base md:text-lg">
+                                                                                {option.name}
                                                                             </span>
-                                                                        )}
+                                                                            {option.type === "PRIMARY" && (
+                                                                                <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full w-fit">
+                                                                                    Recomendado
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            </Label>
+                                                                </Label>
+                                                                
+                                                                {selectedGateway === option.slug && option.slug === "mercadopago_custom" && (
+                                                                    <div className="mt-4 animate-in fade-in zoom-in duration-500 border-2 border-primary/20 rounded-2xl p-4 bg-white/40 shadow-inner">
+                                                                        <MercadoPagoBrick
+                                                                            amount={preview?.total !== undefined && preview.total !== null ? preview.total : clientSubtotal}
+                                                                            onSubmit={handleBrickSubmit}
+                                                                            onError={(err) => toast.error("Error al procesar el pago")}
+                                                                            disabled={isUpdating}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 </RadioGroup>
@@ -2242,29 +2303,37 @@ function CartContent() {
 
                             <div className="space-y-3">
                                 {currentStep === "payment" ? (
-                                    <Button
-                                        className="w-full h-14 text-lg font-bold rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        onClick={handlePlaceOrder}
-                                        disabled={
-                                            createOrderMutation.isPending ||
-                                            isUpdating ||
-                                            !selectedGateway ||
-                                            isRedirecting ||
-                                            preview === null ||
-                                            (preview?.total !== undefined && preview.total <= 0)
-                                        }
-                                    >
-                                        {createOrderMutation.isPending || isRedirecting ? (
-                                            <>
-                                                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                                                {isRedirecting
-                                                    ? "Redirigiendo..."
-                                                    : cartContent.step4.placingOrder}
-                                            </>
-                                        ) : (
-                                            cartContent.step4.placeOrder
-                                        )}
-                                    </Button>
+                                    selectedGateway === "mercadopago_custom" ? (
+                                        <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20 text-center animate-in fade-in duration-500">
+                                            <p className="text-sm font-medium text-primary">
+                                                Completa los datos de tu tarjeta arriba para finalizar la compra.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            className="w-full h-14 text-lg font-bold rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onClick={handlePlaceOrder}
+                                            disabled={
+                                                createOrderMutation.isPending ||
+                                                isUpdating ||
+                                                !selectedGateway ||
+                                                isRedirecting ||
+                                                preview === null ||
+                                                (preview?.total !== undefined && preview.total <= 0)
+                                            }
+                                        >
+                                            {createOrderMutation.isPending || isRedirecting ? (
+                                                <>
+                                                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                                    {isRedirecting
+                                                        ? "Redirigiendo..."
+                                                        : cartContent.step4.placingOrder}
+                                                </>
+                                            ) : (
+                                                cartContent.step4.placeOrder
+                                            )}
+                                        </Button>
+                                    )
                                 ) : (
                                     <Button
                                         className="w-full h-14 text-lg font-bold rounded-full bg-gradient-to-r from-primary to-secondary shadow-lg hover:shadow-xl hover:shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
