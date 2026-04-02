@@ -14,17 +14,17 @@ import { useUIStore } from "@/store/ui";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    Bell,
-    Headphones,
-    Heart,
-    Menu,
-    Package,
-    Search,
-    ShieldCheck,
-    ShoppingCart,
-    Truck,
-    User,
-    X
+      Bell,
+      Headphones,
+      Heart,
+      Menu,
+      Package,
+      Search,
+      ShieldCheck,
+      ShoppingCart,
+      Truck,
+      User,
+      X
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -677,27 +677,7 @@ export function Hero() {
                                             >
                                                 {currentSlideData.subtitle}
                                             </motion.p>
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: 0.5 }}
-                                                className="flex gap-4"
-                                            >
-                                                <Button
-                                                    onClick={() => router.push("/products")}
-                                                    className="bg-white text-primary hover:bg-white/90 font-bold rounded-full px-8 h-12"
-                                                >
-                                                    Ver Productos
-                                                </Button>
-                                                <Button
-                                                    onClick={() => router.push("/profile?tab=orders")}
-                                                    variant="outline"
-                                                    className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-bold rounded-full px-8 h-12 gap-2"
-                                                >
-                                                    <Package size={18} />
-                                                    Rastrear Pedido
-                                                </Button>
-                                            </motion.div>
+                                          
                                         </div>
                                     </motion.div>
                                 </AnimatePresence>
