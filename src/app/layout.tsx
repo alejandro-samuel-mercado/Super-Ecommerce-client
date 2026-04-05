@@ -70,6 +70,17 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                 storeName={config?.storeName}
             />
 
+            {config?.themeColors && Object.keys(config.themeColors).length > 0 && (
+                <style dangerouslySetInnerHTML={{
+                    __html: `:root {
+                        ${Object.entries(config.themeColors)
+                            .filter(([key]) => !key.endsWith('-hex'))
+                            .map(([key, value]) => `--${key}: ${value};`)
+                            .join('\n')}
+                    }`
+                }} />
+            )}
+
             {!isHomePage && <Navbar />}
             <div className={!isHomePage ? "pt-16  md:pt-2  " : "max-sm:px-2 max-md:px-6 max-xl:px-10 overflow-x-hidden"}>
                 {children}

@@ -47,6 +47,7 @@ export interface PublicConfig {
   customPageTextsSubtitle?: string;
   customPageImagesSubtitle?: string;
   customPageVideosSubtitle?: string;
+  themeColors?: Record<string, string>;
 }
 
 export const configService = {
