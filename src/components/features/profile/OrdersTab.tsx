@@ -33,7 +33,7 @@ export function OrdersTab() {
         queryKey: ["orders"],
         queryFn: async () => {
             const token = localStorage.getItem("accessToken");
-            
+
             if (token) {
                 const response = await http<{ success: boolean; data: any[] }>(
                     "/api/sales/my-purchases?includePending=true",
@@ -44,7 +44,7 @@ export function OrdersTab() {
                 // Modo Invitado: Cargar desde localStorage
                 const guestOrders = guestOrderPersistence.getOrders();
                 if (guestOrders.length === 0) return [];
-                
+
                 // Obtener detalles de cada pedido de invitado
                 const detailedOrders = await Promise.all(
                     guestOrders.map(async (go) => {
@@ -56,7 +56,7 @@ export function OrdersTab() {
                         }
                     })
                 );
-                
+
                 return detailedOrders.filter(Boolean);
             }
         },
@@ -130,8 +130,8 @@ export function OrdersTab() {
         setIsDownloading(orderId);
         try {
             const token = localStorage.getItem("accessToken");
-            const endpoint = token 
-                ? `/api/sales/${orderId}/invoice` 
+            const endpoint = token
+                ? `/api/sales/${orderId}/invoice`
                 : `/api/sales/guest/${uuid || orderId}/invoice`;
 
             const blob = await http<Blob>(endpoint, {
@@ -384,7 +384,7 @@ export function OrdersTab() {
                                             />
                                         </div>
                                     </div>
-                                    <p className="text-xs text-purple-600 font-bold text-center">
+                                    <p className="text-xs text-secondary/70  font-bold text-center">
                                         Escanea este QR con tu app bancaria para pagar
                                     </p>
                                 </div>
@@ -667,14 +667,14 @@ function OrderCard({
                             {order.paymentType === 'QR' && (
                                 <Button
                                     variant="outline"
-                                    className="h-12 w-12 rounded-2xl border-2 border-purple-500/40 hover:bg-purple-50 hover:border-purple-500 transition-all p-0"
+                                    className="h-12 w-12 rounded-2xl border-2 border-secondary/40 hover:bg-secondary/10 hover:border-secondary transition-all p-0"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         router.push(`/checkout/pending?saleId=${order.id}`);
                                     }}
                                     title="Ver QR de Pago"
                                 >
-                                    <QrCode className="h-5 w-5 text-purple-600" />
+                                    <QrCode className="h-5 w-5 text-secondary/80" />
                                 </Button>
                             )}
 

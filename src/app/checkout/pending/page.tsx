@@ -39,11 +39,11 @@ function CheckoutPendingContent() {
             const data = await http<any>(endpoint, { method: "GET" });
             const sale = data?.data || data;
             setSaleData(sale);
-            
+
             if (!token && sale?.uuid) {
                 guestOrderPersistence.saveOrder(sale.uuid);
             }
-            
+
             if (sale?.qrPaymentUrl) {
                 setQrUrl(sale.qrPaymentUrl);
             }
@@ -109,7 +109,7 @@ function CheckoutPendingContent() {
         <div className="min-h-screen bg-background text-foreground pb-24 selection:bg-amber-500/20">
             {/* Hero Section */}
             <div className="relative h-[30vh] md:h-[40vh] w-full overflow-hidden px-10">
-                <div className={`absolute inset-0 transition-all duration-1000 ${isQrPayment ? 'bg-gradient-to-br from-purple-500 via-purple-600 to-violet-700' : 'bg-gradient-to-br from-amber-500 via-amber-600 to-orange-700'}`} />
+                <div className={`absolute inset-0 transition-all duration-1000 ${isQrPayment ? 'bg-gradient-to-br from-purple-500 via-secondary to-violet-700' : 'bg-gradient-to-br from-amber-500 via-amber-600 to-orange-700'}`} />
                 <div className="absolute inset-0 bg-black/5 backdrop-blur-[1px]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
@@ -121,7 +121,7 @@ function CheckoutPendingContent() {
                         <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-tight mb-2 tracking-tighter text-primary/80 drop-shadow-2xl">
                             {isQrPayment ? 'Pago por QR' : 'Pago en trámite'}
                         </h1>
-                        <div className={`flex items-center gap-3 text-sm max-md:text-xs font-bold text-white border-4 border-white/20 px-6 max-md:px-3 py-2 w-max shadow-2xl rounded-2xl ${isQrPayment ? 'bg-purple-500' : 'bg-amber-500'}`}>
+                        <div className={`flex items-center gap-3 text-sm max-md:text-xs font-bold text-white border-4 border-white/20 px-6 max-md:px-3 py-2 w-max shadow-2xl rounded-2xl ${isQrPayment ? 'bg-secondary' : 'bg-amber-500'}`}>
                             {isQrPayment ? <QrCode size={20} strokeWidth={3} /> : <Clock size={20} strokeWidth={3} />}
                             {isQrPayment ? 'Escanea el QR para pagar' : 'Estamos procesando tu validación'}
                         </div>
@@ -135,9 +135,9 @@ function CheckoutPendingContent() {
                     <div className="lg:col-span-8 space-y-12">
                         {/* Sección QR */}
                         {isQrPayment && (
-                            <div className="border-4 border-purple-500/20 bg-card p-8 md:p-12 rounded-[2.5rem] shadow-sm">
+                            <div className="border-4 border-secondary/20 bg-card p-8 md:p-12 rounded-[2.5rem] shadow-sm">
                                 <div className="space-y-8">
-                                    <p className="text-xs text-purple-700/60 font-black tracking-widest uppercase">
+                                    <p className="text-xs text-secondary/60 font-black tracking-widest uppercase">
                                         Código QR de Pago
                                     </p>
                                     {qrUrl ? (
@@ -167,7 +167,7 @@ function CheckoutPendingContent() {
                                             <p className="text-base font-medium text-muted-foreground max-w-md mx-auto">
                                                 En breve recibirás el código QR para escanear. También te notificaremos por email cuando esté listo.
                                             </p>
-                                            <p className="text-xs text-purple-500 font-bold animate-pulse">
+                                            <p className="text-xs text-secondary font-bold animate-pulse">
                                                 Actualizando automáticamente...
                                             </p>
                                         </div>
@@ -221,8 +221,8 @@ function CheckoutPendingContent() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {saleId && (
-                                <div className={`p-8 border-4 rounded-[2.5rem] space-y-3 ${isQrPayment ? 'border-purple-500/15 bg-purple-500/5' : 'border-amber-500/15 bg-amber-500/5'}`}>
-                                    <p className={`text-xs font-black tracking-widest uppercase ${isQrPayment ? 'text-purple-700/40' : 'text-amber-700/40'}`}>
+                                <div className={`p-8 border-4 rounded-[2.5rem] space-y-3 ${isQrPayment ? 'border-secondary/15 bg-secondary/5' : 'border-amber-500/15 bg-amber-500/5'}`}>
+                                    <p className={`text-xs font-black tracking-widest uppercase ${isQrPayment ? 'text-secondary/40' : 'text-amber-700/40'}`}>
                                         Referencia
                                     </p>
                                     <p className="text-xl font-bold text-foreground italic">
@@ -243,15 +243,15 @@ function CheckoutPendingContent() {
 
                     {/* Sidebar */}
                     <div className="lg:col-span-4 space-y-8">
-                        <div className={`border-4 bg-card p-8 md:p-10 rounded-[2.5rem] shadow-lg sticky top-8 ${isQrPayment ? 'border-purple-500/40' : 'border-amber-500/40'}`}>
-                            <p className={`text-xs font-black tracking-widest uppercase mb-8 ${isQrPayment ? 'text-purple-700/40' : 'text-amber-700/40'}`}>
+                        <div className={`border-4 bg-card p-8 md:p-10 rounded-[2.5rem] shadow-lg sticky top-8 ${isQrPayment ? 'border-secondary/40' : 'border-amber-500/40'}`}>
+                            <p className={`text-xs font-black tracking-widest uppercase mb-8 ${isQrPayment ? 'text-secondary/40' : 'text-amber-700/40'}`}>
                                 Siguientes pasos
                             </p>
 
                             <div className="space-y-10">
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-4">
-                                        <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-black text-xs ${isQrPayment ? 'bg-purple-500/10 text-purple-700' : 'bg-amber-500/10 text-amber-700'}`}>
+                                        <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-black text-xs ${isQrPayment ? 'bg-secondary/10 text-secondary' : 'bg-amber-500/10 text-amber-700'}`}>
                                             !
                                         </div>
                                         <p className="text-sm font-bold text-foreground/80 leading-normal">
@@ -261,7 +261,7 @@ function CheckoutPendingContent() {
                                         </p>
                                     </div>
                                     <div className="flex items-start gap-4">
-                                        <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-black text-xs ${isQrPayment ? 'bg-purple-500/10 text-purple-700' : 'bg-amber-500/10 text-amber-700'}`}>
+                                        <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-black text-xs ${isQrPayment ? 'bg-secondary/10 text-secondary' : 'bg-amber-500/10 text-amber-700'}`}>
                                             ?
                                         </div>
                                         <p className="text-sm font-bold text-foreground/80 leading-normal">
