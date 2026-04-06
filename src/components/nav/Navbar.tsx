@@ -2,17 +2,21 @@
 
 import { navbar } from "@/../content/navbar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { configService } from "@/services/config";
 import { productService } from "@/services/products";
 import { useCartStore } from "@/store/cart";
+import { useCurrencyStore } from "@/store/currency";
 import { useNotificationStore } from "@/store/notifications";
 import { useUIStore } from "@/store/ui";
 import { Product } from "@/types";
+import { formatPrice } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, Heart, Menu, Package, ShoppingCart, User, X } from "lucide-react";
+import { Bell, Heart, Menu, Package, Search, ShoppingCart, User, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -36,6 +40,9 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
   const [hasGuestOrders, setHasGuestOrders] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const { currency } = useCurrencyStore();
+  const searchContainerRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -108,7 +115,10 @@ export function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+      if (
+        searchRef.current && !searchRef.current.contains(e.target as Node) &&
+        searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)
+      ) {
         setShowSearchResults(false);
       }
     };
@@ -117,21 +127,24 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (pathname === "/products") {
+    if (pathname.includes("/products")) {
       return;
     }
 
     if (debouncedSearch.trim()) {
+      setIsSearching(true);
       productService
         .searchProducts(debouncedSearch as unknown as string)
         .then((res) => {
           setSearchResults(res.data.slice(0, navbar.search.sitewideLimit));
           setShowSearchResults(true);
         })
-        .catch(() => setSearchResults([]));
+        .catch(() => setSearchResults([]))
+        .finally(() => setIsSearching(false));
     } else {
       setSearchResults([]);
       setShowSearchResults(false);
+      setIsSearching(false);
     }
   }, [debouncedSearch, pathname]);
 
@@ -271,10 +284,144 @@ export function Navbar() {
             >
               Todos
             </Link>
+
+            {!pathname.includes("/products") && (
+              <form
+                ref={searchContainerRef}
+                onSubmit={handleSearchSubmit}
+                className="relative hidden lg:block ml-4"
+              >
+                <Input
+                  type="search"
+                  placeholder={navbar.search.placeholder}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setShowSearchResults(true)}
+                  className={`w-64 pr-10 rounded-lg transition-all ${
+                    scrolled
+                      ? "bg-white/20 focus:bg-white/40 text-white placeholder:text-white/60 border-white/20"
+                      : "bg-gray-100 focus:bg-white text-gray-700 placeholder:text-gray-500 border-transparent"
+                  }`}
+                />
+                <Search className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 ${scrolled ? "text-white/60" : "text-gray-500"}`} />
+
+                <AnimatePresence>
+                  {showSearchResults && searchQuery.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-md shadow-xl rounded-xl p-2 max-h-80 w-80 overflow-auto z-50 border border-border"
+                    >
+                      {isSearching ? (
+                        <div className="p-4 text-center text-muted-foreground text-sm">
+                          Buscando...
+                        </div>
+                      ) : searchResults.length > 0 ? (
+                        <>
+                          {searchResults.map((product) => (
+                            <Link
+                              key={product.id}
+                              href={`/products/${product.qr || product.id}`}
+                              className="flex items-center justify-between gap-3 p-2 hover:bg-primary/5 rounded-lg transition-colors w-full"
+                              onClick={() => setShowSearchResults(false)}
+                            >
+                              <div className="flex items-center gap-3 w-full">
+                                <div className="relative w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden flex-shrink-0">
+                                  {product.images && product.images[0] ? (
+                                    <Image
+                                      src={(product.images[0] as any).url || product.images[0]}
+                                      alt={product.name}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <Package className="w-5 h-5 text-gray-400" />
+                                  )}
+                                </div>
+                                <div className="flex flex-col flex-grow min-w-0 text-left">
+                                  <span className="font-semibold text-sm truncate text-gray-900 block">
+                                    {product.name}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground truncate block">
+                                    {product.brand || "Sin marca"}
+                                  </span>
+                                  <span className="text-sm text-primary font-bold mt-0.5 block">
+                                    {formatPrice(
+                                      product.basePrice || product.price,
+                                      product.currencyCode || currency,
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                          <div className="mt-2 text-center border-t pt-2">
+                            <Link
+                              href={`/products?search=${encodeURIComponent(searchQuery)}`}
+                              className="text-xs text-primary hover:underline font-semibold block w-full py-1"
+                              onClick={() => setShowSearchResults(false)}
+                            >
+                              Ver todos los resultados para &quot;{searchQuery}&quot;
+                            </Link>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="p-4 text-center text-muted-foreground text-sm">
+                          No se encontraron productos.
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </form>
+            )}
           </nav>
 
           <div className="flex items-center gap-1 lg:gap-4" ref={searchRef}>
-            
+            {!pathname.includes("/products") && (
+              <div className="flex items-center">
+                <AnimatePresence>
+                  {isMobileSearchExpanded && (
+                    <motion.form
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: "160px", opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      onSubmit={handleSearchSubmit}
+                      className="lg:hidden flex items-center relative mr-2"
+                    >
+                      <input
+                        autoFocus
+                        type="text"
+                        placeholder="Buscar..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className={`w-full h-9 px-3 pr-8 rounded-full text-xs focus:outline-none transition-all ${
+                          scrolled
+                            ? "bg-white/20 border-white/30 text-white placeholder:text-white/70"
+                            : "bg-gray-100 border-gray-200 text-gray-900 placeholder:text-gray-500"
+                        } border`}
+                      />
+                      <button type="submit" className={`absolute right-2 ${scrolled ? "text-white" : "text-gray-500"}`}>
+                        <Search className="h-4 w-4" />
+                      </button>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+
+                <Button
+                  variant="ghost"
+                  className={`rounded-lg p-2 h-auto w-auto lg:hidden ${scrolled ? "text-white hover:bg-white/20" : "text-primary hover:bg-secondary/10"}`}
+                  onClick={() => setIsMobileSearchExpanded(!isMobileSearchExpanded)}
+                >
+                  {isMobileSearchExpanded ? (
+                    <X className="!h-6 !w-6" />
+                  ) : (
+                    <Search className="!h-6 !w-6" />
+                  )}
+                </Button>
+              </div>
+            )}
 
             {mounted && (
               <Button
