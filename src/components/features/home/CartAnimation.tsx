@@ -39,9 +39,9 @@ export default function CartAnimation({ invert = false }: CartAnimationProps) {
                   x2="100%"
                   y2="0%"
                 >
-                  <stop offset="0%" stopColor="#d8b4fe" />
-                  <stop offset="50%" stopColor="#a855f7" />
-                  <stop offset="100%" stopColor="#ec4899" />
+                  <stop offset="0%" stopColor="#f0eaf7e0" />
+                  <stop offset="50%" stopColor="hsl(var(--secondary))" />
+                  <stop offset="100%" stopColor="hsl(var(--primary))" />
                 </linearGradient>
 
                 <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -126,14 +126,14 @@ export default function CartAnimation({ invert = false }: CartAnimationProps) {
                 cx={startX}
                 cy="170"
                 r="8"
-                fill="#a855f7"
+                fill="hsl(var(--secondary))"
                 className="max-md:[r:16px]"
               />
               <circle
                 cx={endX}
                 cy="330"
                 r="8"
-                fill="#ec4899"
+                fill="hsl(var(--primary))"
                 className="max-md:[r:16px]"
               />
 
@@ -142,7 +142,7 @@ export default function CartAnimation({ invert = false }: CartAnimationProps) {
                 x={invert ? startX-20 : startX + 20}
                 y="50"
                 textAnchor="middle"
-                fill="#a855f7"
+                fill="hsl(var(--secondary))"
                 fontSize="20"
                 className="max-md:[font-size:44px] md:[font-size:26px]"
                 style={{ fontWeight: "bold" }}
@@ -154,7 +154,7 @@ export default function CartAnimation({ invert = false }: CartAnimationProps) {
                 x={invert ? endX +40: endX-40}
                 y="420"
                 textAnchor="middle"
-                fill="#ec4899"
+                fill="hsl(var(--primary))"
                 fontSize="20"
                 className="max-md:[font-size:44px] md:[font-size:26px]"
                 style={{ fontWeight: "bold" }}
