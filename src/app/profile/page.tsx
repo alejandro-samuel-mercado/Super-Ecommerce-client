@@ -11,14 +11,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PublicConfig, configService } from "@/services/config";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    Gift,
-    Heart,
-    LogOut,
-    Mail,
-    MapPin,
-    MessageSquare,
-    Package,
-    User as UserIcon
+      Gift,
+      Heart,
+      LogOut,
+      Mail,
+      MapPin,
+      MessageSquare,
+      Package,
+      User as UserIcon
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -109,7 +109,7 @@ function ProfileContent() {
               className="bg-white/20 hover:bg-destructive/20 hover:text-destructive-foreground backdrop-blur-md border border-white/20 rounded-2xl gap-2 transition-all group font-bold"
             >
               <LogOut className="w-4 h-4" />
-              <span className="text-xs uppercase tracking-wider">
+              <span className="text-xs uppercase tracking-wider text-white">
                 Cerrar Sesión
               </span>
             </Button>
@@ -135,7 +135,7 @@ function ProfileContent() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-primary">{user.name?.charAt(0)}</span>
+                  <span className="text-secondary">{user.name?.charAt(0)}</span>
                 )}
               </div>
             </div>
@@ -158,13 +158,13 @@ function ProfileContent() {
               </h1>
               <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm font-medium max-sm:justify-center">
                 <span className="flex items-center gap-1.5 bg-primary/5 px-3 py-1 rounded-full">
-                  <Mail className="w-4 h-4 text-primary" /> {user.email}
+                  <Mail className="w-4 h-4 text-secondary" /> {user.email}
                 </span>
                 <span className="flex items-center gap-1.5 bg-secondary/5 px-3 py-1 rounded-full">
                   <MapPin className="w-4 h-4 text-secondary" />{" "}
                   {user.city || "Ciudad no especificada"}
                 </span>
-                <span className="bg-card px-3 py-1 rounded-full text-[10px] border-4 border-secondary/30 uppercase font-black tracking-widest text-primary">
+                <span className="bg-card px-3 py-1 rounded-full text-[10px] border-4 border-secondary/30 uppercase font-black tracking-widest text-">
                   {(user.role as any)?.name==="CUSTOMER"?"Cliente":"Personal"}
                 </span>
               </div>

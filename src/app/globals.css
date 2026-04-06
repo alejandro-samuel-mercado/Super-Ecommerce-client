@@ -7,6 +7,7 @@
     
     --background: 270 40% 97%; 
     --foreground: 320 35% 25%; 
+    --texto-principal: 320 35% 25%;
     
     --card: 270 20% 97%;
     --card-foreground: 320 35% 25%;
@@ -16,9 +17,11 @@
     
     --primary: 324 39% 51%; 
     --primary-foreground: 0 0% 100%;
+    --texto-primario: 0 0% 100%;
     
     --secondary:  270 91% 65%; 
     --secondary-foreground: 0 0% 100%;
+    --texto-secundario: 0 0% 100%;
     
     --muted: 48 81% 76%; 
     --muted-foreground: 320 20% 40%;
@@ -39,6 +42,7 @@
   .dark {
     --background: 320 30% 12%;
     --foreground: 60 100% 95%;
+    --texto-principal: 60 100% 95%;
     
     --card: 320 25% 15%;
     --card-foreground: 60 100% 95%;
@@ -48,9 +52,11 @@
     
     --primary: 324 39% 51%;
     --primary-foreground: 0 0% 100%;
+    --texto-primario: 0 0% 100%;
     
     --secondary:#a855f7;
     --secondary-foreground: 0 0% 100%;
+    --texto-secundario: 0 0% 100%;
     
     --muted: 320 20% 22%;
     --muted-foreground: 48 40% 70%;
