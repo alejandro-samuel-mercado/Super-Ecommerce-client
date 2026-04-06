@@ -35,7 +35,7 @@ export function ScrollBackground() {
 
       {/* Blob Animado 2 */}
       <motion.div
-        className="absolute top-1/4 -right-40 w-[700px] h-[700px] sm:bg-gradient-to-tl sm:from-purple-400/35 sm:to-pink-400/35 rounded-full blur-3xl"
+        className="absolute top-1/4 -right-40 w-[700px] h-[700px] sm:bg-gradient-to-tl sm:from-secondary/35 sm:to-pink-400/35 rounded-full blur-3xl"
         style={{
           rotate,
           opacity: useTransform(

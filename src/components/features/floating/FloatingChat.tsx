@@ -116,7 +116,7 @@ export function FloatingChat() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -z-10 translate-x-10 -translate-y-10"></div>
 
             {/* Header*/}
-            <div className="p-5 bg-gradient-to-r from-primary/90 to-purple-600/90 backdrop-blur-md text-white flex justify-between items-center shadow-lg">
+            <div className="p-5 bg-gradient-to-r from-primary/90 to-secondary/90 backdrop-blur-md text-white flex justify-between items-center shadow-lg">
               <div className="flex items-center gap-3">
                 <div className="bg-white/20 p-2.5 rounded-full shadow-inner border border-white/10">
                   <Bot className="w-6 h-6" />
@@ -161,7 +161,7 @@ export function FloatingChat() {
                     }`}
                   >
                     {msg.sender === "ADMIN" && (
-                      <span className="block text-[10px] font-bold text-purple-600 mb-1 uppercase tracking-wider">
+                      <span className="block text-[10px] font-bold text-secondary mb-1 uppercase tracking-wider">
                         Agente
                       </span>
                     )}
@@ -233,7 +233,7 @@ export function FloatingChat() {
 
       <Button
         size="lg"
-        className="rounded-full h-14 w-14 shadow-[0_8px_30px_rgba(0,0,0,0.12)] bg-gradient-to-tr from-primary to-purple-600 hover:scale-110 hover:shadow-primary/40 transition-all duration-300 z-50 sm:flex hidden"
+        className="rounded-full h-14 w-14 shadow-[0_8px_30px_rgba(0,0,0,0.12)] bg-gradient-to-tr from-primary to-secondary hover:scale-110 hover:shadow-primary/40 transition-all duration-300 z-50 sm:flex hidden"
         onClick={toggleChat}
       >
         <MessageSquare className="w-7 h-7 text-white" />

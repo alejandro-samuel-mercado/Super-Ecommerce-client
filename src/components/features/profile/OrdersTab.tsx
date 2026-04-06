@@ -371,12 +371,12 @@ export function OrdersTab() {
 
                             {/* QR de Pago */}
                             {selectedOrder.paymentType === 'QR' && selectedOrder.qrPaymentUrl && (
-                                <div className="border-4 border-purple-500/20 bg-purple-50/30 dark:bg-purple-900/10 p-6 rounded-[2rem] space-y-4">
-                                    <p className="text-[10px] text-purple-700/60 font-black tracking-[0.4em] flex items-center gap-2">
+                                <div className="border-4 border-secondary/20 bg-secondary/30 dark:bg-secondary/10 p-6 rounded-[2rem] space-y-4">
+                                    <p className="text-[10px] text-secondary/60 font-black tracking-[0.4em] flex items-center gap-2">
                                         <QrCode size={14} /> CÓDIGO QR DE PAGO
                                     </p>
                                     <div className="flex justify-center">
-                                        <div className="bg-white p-4 rounded-2xl border-2 border-purple-200 shadow-sm inline-block">
+                                        <div className="bg-white p-4 rounded-2xl border-2 border-secondary/20 shadow-sm inline-block">
                                             <img
                                                 src={selectedOrder.qrPaymentUrl}
                                                 alt="QR de Pago"

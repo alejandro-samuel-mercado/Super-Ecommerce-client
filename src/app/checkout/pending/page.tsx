@@ -109,7 +109,7 @@ function CheckoutPendingContent() {
         <div className="min-h-screen bg-background text-foreground pb-24 selection:bg-amber-500/20">
             {/* Hero Section */}
             <div className="relative h-[30vh] md:h-[40vh] w-full overflow-hidden px-10">
-                <div className={`absolute inset-0 transition-all duration-1000 ${isQrPayment ? 'bg-gradient-to-br from-purple-500 via-secondary to-violet-700' : 'bg-gradient-to-br from-amber-500 via-amber-600 to-orange-700'}`} />
+                <div className={`absolute inset-0 transition-all duration-1000 ${isQrPayment ? 'bg-gradient-to-br from-secondary/50 via-secondary to-secondary/50' : 'bg-gradient-to-br from-amber-500 via-amber-600 to-orange-700'}`} />
                 <div className="absolute inset-0 bg-black/5 backdrop-blur-[1px]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 

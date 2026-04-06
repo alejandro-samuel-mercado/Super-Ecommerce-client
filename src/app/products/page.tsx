@@ -443,7 +443,7 @@ function ProductsContent() {
               <div
               className="sticky top-24"
             >
-              <div className="bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 border-4 border-gray-200 rounded-[2rem] p-6 shadow-2xl shadow-primary/70">
+              <div className="bg-gradient-to-br from-white via-secondary/30 to-pink-50/30 border-4 border-gray-200 rounded-[2rem] p-6 shadow-2xl shadow-primary/70">
                 <div className="mb-6 0">
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
                     {productsContent.listing.filters.title}
